@@ -5,48 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coin Pop</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div id="login-screen" class="screen active">
-        <div class="card">
-            <h1>Welcome to Coin Pop</h1>
-            <p>The fun-tastic bubble shooter where every pop gets you closer to real rewards.</p>
-            <input type="text" id="username-input" placeholder="Enter your name">
-            <button id="login-button">Start Popping</button>
+        <div class="login-wrapper">
+            <div class="intro-card">
+                <img src="https://i.imgur.com/G9C4z1B.png" alt="Coin Pop Logo" class="intro-logo"> <h2>Welcome to Coin Pop</h2>
+                <p>The fun-tastic bubble shooter where every pop gets you closer to real rewards. Collect coins, convert them to cash, and withdraw your earnings!</p>
+            </div>
+            <div class="signup-card">
+                <h3>Get Popping!</h3>
+                <p>Sign in or create an account to start earning.</p>
+                <div class="auth-toggle">
+                    <button id="signInTab" class="active">Sign in</button>
+                    <button id="signUpTab">Sign Up</button>
+                </div>
+                <input type="text" id="email-input" placeholder="Email (e.g., m@example.com)">
+                <input type="password" id="password-input" placeholder="Password">
+                <button id="auth-submit-button">Sign In</button>
+            </div>
         </div>
     </div>
 
     <div id="app-container" style="display: none;">
         <header>
-            <div class="logo">Coin Pop</div>
-            <div class="wallet-display">
-                <span id="coin-balance-display">Coins: 0</span>
+            <div class="header-left">
+                <img src="https://i.imgur.com/G9C4z1B.png" alt="Coin Pop Logo" class="header-logo"> <nav>
+                    <button class="nav-btn active" data-screen="dashboard-screen">Dashboard</button>
+                    <button class="nav-btn" data-screen="play-screen">Play</button>
+                    <button id="withdraw-nav-btn" class="nav-btn" data-screen="withdraw-screen" disabled>Withdraw</button>
+                    </nav>
             </div>
-            <nav>
-                <button class="nav-btn" data-screen="dashboard-screen">Dashboard</button>
-                <button class="nav-btn" data-screen="play-screen">Play</button>
-                <button id="withdraw-nav-btn" class="nav-btn" data-screen="withdraw-screen" disabled>Withdraw</button>
-            </nav>
+            <div class="header-right">
+                <div class="user-info">
+                    <span id="coin-balance-display">115</span>
+                    <button id="sign-out-btn">Sign Out</button>
+                </div>
+            </div>
         </header>
 
         <main>
-            <div id="dashboard-screen" class="screen">
-                <div class="card">
-                    <h2>Ready to Play?</h2>
+            <div id="dashboard-screen" class="screen active">
+                <div class="welcome-banner card">
+                    <h2>Welcome back! Let's get popping.</h2>
+                </div>
+                <div class="card ready-to-play">
+                    <h3>Ready to Play?</h3>
                     <p>Dive into the fun and watch your earnings grow.</p>
                     <button id="play-now-btn">Play Coin Pop</button>
                 </div>
-                <div class="card">
+                <div class="card my-wallet">
                     <h3>My Wallet</h3>
-                    <p>Coin Balance: <span id="wallet-coin-balance">115</span></p>
-                    <p>PKR Value: <strong id="wallet-pkr-value">PKR 1.15</strong></p>
-                    <div class="progress-bar-container">
-                        <div id="withdrawal-progress" class="progress-bar"></div>
+                    <div class="wallet-summary">
+                        <div class="wallet-item">
+                            <span class="icon">💰</span>
+                            <span class="label">Coin Balance</span>
+                            <span id="wallet-coin-balance" class="value">115</span>
+                        </div>
+                        <div class="wallet-item">
+                            <span class="icon"> PKR </span>
+                            <span class="label">PKR Value</span>
+                            <strong id="wallet-pkr-value" class="value">PKR 1.15</strong>
+                        </div>
                     </div>
-                    <p id="withdrawal-message">You need to reach PKR 250 to unlock withdrawals.</p>
+                    <div class="progress-container">
+                        <div class="progress-bar-container">
+                            <div id="withdrawal-progress" class="progress-bar"></div>
+                        </div>
+                        <p id="withdrawal-message">You need to reach PKR 250 to unlock withdrawals.</p>
+                    </div>
                 </div>
-                 <div class="card">
+                 <div class="card how-it-works">
                     <h3>How it Works</h3>
                     <ol>
                         <li>Play the balloon popper game to earn coins.</li>
@@ -72,9 +103,9 @@
                  <div class="card">
                     <h2>Withdraw Earnings</h2>
                     <p>Transfer your earnings to your Jazzcash or Easypaisa wallet.</p>
-                    <p>Current Balance: <strong id="withdraw-pkr-balance">PKR 0.00</strong></p>
+                    <p class="current-balance">Current Balance: <strong id="withdraw-pkr-balance">PKR 0.00</strong></p>
                     <form id="withdraw-form">
-                        <input type="number" id="withdraw-amount" placeholder="Amount (PKR)" required>
+                        <input type="number" id="withdraw-amount" placeholder="Amount (PKR)" required min="250">
                         <select id="payment-method" required>
                             <option value="">Select Payment Method</option>
                             <option value="Jazzcash">Jazzcash</option>
@@ -84,8 +115,89 @@
                         <button type="submit">Submit Request</button>
                     </form>
                 </div>
+                <div class="card transaction-history">
+                    <h3>Transaction History</h3>
+                    <p>No transactions yet.</p>
+                    </div>
             </div>
+
+            <div id="description-screen" class="screen">
+                <div class="card">
+                    <h2>About Coin Pop</h2>
+                    <p>Coin Pop is an engaging online earning game where you pop balloons to collect virtual coins. These coins can then be converted into real Pakistani Rupees (PKR) and withdrawn directly to your Jazzcash or Easypaisa accounts.</p>
+                    <p>Our mission is to provide a fun, accessible, and rewarding experience for everyone. Start playing today and turn your taps into cash!</p>
+                    <h3>Our Vision</h3>
+                    <p>To be the leading casual gaming platform that empowers users to earn real money while enjoying simple, engaging games.</p>
+                </div>
+            </div>
+
+            <div id="privacy-screen" class="screen">
+                <div class="card">
+                    <h2>Privacy Policy</h2>
+                    <p>Your privacy is important to us. This policy explains what information we collect, how we use it, and your choices regarding your data.</p>
+                    <h3>Information We Collect</h3>
+                    <ul>
+                        <li>**User Data:** Your chosen username (if applicable) and in-game progress (coin balance, game scores). This is stored locally on your device.</li>
+                        <li>**Withdrawal Information (if submitted):** Amount, payment method (Jazzcash/Easypaisa), and account number provided by you for withdrawal purposes. This data is for processing your manual payout requests.</li>
+                    </ul>
+                    <h3>How We Use Your Information</h3>
+                    <ul>
+                        <li>To enable you to play the game and track your earnings.</li>
+                        <li>To process your withdrawal requests manually.</li>
+                        <li>To improve our services (e.g., game performance, user experience).</li>
+                    </ul>
+                    <h3>Data Security</h3>
+                    <p>We implement various security measures to maintain the safety of your personal information when you enter, submit, or access your personal information.</p>
+                    <p>For this client-side demo, data is stored in your browser's local storage. For a production app, secure server-side storage would be used.</p>
+                    <p>By using our site, you consent to our privacy policy.</p>
+                </div>
+            </div>
+
+            <div id="contact-screen" class="screen">
+                <div class="card">
+                    <h2>Contact Us</h2>
+                    <p>Have questions, feedback, or need support? We're here to help!</p>
+                    <p><strong>Email:</strong> support@coinpopgame.com</p>
+                    <p><strong>Phone:</strong> +92 3XX XXXXXXX (Mon-Fri, 9 AM - 5 PM PKT)</p>
+                    <p><strong>Address:</strong> [Your Company Address Here], [City], Pakistan</p>
+                    <h3>Send Us a Message</h3>
+                    <form id="contact-form">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="security-screen" class="screen">
+                <div class="card">
+                    <h2>Security Services</h2>
+                    <p>At Coin Pop, we take the security of your account and earnings seriously. While this demo uses client-side storage, a production application would employ robust server-side security measures.</p>
+                    <h3>Key Security Practices (for a production environment):</h3>
+                    <ul>
+                        <li>**Encrypted Data Transmission:** All communication between your device and our servers would be encrypted using HTTPS/SSL.</li>
+                        <li>**Secure User Authentication:** Using industry-standard protocols for password hashing and secure session management.</li>
+                        <li>**Database Security:** Strict access controls and regular audits to protect user data.</li>
+                        <li>**Fraud Prevention:** Systems to detect and prevent fraudulent activities, especially concerning withdrawals.</li>
+                        <li>**Regular Security Audits:** Our systems would be regularly reviewed for vulnerabilities.</li>
+                    </ul>
+                    <p>We are committed to providing a secure and trustworthy platform for all our users.</p>
+                </div>
+            </div>
+
+
         </main>
+
+        <footer>
+            <nav class="footer-nav">
+                <button class="nav-btn" data-screen="description-screen">About Us</button>
+                <button class="nav-btn" data-screen="privacy-screen">Privacy Policy</button>
+                <button class="nav-btn" data-screen="security-screen">Security</button>
+                <button class="nav-btn" data-screen="contact-screen">Contact</button>
+            </nav>
+            <p>&copy; 2023 Coin Pop. All rights reserved.</p>
+        </footer>
     </div>
 
     <div id="level-complete-modal" class="modal">

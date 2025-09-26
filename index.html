@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Pop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="login-screen" class="screen active">
+        <div class="card">
+            <h1>Welcome to Coin Pop</h1>
+            <p>The fun-tastic bubble shooter where every pop gets you closer to real rewards.</p>
+            <input type="text" id="username-input" placeholder="Enter your name">
+            <button id="login-button">Start Popping</button>
+        </div>
+    </div>
+
+    <div id="app-container" style="display: none;">
+        <header>
+            <div class="logo">Coin Pop</div>
+            <div class="wallet-display">
+                <span id="coin-balance-display">Coins: 0</span>
+            </div>
+            <nav>
+                <button class="nav-btn" data-screen="dashboard-screen">Dashboard</button>
+                <button class="nav-btn" data-screen="play-screen">Play</button>
+                <button id="withdraw-nav-btn" class="nav-btn" data-screen="withdraw-screen" disabled>Withdraw</button>
+            </nav>
+        </header>
+
+        <main>
+            <div id="dashboard-screen" class="screen">
+                <div class="card">
+                    <h2>Ready to Play?</h2>
+                    <p>Dive into the fun and watch your earnings grow.</p>
+                    <button id="play-now-btn">Play Coin Pop</button>
+                </div>
+                <div class="card">
+                    <h3>My Wallet</h3>
+                    <p>Coin Balance: <span id="wallet-coin-balance">115</span></p>
+                    <p>PKR Value: <strong id="wallet-pkr-value">PKR 1.15</strong></p>
+                    <div class="progress-bar-container">
+                        <div id="withdrawal-progress" class="progress-bar"></div>
+                    </div>
+                    <p id="withdrawal-message">You need to reach PKR 250 to unlock withdrawals.</p>
+                </div>
+                 <div class="card">
+                    <h3>How it Works</h3>
+                    <ol>
+                        <li>Play the balloon popper game to earn coins.</li>
+                        <li>Every 100 coins automatically convert to PKR 1 in your wallet.</li>
+                        <li>Once you have PKR 250, the withdrawal option appears.</li>
+                        <li>Withdraw your earnings via Jazzcash or Easypaisa!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="play-screen" class="screen">
+                <div id="game-intro" class="card">
+                    <h2>New Challenge!</h2>
+                    <p>Pop <strong id="target-score">20</strong> balloons to complete the level and earn <strong id="reward-coins">5</strong> coins.</p>
+                    <button id="start-level-btn">Start Level</button>
+                </div>
+                <div id="game-area" style="display: none;">
+                     <div id="game-hud">Score: <span id="current-score">0</span> / <span id="hud-target-score">20</span></div>
+                </div>
+            </div>
+
+            <div id="withdraw-screen" class="screen">
+                 <div class="card">
+                    <h2>Withdraw Earnings</h2>
+                    <p>Transfer your earnings to your Jazzcash or Easypaisa wallet.</p>
+                    <p>Current Balance: <strong id="withdraw-pkr-balance">PKR 0.00</strong></p>
+                    <form id="withdraw-form">
+                        <input type="number" id="withdraw-amount" placeholder="Amount (PKR)" required>
+                        <select id="payment-method" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="Jazzcash">Jazzcash</option>
+                            <option value="Easypaisa">Easypaisa</option>
+                        </select>
+                        <input type="text" id="account-number" placeholder="Account Number" required>
+                        <button type="submit">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="level-complete-modal" class="modal">
+        <div class="modal-content">
+            <h2>Level Complete!</h2>
+            <p>You earned <span id="modal-coins-earned">5</span> coins!</p>
+            <button id="next-level-btn">Next Level</button>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>

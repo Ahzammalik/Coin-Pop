@@ -337,16 +337,25 @@ function showApp() {
     showScreen('dashboard-screen');
     updateDashboard();
 
-    // --- Add this logic ---
-    // Check if the logged-in user is the admin
-    const adminNavBtn = document.getElementById('admin-nav-btn');
-    if (user.name.toLowerCase() === 'ghazimalik1997@gmail.com') {
-        // If they are, show the admin button in the navigation
-        adminNavBtn.style.display = 'inline-block';
-        console.log("Admin access granted.");
+// Replace your old handleLogin function with this one
+
+function handleLogin() {
+    // Get values from the new email and password fields
+    const emailInput = document.getElementById('email-input').value.trim();
+    const passwordInput = document.getElementById('password-input').value.trim();
+
+    // The admin credentials (insecurely stored)
+    const adminEmail = 'ghazimalik1997@gmail.com';
+    const adminPassword = 'ABC123';
+
+    // Check if the entered email and password match the admin credentials
+    if (emailInput.toLowerCase() === adminEmail && passwordInput === adminPassword) {
+        // If they match, treat them as the admin user
+        user.name = adminEmail; // Set the user's name to the email
+        saveData();
+        showApp(); // This function shows the main app and the admin button
     } else {
-        // Otherwise, make sure it's hidden
-        adminNavBtn.style.display = 'none';
+        // If they don't match, show an error
+        alert('Invalid email or password. Please try again.');
     }
-    // --- End of new logic ---
 }

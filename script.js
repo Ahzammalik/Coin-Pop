@@ -329,3 +329,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
+// Find your existing showApp() function and add the 'if' block.
+
+function showApp() {
+    loginScreen.style.display = 'none';
+    appContainer.style.display = 'block';
+    showScreen('dashboard-screen');
+    updateDashboard();
+
+    // --- Add this logic ---
+    // Check if the logged-in user is the admin
+    const adminNavBtn = document.getElementById('admin-nav-btn');
+    if (user.name.toLowerCase() === 'ghazimalik1997@gmail.com') {
+        // If they are, show the admin button in the navigation
+        adminNavBtn.style.display = 'inline-block';
+        console.log("Admin access granted.");
+    } else {
+        // Otherwise, make sure it's hidden
+        adminNavBtn.style.display = 'none';
+    }
+    // --- End of new logic ---
+}

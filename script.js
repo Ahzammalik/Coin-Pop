@@ -1,235 +1,150 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // =================================================================
-    // STATE MANAGEMENT & CONFIGURATION
-    // =================================================================
-    let user = {
-        name: '',
-        coins: 0
-    };
-    const MIN_WITHDRAWAL_PKR = 250;
-    const COINS_PER_PKR = 100;
+    // --- APP-WIDE LOGIC ---
 
-    // Admin Credentials (NOTE: Not secure, for testing only)
-    const ADMIN_EMAIL = 'ghazimalik1997@gmail.com';
-    const ADMIN_PASSWORD = 'ABC123';
+    const userEmailDisplay = document.getElementById('user-email-display');
+    const coinBalanceDisplay = document.getElementById('coin-balance-display');
+    const logoutBtn = document.getElementById('logout-btn');
+    const adminNavLink = document.getElementById('admin-nav-link');
 
-    // Game Variables
-    let currentScore = 0;
-    let targetScore = 20;
-    let rewardCoins = 5;
-    let gameInterval;
-
-    // =================================================================
-    // DOM ELEMENT SELECTION
-    // =================================================================
-    const loginScreen = document.getElementById('login-screen');
-    const loginButton = document.getElementById('login-button');
-    const appContainer = document.getElementById('app-container');
-    const screens = document.querySelectorAll('#app-container .screen');
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const playNowBtn = document.getElementById('play-now-btn');
-    const levelCompleteModal = document.getElementById('level-complete-modal');
-    const nextLevelBtn = document.getElementById('next-level-btn');
-    const withdrawForm = document.getElementById('withdraw-form');
-
-    // =================================================================
-    // INITIALIZATION
-    // =================================================================
-    function init() {
-        loadData();
-        if (user.name) {
-            showApp();
-        } else {
-            loginScreen.style.display = 'flex'; // Use flex for centering
-            appContainer.style.display = 'none';
+    // For simulation: Create a dummy user if one doesn't exist.
+    // In a real app, users would be created during signup.
+    function initializeDummyUser() {
+        if (!localStorage.getItem('user_test@example.com')) {
+            const dummyUser = {
+                email: 'test@example.com',
+                password: 'password123', // In a real app, this should be hashed.
+                coins: 100,
+                isAdmin: true, // Set to true to test admin link
+                lastClaimTime: null // No rewards claimed yet
+            };
+            localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
         }
-
-        // Attach all primary event listeners
-        if (loginButton) {
-            loginButton.addEventListener('click', handleLogin);
-        }
-        navButtons.forEach(btn => btn.addEventListener('click', handleNav));
-        playNowBtn.addEventListener('click', () => showScreen('play-screen'));
-        document.getElementById('start-level-btn').addEventListener('click', startGame);
-        nextLevelBtn.addEventListener('click', handleNextLevel);
-        withdrawForm.addEventListener('submit', handleWithdrawal);
-    }
-
-    // =================================================================
-    // DATA & AUTHENTICATION
-    // =================================================================
-    function saveData() {
-        localStorage.setItem('coinPopUser', JSON.stringify(user));
-    }
-
-    function loadData() {
-        const savedUser = localStorage.getItem('coinPopUser');
-        if (savedUser) {
-            user = JSON.parse(savedUser);
+        // Simulate login by setting the current user
+        if (!localStorage.getItem('currentUser')) {
+            localStorage.setItem('currentUser', 'test@example.com');
         }
     }
 
-    function handleLogin() {
-        const emailInput = document.getElementById('email-input').value.trim();
-        const passwordInput = document.getElementById('password-input').value.trim();
+    initializeDummyUser();
 
-        if (emailInput.toLowerCase() === ADMIN_EMAIL && passwordInput === ADMIN_PASSWORD) {
-            user.name = emailInput;
-            saveData();
-            showApp();
-        } else {
-            // In a real app, you'd check a database for any user.
-            // For this simulation, we'll just show an error if it's not the admin.
-            alert('Invalid email or password. Please try again.');
+    // Check for a logged-in user
+    const currentUserEmail = localStorage.getItem('currentUser');
+    if (!currentUserEmail) {
+        // If no user is logged in, redirect to the login page (assumed to be index.html)
+        window.location.href = 'index.html';
+        return; // Stop further execution
+    }
+
+    // Load user data from localStorage
+    let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+
+    // Function to update user data in both the variable and localStorage
+    function updateUserData(newData) {
+        userData = { ...userData, ...newData };
+        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+        updateUI();
+    }
+
+    // Function to update all UI elements with current user data
+    function updateUI() {
+        if (userEmailDisplay) userEmailDisplay.textContent = userData.email;
+        if (coinBalanceDisplay) coinBalanceDisplay.textContent = `Coins: ${userData.coins}`;
+        if (adminNavLink && userData.isAdmin) {
+            adminNavLink.style.display = 'flex';
         }
     }
 
-    // =================================================================
-    // UI & NAVIGATION
-    // =================================================================
-    function showApp() {
-        loginScreen.style.display = 'none';
-        appContainer.style.display = 'block';
-        showScreen('dashboard-screen');
-        updateDashboard();
+    // Logout functionality
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html'; // Redirect to login
+        });
+    }
 
-        // Check if the logged-in user is the admin to show the admin button
-        const adminNavBtn = document.getElementById('admin-nav-btn');
-        if (user.name.toLowerCase() === ADMIN_EMAIL) {
-            adminNavBtn.style.display = 'inline-block';
-        } else {
-            adminNavBtn.style.display = 'none';
+    // Initial UI update on page load
+    updateUI();
+
+
+    // --- DAILY REWARDS PAGE-SPECIFIC LOGIC ---
+
+    const claimButton = document.getElementById('claim-reward-btn');
+    const rewardMessage = document.getElementById('reward-message');
+    const timerMessage = document.getElementById('timer-message');
+
+    // This ensures the following code only runs on the rewards page
+    if (claimButton) {
+        const REWARD_AMOUNT = 50;
+        const COOLDOWN_PERIOD = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        let countdownInterval;
+
+        function checkRewardStatus() {
+            const lastClaim = userData.lastClaimTime;
+            if (!lastClaim) {
+                // User has never claimed before
+                enableClaimButton();
+                return;
+            }
+
+            const now = Date.now();
+            const timeSinceClaim = now - lastClaim;
+
+            if (timeSinceClaim >= COOLDOWN_PERIOD) {
+                // More than 24 hours have passed
+                enableClaimButton();
+            } else {
+                // Cooldown period is active
+                disableClaimButton();
+                const remainingTime = COOLDOWN_PERIOD - timeSinceClaim;
+                startCountdown(remainingTime);
+            }
         }
-    }
 
-    function showScreen(screenId) {
-        screens.forEach(screen => screen.style.display = 'none');
-        document.getElementById(screenId).style.display = 'block';
-    }
-
-    function handleNav(event) {
-        const screenId = event.target.dataset.screen;
-        if (screenId) {
-            showScreen(screenId);
+        function enableClaimButton() {
+            claimButton.disabled = false;
+            claimButton.textContent = `Claim ${REWARD_AMOUNT} Coins`;
+            rewardMessage.textContent = 'Your daily reward is ready. Claim it now!';
+            timerMessage.style.display = 'none';
+            if (countdownInterval) clearInterval(countdownInterval);
         }
-    }
 
-    function updateDashboard() {
-        const pkrValue = user.coins / COINS_PER_PKR;
-
-        document.getElementById('coin-balance-display').textContent = `Coins: ${user.coins}`;
-        document.getElementById('wallet-coin-balance').textContent = user.coins;
-        document.getElementById('wallet-pkr-value').textContent = `PKR ${pkrValue.toFixed(2)}`;
-
-        const progress = Math.min((pkrValue / MIN_WITHDRAWAL_PKR) * 100, 100);
-        document.getElementById('withdrawal-progress').style.width = `${progress}%`;
-
-        const withdrawNavBtn = document.getElementById('withdraw-nav-btn');
-        if (pkrValue >= MIN_WITHDRAWAL_PKR) {
-            withdrawNavBtn.disabled = false;
-            document.getElementById('withdrawal-message').textContent = 'You can now withdraw your earnings!';
-            document.getElementById('withdraw-pkr-balance').textContent = `PKR ${pkrValue.toFixed(2)}`;
-        } else {
-            withdrawNavBtn.disabled = true;
-            document.getElementById('withdrawal-message').textContent = `You need to reach PKR ${MIN_WITHDRAWAL_PKR} to unlock withdrawals.`;
+        function disableClaimButton() {
+            claimButton.disabled = true;
+            claimButton.textContent = 'Reward Claimed';
+            rewardMessage.textContent = 'You have already claimed your reward for today.';
+            timerMessage.style.display = 'block';
         }
-    }
 
-    // =================================================================
-    // GAME LOGIC
-    // =================================================================
-    function startGame() {
-        document.getElementById('game-intro').style.display = 'none';
-        const gameArea = document.getElementById('game-area');
-        gameArea.style.display = 'block';
-        gameArea.innerHTML = `<div id="game-hud">Score: <span id="current-score">0</span> / <span id="hud-target-score">${targetScore}</span></div>`;
-
-        currentScore = 0;
-        updateScoreDisplay();
-        gameInterval = setInterval(spawnBalloon, 1000);
-    }
-
-    function updateScoreDisplay() {
-        document.getElementById('current-score').textContent = currentScore;
-    }
-
-    function spawnBalloon() {
-        const gameArea = document.getElementById('game-area');
-        if (!gameArea) return;
-        const balloon = document.createElement('div');
-        balloon.className = 'balloon';
-
-        const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502'];
-        balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        balloon.style.left = `${Math.random() * (gameArea.clientWidth - 50)}px`;
-        balloon.style.top = `${Math.random() * (gameArea.clientHeight - 65)}px`;
-
-        balloon.addEventListener('click', () => popBalloon(balloon), { once: true });
-        gameArea.appendChild(balloon);
-    }
-
-    function popBalloon(balloon) {
-        balloon.remove();
-        currentScore++;
-        updateScoreDisplay();
-
-        if (currentScore >= targetScore) {
-            endLevel();
+        function startCountdown(duration) {
+            let timer = duration;
+            countdownInterval = setInterval(() => {
+                timer -= 1000;
+                if (timer < 0) {
+                    clearInterval(countdownInterval);
+                    checkRewardStatus(); // Re-check status, which will enable the button
+                } else {
+                    const hours = Math.floor((timer / (1000 * 60 * 60)) % 24);
+                    const minutes = Math.floor((timer / (1000 * 60)) % 60);
+                    const seconds = Math.floor((timer / 1000) % 60);
+                    timerMessage.textContent = `Next claim in: ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
         }
+
+        claimButton.addEventListener('click', () => {
+            if (claimButton.disabled) return;
+
+            // Update user data with new coins and the current timestamp
+            updateUserData({
+                coins: userData.coins + REWARD_AMOUNT,
+                lastClaimTime: Date.now()
+            });
+            
+            // Re-run the check to disable the button and start the timer
+            checkRewardStatus();
+        });
+
+        // Initial check when the page loads
+        checkRewardStatus();
     }
-
-    function endLevel() {
-        clearInterval(gameInterval);
-        user.coins += rewardCoins;
-        saveData();
-        updateDashboard();
-
-        document.getElementById('modal-coins-earned').textContent = rewardCoins;
-        levelCompleteModal.style.display = 'flex';
-    }
-
-    // =================================================================
-    // ADS & WITHDRAWALS
-    // =================================================================
-    function handleNextLevel() {
-        levelCompleteModal.style.display = 'none';
-
-        // GOOGLE ADS INTEGRATION POINT
-        if (window.Android && typeof window.Android.showInterstitialAd === 'function') {
-            window.Android.showInterstitialAd();
-        } else {
-            console.log("Not in Android app or function not available, skipping ad.");
-            prepareNextLevel();
-        }
-    }
-
-    window.adClosed = function() {
-        console.log("Ad closed, preparing next level.");
-        prepareNextLevel();
-    }
-
-    function prepareNextLevel() {
-        document.getElementById('game-area').style.display = 'none';
-        document.getElementById('game-intro').style.display = 'block';
-        showScreen('play-screen');
-    }
-
-    function handleWithdrawal(event) {
-        event.preventDefault();
-        const amount = document.getElementById('withdraw-amount').value;
-        const method = document.getElementById('payment-method').value;
-        const accountNumber = document.getElementById('account-number').value;
-
-        if (amount && method && accountNumber) {
-            alert(`Withdrawal Request Submitted:\nAmount: PKR ${amount}\nMethod: ${method}\nAccount: ${accountNumber}\n\nThis is a demo. A real app would send this to a server.`);
-            withdrawForm.reset();
-        } else {
-            alert('Please fill out all fields.');
-        }
-    }
-
-    // =================================================================
-    // SCRIPT EXECUTION START
-    // =================================================================
-    init();
 });

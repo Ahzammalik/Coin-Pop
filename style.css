@@ -135,3 +135,9 @@ body {
     background-color: #a5b4fc; /* Lighter indigo when disabled */
     cursor: not-allowed;
 }
+/* Style for the active navigation link */
+.nav-link.active {
+    background-color: #eef2ff; /* Light blue background */
+    color: #4338ca; /* Indigo text color */
+    font-weight: 600;
+}

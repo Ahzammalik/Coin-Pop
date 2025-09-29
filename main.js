@@ -341,13 +341,13 @@ function handleWithdrawPage(userData, updateUserData) {
     const cashValueDisplay = document.getElementById('cash-value');
     const messageDisplay = document.getElementById('withdraw-message');
 
-    const CONVERSION_RATE = 1000; // 1000 coins = $1
+    const CONVERSION_RATE = 1000; // 1000 coins = PKR1
 
     // Update cash value as the user types
     amountInput.addEventListener('input', () => {
         const amount = parseInt(amountInput.value, 10) || 0;
         const value = (amount / CONVERSION_RATE).toFixed(2);
-        cashValueDisplay.textContent = `$${value}`;
+        cashValueDisplay.textContent = `PKR{value}`;
     });
 
     // Handle form submission
@@ -378,11 +378,11 @@ function handleWithdrawPage(userData, updateUserData) {
 
         // Show success message
         const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked').value;
-        messageDisplay.textContent = `Success! Your ${selectedMethod} reward is being processed.`;
+        messageDisplay.textContent = `Success! Your PKR{selectedMethod} reward is being processed.`;
         messageDisplay.classList.add('text-green-500');
 
         // Reset form
         amountInput.value = '';
-        cashValueDisplay.textContent = '$0.00';
+        cashValueDisplay.textContent = 'Rs0.00';
     });
 }

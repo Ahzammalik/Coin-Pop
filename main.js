@@ -219,3 +219,5 @@ document.addEventListener('DOMContentLoaded', () => {
         checkRewardStatus();
     }
 });
+// --- PAGE-SPECIFIC LOGIC ---
+handleRewardsPage(); // Run logic for the Daily Rewards page

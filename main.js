@@ -105,6 +105,7 @@ function handleAuthenticatedPages() {
     handleDashboardPage(userData);
     handleRewardsPage(userData, updateUserData);
     handlePlayPage(userData, updateUserData); // <-- New page logic
+    handleLeaderboardPage(userData);
 }
 
 function initializeDummyUser() {
@@ -263,5 +264,69 @@ function handlePlayPage(userData, updateUserData) {
         setTimeout(() => {
             popButton.classList.remove('pop-animation');
         }, 300); // Animation duration is 0.3s
+    });
+}
+
+// --- NEW FUNCTION for the Leaderboard Page ---
+function handleLeaderboardPage(currentUserData) {
+    const leaderboardBody = document.getElementById('leaderboard-body');
+    if (!leaderboardBody) return; // Only run on the Leaderboard page
+
+    // 1. Fetch and sort all users
+    const allUsers = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('user_')) {
+            allUsers.push(JSON.parse(localStorage.getItem(key)));
+        }
+    }
+
+    // Sort users by coins in descending order
+    allUsers.sort((a, b) => b.coins - a.coins);
+
+    // 2. Clear the loading message
+    leaderboardBody.innerHTML = '';
+
+    // 3. Populate the table
+    if (allUsers.length === 0) {
+        leaderboardBody.innerHTML = `<tr><td colspan="3" class="px-6 py-12 text-center text-gray-500">No players found.</td></tr>`;
+        return;
+    }
+
+    allUsers.forEach((user, index) => {
+        const rank = index + 1;
+        const isCurrentUser = user.email === currentUserData.email;
+
+        // Create table row element
+        const row = document.createElement('tr');
+        
+        // Add a highlight class if the row is for the current user
+        if (isCurrentUser) {
+            row.className = 'bg-blue-50 font-semibold';
+        }
+
+        // Create cells for rank, player name, and coins
+        const rankCell = document.createElement('td');
+        rankCell.className = 'px-6 py-4 whitespace-nowrap';
+        rankCell.textContent = `#${rank}`;
+
+        const playerCell = document.createElement('td');
+        playerCell.className = 'px-6 py-4 whitespace-nowrap';
+        // Displaying only the part before '@' for privacy/cleanliness
+        playerCell.textContent = user.email.split('@')[0]; 
+        if(isCurrentUser) playerCell.textContent += ' (You)';
+
+
+        const coinsCell = document.createElement('td');
+        coinsCell.className = 'px-6 py-4 whitespace-nowrap text-blue-600 font-bold';
+        coinsCell.textContent = user.coins;
+
+        // Append cells to the row
+        row.appendChild(rankCell);
+        row.appendChild(playerCell);
+        row.appendChild(coinsCell);
+
+        // Append the row to the table body
+        leaderboardBody.appendChild(row);
     });
 }

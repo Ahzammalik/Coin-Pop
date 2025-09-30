@@ -216,6 +216,102 @@
                 opacity: 0;
             }
         }
+        
+        .ad-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .ad-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .ad-message {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+        }
+        
+        .ad-countdown {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .ad-skip-btn {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .ad-skip-btn:hover {
+            background-color: #cbd5e1;
+        }
+        
+        .level-complete {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .level-complete-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .level-complete-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+        
+        .level-complete-message {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+        }
+        
+        .level-complete-reward {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f59e0b;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen bg-gray-100">
@@ -259,7 +355,7 @@
         <div class="main-content">
             <header class="content-header">
                 <h2 class="text-2xl font-bold text-gray-800">Balloon Pop Game</h2>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
+                <div id="coin-balance-display" class="coin-balance-display">Coins: 125.75</div>
             </header>
 
             <main>
@@ -277,7 +373,7 @@
                             <div class="stat-label">Balloons Popped</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="coins-earned">0.00</div>
+                            <div class="stat-value" id="coins-earned">125.75</div>
                             <div class="stat-label">Coins Earned</div>
                         </div>
                     </div>
@@ -293,16 +389,36 @@
         </div>
     </div>
     
+    <!-- Ad Container -->
+    <div id="ad-container" class="ad-container">
+        <div class="ad-content">
+            <div class="ad-message">Watch an ad to continue playing</div>
+            <div class="ad-countdown" id="ad-countdown">5</div>
+            <button id="ad-skip-btn" class="ad-skip-btn">Skip Ad</button>
+        </div>
+    </div>
+    
+    <!-- Level Complete Container -->
+    <div id="level-complete" class="level-complete">
+        <div class="level-complete-content">
+            <div class="level-complete-title">Level Complete!</div>
+            <div class="level-complete-message">Congratulations! You've completed level <span id="completed-level">1</span></div>
+            <div class="level-complete-reward">+0.20 Coins Added!</div>
+            <button id="continue-btn" class="btn btn-primary">Continue</button>
+        </div>
+    </div>
+    
     <script>
         // Game state
         const gameState = {
-            coins: 0,
+            coins: 125.75,
             level: 1,
             balloonsPopped: 0,
             balloonsPerLevel: 100,
             coinRewardPerLevel: 0.20,
             gameActive: false,
-            balloons: []
+            balloons: [],
+            pkrRate: 0.01 // 100 coins = 1 PKR (0.01 PKR per coin)
         };
 
         // DOM elements
@@ -313,12 +429,20 @@
         const coinsEarnedDisplay = document.getElementById('coins-earned');
         const startGameBtn = document.getElementById('start-game-btn');
         const resetGameBtn = document.getElementById('reset-game-btn');
+        const adContainer = document.getElementById('ad-container');
+        const adCountdown = document.getElementById('ad-countdown');
+        const adSkipBtn = document.getElementById('ad-skip-btn');
+        const levelComplete = document.getElementById('level-complete');
+        const completedLevel = document.getElementById('completed-level');
+        const continueBtn = document.getElementById('continue-btn');
 
         // Initialize game
         function initGame() {
             updateUI();
             startGameBtn.addEventListener('click', startGame);
             resetGameBtn.addEventListener('click', resetGame);
+            adSkipBtn.addEventListener('click', skipAd);
+            continueBtn.addEventListener('click', continueGame);
         }
 
         // Start the game
@@ -338,7 +462,6 @@
             gameState.gameActive = false;
             gameState.balloonsPopped = 0;
             gameState.level = 1;
-            gameState.coins = 0;
             
             // Clear all balloons
             gameState.balloons.forEach(balloon => {
@@ -494,33 +617,64 @@
 
         // Complete level
         function completeLevel() {
-            gameState.level++;
-            gameState.balloonsPopped = 0;
+            // Pause the game
+            gameState.gameActive = false;
+            
+            // Show ad after level completion
+            showAd();
+        }
+
+        // Show ad
+        function showAd() {
+            let countdown = 5;
+            adCountdown.textContent = countdown;
+            adContainer.style.display = 'flex';
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                adCountdown.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    closeAd();
+                }
+            }, 1000);
+        }
+
+        // Skip ad
+        function skipAd() {
+            closeAd();
+        }
+
+        // Close ad and show level complete
+        function closeAd() {
+            adContainer.style.display = 'none';
+            
+            // Add coin reward
             gameState.coins += gameState.coinRewardPerLevel;
             
-            // Show level completion message
-            const message = document.createElement('div');
-            message.textContent = `Level ${gameState.level-1} Complete! +${gameState.coinRewardPerLevel} coins`;
-            message.style.position = 'absolute';
-            message.style.top = '50%';
-            message.style.left = '50%';
-            message.style.transform = 'translate(-50%, -50%)';
-            message.style.backgroundColor = 'rgba(255,255,255,0.9)';
-            message.style.padding = '1rem 2rem';
-            message.style.borderRadius = '0.5rem';
-            message.style.fontWeight = 'bold';
-            message.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-            message.style.zIndex = '100';
+            // Show level complete message
+            completedLevel.textContent = gameState.level;
+            levelComplete.style.display = 'flex';
+        }
+
+        // Continue to next level
+        function continueGame() {
+            levelComplete.style.display = 'none';
             
-            gameContainer.appendChild(message);
+            // Update level and reset balloons popped
+            gameState.level++;
+            gameState.balloonsPopped = 0;
             
-            setTimeout(() => {
-                if (message.parentNode) {
-                    message.parentNode.removeChild(message);
-                }
-            }, 2000);
+            // Resume game
+            gameState.gameActive = true;
+            startGameBtn.textContent = 'Game Running...';
+            startGameBtn.disabled = true;
             
             updateUI();
+            
+            // Create new balloons for the next level
+            createBalloons(10);
         }
 
         // Update UI
@@ -533,6 +687,21 @@
 
         // Initialize the game when page loads
         window.addEventListener('DOMContentLoaded', initGame);
+        
+        // Google AdMob Integration (Placeholder for actual implementation)
+        // In a real implementation, you would initialize AdMob here
+        function initializeAdMob() {
+            // This is where you would initialize Google AdMob
+            // For example:
+            // admob.initialize().then(() => {
+            //     console.log('AdMob initialized');
+            // });
+            
+            console.log('AdMob would be initialized here in a real implementation');
+        }
+        
+        // Call AdMob initialization
+        initializeAdMob();
     </script>
 </body>
 </html>

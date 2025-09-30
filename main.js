@@ -107,6 +107,7 @@ function handleAuthenticatedPages() {
     handlePlayPage(userData, updateUserData); // <-- New page logic
     handleLeaderboardPage(userData);
     handleWithdrawPage(userData, updateUserData);
+    handleAdminPage(userData, updateUserData);
 }
 
 function initializeDummyUser() {

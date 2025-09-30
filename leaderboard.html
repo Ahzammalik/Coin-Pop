@@ -6,7 +6,497 @@
     <title>Leaderboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1e293b;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: #334155;
+            color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .coin-balance-display {
+            background-color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* 3D Card Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 1rem 1rem 0 0;
+            transform: translateZ(10px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-card::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -80px;
+            right: -80px;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -60px;
+            left: -60px;
+        }
+        
+        .payout-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .rewards-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .leaderboard-table th {
+            background-color: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .leaderboard-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .leaderboard-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+        }
+        
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #A56C28);
+        }
+        
+        .rank-other {
+            background-color: #64748b;
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .player-name {
+            font-weight: 600;
+        }
+        
+        .player-level {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .coins-amount {
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        
+        .payout-amount {
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .time-filter {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .time-option {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .time-option.active {
+            background: white;
+            color: #3b82f6;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .payout-info {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .floating-coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .coin-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .coin-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+        
+        .coin-3 {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 1rem;
+            position: relative;
+        }
+        
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            text-align: center;
+            width: 30px;
+            font-size: 0.75rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .payout-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .payout-item:last-child {
+            border-bottom: none;
+        }
+        
+        .payout-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .payout-details {
+            flex: 1;
+        }
+        
+        .payout-title {
+            font-weight: 600;
+        }
+        
+        .payout-date {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .payout-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            background: #f1f5f9;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .achievement-gold {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .achievement-silver {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .achievement-bronze {
+            background: #fef7ed;
+            color: #9a3412;
+        }
+    </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen bg-gray-100">
     <div id="app-container" class="w-full flex-grow">
@@ -49,33 +539,335 @@
         <div class="main-content">
             <header class="content-header">
                 <h2 class="text-2xl font-bold text-gray-800">Leaderboard</h2>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
+                <div id="coin-balance-display" class="coin-balance-display">Coins: 125.75</div>
             </header>
 
             <main>
-                <div class="card overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Player</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Coins</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaderboard-body" class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td colspan="3" class="px-6 py-12 text-center text-gray-500">
-                                        Loading leaderboard...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="card stats-card card-3d">
+                        <div class="floating-coin coin-1"></div>
+                        <div class="floating-coin coin-2"></div>
+                        <div class="floating-coin coin-3"></div>
+                        
+                        <h4 class="text-white font-medium opacity-90">Your Ranking</h4>
+                        <p class="text-4xl font-bold text-white mt-2">#42</p>
+                        <p class="text-white opacity-80 mt-1">Top 15% of players</p>
+                        
+                        <div class="stats-grid mt-4">
+                            <div class="stat-item">
+                                <div class="stat-value">1,284</div>
+                                <div class="stat-label">Total Players</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">+3</div>
+                                <div class="stat-label">This Week</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card payout-card card-3d">
+                        <h4 class="text-white font-medium opacity-90">Total Payouts</h4>
+                        <p class="text-4xl font-bold text-white mt-2">PKR 12,450</p>
+                        <p class="text-white opacity-80 mt-1">Distributed to players</p>
+                        
+                        <div class="stats-grid mt-4">
+                            <div class="stat-item">
+                                <div class="stat-value">84</div>
+                                <div class="stat-label">Payments</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">PKR 250</div>
+                                <div class="stat-label">Min. Withdrawal</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card rewards-card card-3d">
+                        <h4 class="text-white font-medium opacity-90">Weekly Rewards</h4>
+                        <p class="text-2xl font-bold text-white mt-3">Top 3 Players</p>
+                        <p class="text-white opacity-80 mt-1">Bonus coins every week</p>
+                        
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm">
+                                <span>1st: +500 Coins</span>
+                                <span>2nd: +300 Coins</span>
+                                <span>3rd: +200 Coins</span>
+                            </div>
+                            <div class="progress-bar mt-2">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                            <p class="text-white opacity-80 text-sm mt-2">4 days until reset</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="leaderboard">Leaderboard</div>
+                    <div class="tab" data-tab="payouts">Payout History</div>
+                    <div class="tab" data-tab="achievements">Achievements</div>
+                </div>
+
+                <!-- Time Filter -->
+                <div class="time-filter">
+                    <div class="time-option active" data-time="all">All Time</div>
+                    <div class="time-option" data-time="weekly">This Week</div>
+                    <div class="time-option" data-time="monthly">This Month</div>
+                    <div class="time-option" data-time="daily">Today</div>
+                </div>
+
+                <!-- Leaderboard Tab -->
+                <div class="tab-content active" id="leaderboard-tab">
+                    <div class="card">
+                        <h4 class="card-header">Top Players</h4>
+                        <div class="overflow-x-auto">
+                            <table class="leaderboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Player</th>
+                                        <th>Level</th>
+                                        <th>Coins</th>
+                                        <th>PKR Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body">
+                                    <!-- Leaderboard data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payouts Tab -->
+                <div class="tab-content" id="payouts-tab">
+                    <div class="card">
+                        <h4 class="card-header">Payout History</h4>
+                        <div id="payouts-list">
+                            <!-- Payout data will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="payout-info">
+                            <p class="text-sm font-medium text-gray-800">Withdrawal Information</p>
+                            <p class="text-xs text-gray-600 mt-1">100 Coins = 1 PKR</p>
+                            <p class="text-xs text-gray-600">Minimum Withdrawal: PKR 250 (25,000 Coins)</p>
+                            <p class="text-xs text-gray-600">Processing Time: 24-48 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div class="tab-content" id="achievements-tab">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card">
+                            <h4 class="card-header">Your Achievements</h4>
+                            <div id="user-achievements">
+                                <!-- User achievements will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h4 class="card-header">Global Achievements</h4>
+                            <div id="global-achievements">
+                                <!-- Global achievements will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
-    <script src="main.js"></script>
+    
+    <script>
+        // Sample data
+        const leaderboardData = {
+            userRank: 42,
+            totalPlayers: 1284,
+            totalPayouts: 12450,
+            payoutsCount: 84,
+            minWithdrawal: 250,
+            leaderboard: [
+                { id: 1, name: "ProPlayer99", level: 25, coins: 12500, pkrValue: 125, status: "Active" },
+                { id: 2, name: "CoinMaster", level: 23, coins: 11800, pkrValue: 118, status: "Active" },
+                { id: 3, name: "BalloonHunter", level: 22, coins: 11200, pkrValue: 112, status: "Active" },
+                { id: 4, name: "LuckyWinner", level: 21, coins: 9800, pkrValue: 98, status: "Active" },
+                { id: 5, name: "GameChanger", level: 20, coins: 9200, pkrValue: 92, status: "Active" },
+                { id: 6, name: "CoinCollector", level: 19, coins: 8700, pkrValue: 87, status: "Active" },
+                { id: 7, name: "PopMaster", level: 18, coins: 8100, pkrValue: 81, status: "Active" },
+                { id: 8, name: "BalloonPro", level: 18, coins: 7800, pkrValue: 78, status: "Active" },
+                { id: 9, name: "GoldenPlayer", level: 17, coins: 7400, pkrValue: 74, status: "Active" },
+                { id: 10, name: "Winner2024", level: 17, coins: 7100, pkrValue: 71, status: "Active" }
+            ],
+            payouts: [
+                { id: 1, player: "ProPlayer99", amount: 500, date: "2024-01-15", status: "Completed" },
+                { id: 2, player: "CoinMaster", amount: 350, date: "2024-01-14", status: "Completed" },
+                { id: 3, player: "BalloonHunter", amount: 250, date: "2024-01-13", status: "Completed" },
+                { id: 4, player: "LuckyWinner", amount: 300, date: "2024-01-12", status: "Completed" },
+                { id: 5, player: "GameChanger", amount: 450, date: "2024-01-11", status: "Pending" },
+                { id: 6, player: "CoinCollector", amount: 280, date: "2024-01-10", status: "Completed" }
+            ],
+            userAchievements: [
+                { id: 1, name: "First Blood", description: "Pop your first balloon", type: "bronze", earned: true },
+                { id: 2, name: "Coin Collector", description: "Collect 100 coins", type: "silver", earned: true },
+                { id: 3, name: "Level Master", description: "Reach level 10", type: "silver", earned: true },
+                { id: 4, name: "Balloon Popper", description: "Pop 500 balloons", type: "gold", earned: false },
+                { id: 5, name: "Rich Player", description: "Collect 1000 coins", type: "gold", earned: false }
+            ],
+            globalAchievements: [
+                { id: 1, name: "Millionaire", description: "First player to reach 10,000 coins", player: "ProPlayer99", type: "gold" },
+                { id: 2, name: "Speed Demon", description: "Complete 10 levels in one day", player: "CoinMaster", type: "silver" },
+                { id: 3, name: "Consistent Player", description: "Play for 30 consecutive days", player: "BalloonHunter", type: "bronze" },
+                { id: 4, name: "Lucky Streak", description: "Get 5 daily rewards in a row", player: "LuckyWinner", type: "silver" }
+            ]
+        };
+
+        // Initialize leaderboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLeaderboard();
+            setupTabs();
+            setupTimeFilter();
+            updatePayouts();
+            updateAchievements();
+        });
+
+        // Update leaderboard with data
+        function updateLeaderboard() {
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            leaderboardBody.innerHTML = '';
+            
+            leaderboardData.leaderboard.forEach((player, index) => {
+                const row = document.createElement('tr');
+                
+                // Rank badge
+                let rankClass = 'rank-other';
+                if (index === 0) rankClass = 'rank-1';
+                else if (index === 1) rankClass = 'rank-2';
+                else if (index === 2) rankClass = 'rank-3';
+                
+                // Player avatar initial
+                const avatarInitial = player.name.charAt(0).toUpperCase();
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="rank-badge ${rankClass}">${index + 1}</div>
+                    </td>
+                    <td>
+                        <div class="player-info">
+                            <div class="player-avatar">${avatarInitial}</div>
+                            <div>
+                                <div class="player-name">${player.name}</div>
+                                <div class="player-level">Level ${player.level}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${player.level}</td>
+                    <td class="coins-amount">${player.coins.toLocaleString()}</td>
+                    <td class="payout-amount">PKR ${player.pkrValue}</td>
+                    <td>
+                        <span class="payout-status status-completed">${player.status}</span>
+                    </td>
+                `;
+                
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // Setup tabs functionality
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+
+        // Setup time filter functionality
+        function setupTimeFilter() {
+            const timeOptions = document.querySelectorAll('.time-option');
+            
+            timeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    timeOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // In a real app, you would filter the leaderboard based on the selected time
+                    const timeFilter = this.getAttribute('data-time');
+                    console.log(`Filtering by: ${timeFilter}`);
+                    // updateLeaderboardWithFilter(timeFilter);
+                });
+            });
+        }
+
+        // Update payouts list
+        function updatePayouts() {
+            const payoutsList = document.getElementById('payouts-list');
+            payoutsList.innerHTML = '';
+            
+            leaderboardData.payouts.forEach(payout => {
+                const payoutItem = document.createElement('div');
+                payoutItem.className = 'payout-item';
+                
+                // Status class
+                let statusClass = 'status-completed';
+                if (payout.status === 'Pending') statusClass = 'status-pending';
+                else if (payout.status === 'Failed') statusClass = 'status-failed';
+                
+                // Player avatar initial
+                const avatarInitial = payout.player.charAt(0).toUpperCase();
+                
+                payoutItem.innerHTML = `
+                    <div class="payout-icon">${avatarInitial}</div>
+                    <div class="payout-details">
+                        <div class="payout-title">${payout.player}</div>
+                        <div class="payout-date">${payout.date}</div>
+                    </div>
+                    <div class="payout-amount">PKR ${payout.amount}</div>
+                    <div class="payout-status ${statusClass}">${payout.status}</div>
+                `;
+                
+                payoutsList.appendChild(payoutItem);
+            });
+        }
+
+        // Update achievements
+        function updateAchievements() {
+            const userAchievements = document.getElementById('user-achievements');
+            const globalAchievements = document.getElementById('global-achievements');
+            
+            userAchievements.innerHTML = '';
+            globalAchievements.innerHTML = '';
+            
+            // User achievements
+            leaderboardData.userAchievements.forEach(achievement => {
+                const achievementEl = document.createElement('div');
+                achievementEl.className = `achievement-badge ${achievement.earned ? 'achievement-' + achievement.type : ''}`;
+                achievementEl.textContent = achievement.name;
+                userAchievements.appendChild(achievementEl);
+            });
+            
+            // Global achievements
+            leaderboardData.globalAchievements.forEach(achievement => {
+                const achievementEl = document.createElement('div');
+                achievementEl.className = `achievement-badge achievement-${achievement.type}`;
+                achievementEl.textContent = `${achievement.name} - ${achievement.player}`;
+                globalAchievements.appendChild(achievementEl);
+            });
+        }
+    </script>
 </body>
 </html>

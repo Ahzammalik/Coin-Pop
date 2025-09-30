@@ -6,7 +6,6 @@
     <title>Play Game - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
         /* Animation for the coin pop */
         @keyframes pop {
@@ -16,6 +15,206 @@
         }
         .pop-animation {
             animation: pop 0.3s ease-in-out;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1e293b;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: #334155;
+            color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            background-color: #f8fafc;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .coin-balance-display {
+            background-color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 2rem;
+        }
+        
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* Game container styles */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FF);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .balloon {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2),
+                        inset 10px 10px 20px rgba(255,255,255,0.4);
+        }
+        
+        .balloon-string {
+            position: absolute;
+            background-color: #333;
+            width: 2px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-box {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+            flex: 1;
+            margin: 0 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        
+        .pop-effect {
+            position: absolute;
+            pointer-events: none;
+            animation: popEffect 0.5s forwards;
+        }
+        
+        @keyframes popEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -27,7 +226,7 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     <span>Dashboard</span>
                 </a>
                 <a href="play.html" class="nav-link">
@@ -59,25 +258,281 @@
 
         <div class="main-content">
             <header class="content-header">
-                <h2 class="text-2xl font-bold text-gray-800">Play Game</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Balloon Pop Game</h2>
                 <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
             </header>
 
             <main>
-                <div class="card max-w-2xl mx-auto text-center">
-                    <h3 class="card-header">Pop The Coin!</h3>
-                    <p class="text-gray-600 mb-8">Click the giant coin to earn a random reward between 1 and 5 coins.</p>
+                <div class="card max-w-4xl mx-auto">
+                    <h3 class="card-header">Pop 100 Balloons to Complete Level</h3>
+                    <p class="text-gray-600 mb-8">Pop balloons to earn coins. Complete levels to get 0.20 coins reward.</p>
                     
-                    <div id="pop-coin-btn" class="relative w-48 h-48 mx-auto bg-yellow-400 rounded-full flex items-center justify-center text-4xl font-bold text-yellow-800 border-8 border-yellow-500 cursor-pointer transition-transform duration-100 hover:scale-105 active:scale-95 shadow-lg">
-                        POP!
-                    </div>
-
-                    <div id="pop-result-message" class="mt-8 text-xl font-semibold text-gray-700 h-8">
+                    <div class="game-stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="level-display">1</div>
+                            <div class="stat-label">Current Level</div>
                         </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="balloons-popped">0/100</div>
+                            <div class="stat-label">Balloons Popped</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="coins-earned">0.00</div>
+                            <div class="stat-label">Coins Earned</div>
+                        </div>
+                    </div>
+                    
+                    <div id="game-container"></div>
+                    
+                    <div class="game-controls">
+                        <button id="start-game-btn" class="btn btn-primary">Start Game</button>
+                        <button id="reset-game-btn" class="btn btn-secondary">Reset Game</button>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
-    <script src="main.js"></script>
+    
+    <script>
+        // Game state
+        const gameState = {
+            coins: 0,
+            level: 1,
+            balloonsPopped: 0,
+            balloonsPerLevel: 100,
+            coinRewardPerLevel: 0.20,
+            gameActive: false,
+            balloons: []
+        };
+
+        // DOM elements
+        const gameContainer = document.getElementById('game-container');
+        const coinBalanceDisplay = document.getElementById('coin-balance-display');
+        const levelDisplay = document.getElementById('level-display');
+        const balloonsPoppedDisplay = document.getElementById('balloons-popped');
+        const coinsEarnedDisplay = document.getElementById('coins-earned');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const resetGameBtn = document.getElementById('reset-game-btn');
+
+        // Initialize game
+        function initGame() {
+            updateUI();
+            startGameBtn.addEventListener('click', startGame);
+            resetGameBtn.addEventListener('click', resetGame);
+        }
+
+        // Start the game
+        function startGame() {
+            if (gameState.gameActive) return;
+            
+            gameState.gameActive = true;
+            startGameBtn.textContent = 'Game Running...';
+            startGameBtn.disabled = true;
+            
+            // Create initial balloons
+            createBalloons(10);
+        }
+
+        // Reset the game
+        function resetGame() {
+            gameState.gameActive = false;
+            gameState.balloonsPopped = 0;
+            gameState.level = 1;
+            gameState.coins = 0;
+            
+            // Clear all balloons
+            gameState.balloons.forEach(balloon => {
+                if (balloon.element && balloon.element.parentNode) {
+                    balloon.element.parentNode.removeChild(balloon.element);
+                }
+            });
+            gameState.balloons = [];
+            
+            startGameBtn.textContent = 'Start Game';
+            startGameBtn.disabled = false;
+            
+            updateUI();
+        }
+
+        // Create balloons
+        function createBalloons(count) {
+            for (let i = 0; i < count; i++) {
+                createBalloon();
+            }
+        }
+
+        // Create a single balloon
+        function createBalloon() {
+            if (!gameState.gameActive) return;
+            
+            const balloonSize = Math.random() * 40 + 30; // 30-70px
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            
+            // Random position
+            const xPos = Math.random() * (gameContainer.offsetWidth - balloonSize);
+            const yPos = gameContainer.offsetHeight;
+            
+            balloon.style.width = `${balloonSize}px`;
+            balloon.style.height = `${balloonSize}px`;
+            balloon.style.left = `${xPos}px`;
+            balloon.style.bottom = `-${balloonSize}px`;
+            
+            // Create gradient color
+            const hue1 = Math.floor(Math.random() * 360);
+            const hue2 = (hue1 + 30) % 360;
+            balloon.style.background = `radial-gradient(circle at 30% 30%, hsl(${hue1}, 100%, 70%), hsl(${hue2}, 100%, 50%))`;
+            
+            // Add string
+            const string = document.createElement('div');
+            string.className = 'balloon-string';
+            string.style.height = `${balloonSize * 0.8}px`;
+            balloon.appendChild(string);
+            
+            // Add click event
+            balloon.addEventListener('click', () => popBalloon(balloon));
+            
+            gameContainer.appendChild(balloon);
+            
+            // Store balloon data
+            const balloonData = {
+                element: balloon,
+                speed: Math.random() * 2 + 1, // 1-3 pixels per frame
+                xPos: xPos,
+                yPos: -balloonSize
+            };
+            
+            gameState.balloons.push(balloonData);
+            
+            // Animate balloon
+            animateBalloon(balloonData);
+        }
+
+        // Animate balloon movement
+        function animateBalloon(balloonData) {
+            if (!gameState.gameActive) return;
+            
+            const balloon = balloonData.element;
+            let yPos = parseFloat(balloon.style.bottom) || -parseInt(balloon.style.height);
+            
+            // Move balloon upward
+            yPos += balloonData.speed;
+            balloon.style.bottom = `${yPos}px`;
+            
+            // Add slight horizontal movement
+            const xMovement = Math.sin(Date.now() / 1000 + balloonData.xPos) * 0.5;
+            balloon.style.left = `${balloonData.xPos + xMovement}px`;
+            
+            // Check if balloon is out of bounds
+            if (yPos > gameContainer.offsetHeight) {
+                // Remove balloon
+                if (balloon.parentNode) {
+                    balloon.parentNode.removeChild(balloon);
+                }
+                
+                // Remove from array
+                const index = gameState.balloons.indexOf(balloonData);
+                if (index > -1) {
+                    gameState.balloons.splice(index, 1);
+                }
+                
+                // Create new balloon to replace it
+                createBalloon();
+            } else {
+                // Continue animation
+                requestAnimationFrame(() => animateBalloon(balloonData));
+            }
+        }
+
+        // Pop a balloon
+        function popBalloon(balloon) {
+            if (!gameState.gameActive) return;
+            
+            // Create pop effect
+            const popEffect = document.createElement('div');
+            popEffect.className = 'pop-effect';
+            popEffect.style.width = balloon.style.width;
+            popEffect.style.height = balloon.style.height;
+            popEffect.style.left = balloon.style.left;
+            popEffect.style.bottom = balloon.style.bottom;
+            popEffect.style.background = balloon.style.background;
+            popEffect.style.borderRadius = '50%';
+            
+            gameContainer.appendChild(popEffect);
+            
+            // Remove pop effect after animation
+            setTimeout(() => {
+                if (popEffect.parentNode) {
+                    popEffect.parentNode.removeChild(popEffect);
+                }
+            }, 500);
+            
+            // Remove balloon
+            if (balloon.parentNode) {
+                balloon.parentNode.removeChild(balloon);
+            }
+            
+            // Update game state
+            gameState.balloonsPopped++;
+            
+            // Remove from balloons array
+            const balloonIndex = gameState.balloons.findIndex(b => b.element === balloon);
+            if (balloonIndex > -1) {
+                gameState.balloons.splice(balloonIndex, 1);
+            }
+            
+            // Create new balloon
+            createBalloon();
+            
+            // Check level completion
+            if (gameState.balloonsPopped >= gameState.balloonsPerLevel) {
+                completeLevel();
+            }
+            
+            updateUI();
+        }
+
+        // Complete level
+        function completeLevel() {
+            gameState.level++;
+            gameState.balloonsPopped = 0;
+            gameState.coins += gameState.coinRewardPerLevel;
+            
+            // Show level completion message
+            const message = document.createElement('div');
+            message.textContent = `Level ${gameState.level-1} Complete! +${gameState.coinRewardPerLevel} coins`;
+            message.style.position = 'absolute';
+            message.style.top = '50%';
+            message.style.left = '50%';
+            message.style.transform = 'translate(-50%, -50%)';
+            message.style.backgroundColor = 'rgba(255,255,255,0.9)';
+            message.style.padding = '1rem 2rem';
+            message.style.borderRadius = '0.5rem';
+            message.style.fontWeight = 'bold';
+            message.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            message.style.zIndex = '100';
+            
+            gameContainer.appendChild(message);
+            
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 2000);
+            
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            coinBalanceDisplay.textContent = `Coins: ${gameState.coins.toFixed(2)}`;
+            levelDisplay.textContent = gameState.level;
+            balloonsPoppedDisplay.textContent = `${gameState.balloonsPopped}/${gameState.balloonsPerLevel}`;
+            coinsEarnedDisplay.textContent = gameState.coins.toFixed(2);
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
 </body>
 </html>

@@ -6,7 +6,366 @@
     <title>Dashboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1e293b;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: #334155;
+            color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .coin-balance-display {
+            background-color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* 3D Card Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 1rem 1rem 0 0;
+            transform: translateZ(10px);
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -80px;
+            right: -80px;
+        }
+        
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -60px;
+            left: -60px;
+        }
+        
+        .rank-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .reward-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .feature-icon {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .currency-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2rem;
+            padding: 0.25rem;
+            margin-top: 1rem;
+        }
+        
+        .currency-option {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .currency-option.active {
+            background: white;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .floating-coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .coin-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .coin-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+        
+        .coin-3 {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        .recent-activity {
+            margin-top: 1.5rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        
+        .activity-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #10b981;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 1rem;
+            position: relative;
+        }
+        
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            text-align: center;
+            width: 30px;
+            font-size: 0.75rem;
+        }
+    </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen bg-gray-100">
     <div id="app-container" class="w-full flex-grow">
@@ -50,50 +409,306 @@
             <header class="content-header">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
-                    <p id="welcome-message" class="text-gray-600">Welcome back!</p>
+                    <p id="welcome-message" class="text-gray-600">Welcome back, Player!</p>
                 </div>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
+                <div id="coin-balance-display" class="coin-balance-display">Coins: 125.75</div>
             </header>
 
             <main>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Current Balance</h4>
-                        <p id="dashboard-coins" class="text-4xl font-bold text-blue-600 mt-2">0</p>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="card balance-card card-3d">
+                        <div class="floating-coin coin-1"></div>
+                        <div class="floating-coin coin-2"></div>
+                        <div class="floating-coin coin-3"></div>
+                        
+                        <h4 class="text-white font-medium opacity-90">Current Balance</h4>
+                        <p id="dashboard-coins" class="text-4xl font-bold text-white mt-2">125.75</p>
+                        <p id="pkr-balance" class="text-xl font-semibold text-white opacity-90 mt-1">PKR 4,403.13</p>
+                        
+                        <div class="currency-toggle">
+                            <div class="currency-option active" data-currency="coins">Coins</div>
+                            <div class="currency-option" data-currency="pkr">PKR</div>
+                        </div>
+                        
+                        <div class="progress-bar mt-4">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <p class="text-white opacity-80 text-sm mt-2">65% to next level</p>
                     </div>
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Leaderboard Rank</h4>
-                        <p id="dashboard-rank" class="text-4xl font-bold text-gray-800 mt-2">--</p>
+                    
+                    <div class="card rank-card card-3d">
+                        <h4 class="text-white font-medium opacity-90">Leaderboard Rank</h4>
+                        <p id="dashboard-rank" class="text-4xl font-bold text-white mt-2">#42</p>
+                        <p class="text-white opacity-80 mt-1">Top 15% of players</p>
+                        
+                        <div class="stats-grid mt-4">
+                            <div class="stat-item">
+                                <div class="stat-value">1,284</div>
+                                <div class="stat-label">Players</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">+3</div>
+                                <div class="stat-label">This Week</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Next Daily Reward</h4>
-                        <p id="dashboard-reward-timer" class="text-2xl font-bold text-green-600 mt-3">Ready to Claim!</p>
+                    
+                    <div class="card reward-card card-3d">
+                        <h4 class="text-white font-medium opacity-90">Next Daily Reward</h4>
+                        <p id="dashboard-reward-timer" class="text-2xl font-bold text-white mt-3">Ready to Claim!</p>
+                        <p class="text-white opacity-80 mt-1">Claim your daily bonus</p>
+                        
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm">
+                                <span>Streak: 5 days</span>
+                                <span>Bonus: +25%</span>
+                            </div>
+                            <div class="progress-bar mt-2">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card stats-card card-3d">
+                        <h4 class="text-white font-medium opacity-90">Weekly Stats</h4>
+                        
+                        <div class="chart-container">
+                            <!-- Chart bars will be generated by JavaScript -->
+                        </div>
+                        
+                        <div class="flex justify-between text-sm mt-2">
+                            <span>Mon</span>
+                            <span>Tue</span>
+                            <span>Wed</span>
+                            <span>Thu</span>
+                            <span>Fri</span>
+                            <span>Sat</span>
+                            <span>Sun</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <a href="play.html" class="card flex items-center p-6 hover:bg-gray-50 transition">
-                        <div class="p-4 bg-purple-100 rounded-lg">
-                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <!-- Activity and Features -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2">
+                        <div class="card">
+                            <h4 class="card-header">Recent Activity</h4>
+                            <div class="recent-activity">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-title">Daily Reward Claimed</div>
+                                        <div class="activity-time">2 hours ago</div>
+                                    </div>
+                                    <div class="activity-amount positive">+15.50</div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-title">Balloon Pop Game</div>
+                                        <div class="activity-time">5 hours ago</div>
+                                    </div>
+                                    <div class="activity-amount positive">+8.25</div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-title">Leaderboard Bonus</div>
+                                        <div class="activity-time">Yesterday</div>
+                                    </div>
+                                    <div class="activity-amount positive">+12.00</div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-title">Special Event Reward</div>
+                                        <div class="activity-time">2 days ago</div>
+                                    </div>
+                                    <div class="activity-amount positive">+25.00</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-bold text-gray-800">Play Game</h4>
-                            <p class="text-gray-600">Earn coins by playing.</p>
+                    </div>
+                    
+                    <div>
+                        <div class="card">
+                            <h4 class="card-header">Quick Actions</h4>
+                            
+                            <a href="play.html" class="feature-card mb-4">
+                                <div class="feature-icon bg-purple-100">
+                                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800">Play Game</h4>
+                                    <p class="text-gray-600">Earn coins by playing</p>
+                                </div>
+                            </a>
+                            
+                            <a href="rewards.html" class="feature-card mb-4">
+                                <div class="feature-icon bg-yellow-100">
+                                   <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800">Claim Reward</h4>
+                                    <p class="text-gray-600">Get your free daily bonus</p>
+                                </div>
+                            </a>
+                            
+                            <a href="withdraw.html" class="feature-card">
+                                <div class="feature-icon bg-green-100">
+                                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-800">Withdraw</h4>
+                                    <p class="text-gray-600">Cash out your earnings</p>
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                     <a href="rewards.html" class="card flex items-center p-6 hover:bg-gray-50 transition">
-                        <div class="p-4 bg-yellow-100 rounded-lg">
-                           <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    </div>
+                </div>
+                
+                <!-- Goals and Progress -->
+                <div class="card">
+                    <h4 class="card-header">Your Goals & Progress</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center p-4">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            </div>
+                            <h5 class="font-bold text-gray-800">Level Up</h5>
+                            <p class="text-gray-600 mt-2">Reach Level 10 to unlock special rewards</p>
+                            <div class="progress-bar mt-4">
+                                <div class="progress-fill" style="width: 70%"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">7/10 Levels</p>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-bold text-gray-800">Claim Reward</h4>
-                            <p class="text-gray-600">Get your free daily bonus.</p>
+                        
+                        <div class="text-center p-4">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            <h5 class="font-bold text-gray-800">Daily Streak</h5>
+                            <p class="text-gray-600 mt-2">Maintain your streak for bigger bonuses</p>
+                            <div class="progress-bar mt-4">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">5 days in a row</p>
                         </div>
-                    </a>
+                        
+                        <div class="text-center p-4">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+                                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                            </div>
+                            <h5 class="font-bold text-gray-800">Achievements</h5>
+                            <p class="text-gray-600 mt-2">Complete achievements for extra coins</p>
+                            <div class="progress-bar mt-4">
+                                <div class="progress-fill" style="width: 45%"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">9/20 Achievements</p>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
-    <script src="main.js"></script>
+    
+    <script>
+        // Sample data
+        const userData = {
+            coins: 125.75,
+            pkrRate: 35, // 1 coin = 35 PKR
+            rank: 42,
+            totalPlayers: 1284,
+            weeklyStats: [65, 80, 45, 70, 90, 60, 75], // Coin earnings for each day
+            activities: [
+                { type: 'reward', title: 'Daily Reward Claimed', time: '2 hours ago', amount: 15.50 },
+                { type: 'game', title: 'Balloon Pop Game', time: '5 hours ago', amount: 8.25 },
+                { type: 'bonus', title: 'Leaderboard Bonus', time: 'Yesterday', amount: 12.00 },
+                { type: 'event', title: 'Special Event Reward', time: '2 days ago', amount: 25.00 }
+            ]
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            setupCurrencyToggle();
+            createWeeklyChart();
+        });
+
+        // Update dashboard with user data
+        function updateDashboard() {
+            document.getElementById('dashboard-coins').textContent = userData.coins.toFixed(2);
+            document.getElementById('pkr-balance').textContent = `PKR ${(userData.coins * userData.pkrRate).toFixed(2)}`;
+            document.getElementById('dashboard-rank').textContent = `#${userData.rank}`;
+            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins.toFixed(2)}`;
+        }
+
+        // Setup currency toggle between coins and PKR
+        function setupCurrencyToggle() {
+            const currencyOptions = document.querySelectorAll('.currency-option');
+            const coinDisplay = document.getElementById('dashboard-coins');
+            const pkrDisplay = document.getElementById('pkr-balance');
+            
+            currencyOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    currencyOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    const currency = this.getAttribute('data-currency');
+                    
+                    if (currency === 'coins') {
+                        coinDisplay.style.display = 'block';
+                        pkrDisplay.style.display = 'block';
+                    } else {
+                        coinDisplay.style.display = 'none';
+                        pkrDisplay.style.display = 'block';
+                        pkrDisplay.textContent = `PKR ${(userData.coins * userData.pkrRate).toFixed(2)}`;
+                    }
+                });
+            });
+        }
+
+        // Create weekly stats chart
+        function createWeeklyChart() {
+            const chartContainer = document.querySelector('.chart-container');
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const maxValue = Math.max(...userData.weeklyStats);
+            
+            // Clear any existing chart
+            chartContainer.innerHTML = '';
+            
+            // Create bars for each day
+            userData.weeklyStats.forEach((value, index) => {
+                const barHeight = (value / maxValue) * 160; // 160px max height
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${barHeight}px`;
+                bar.style.left = `${20 + index * 45}px`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = days[index];
+                label.style.left = `${20 + index * 45}px`;
+                
+                chartContainer.appendChild(bar);
+                chartContainer.appendChild(label);
+            });
+        }
+    </script>
 </body>
 </html>

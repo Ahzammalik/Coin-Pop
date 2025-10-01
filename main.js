@@ -276,8 +276,21 @@ function setupEventListeners() {
 
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
-            location.reload();
+            refreshUserData();
         });
+    }
+}
+
+function refreshUserData() {
+    const currentUserEmail = localStorage.getItem('currentUser');
+    if (!currentUserEmail) return;
+
+    // Reload user data from localStorage
+    currentUserData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+    
+    if (currentUserData) {
+        updateUI();
+        showNotification('Data Refreshed', 'Your data has been updated successfully!', 'success');
     }
 }
 
@@ -893,3 +906,4 @@ function showNotification(title, message, type = 'info') {
 
 // Make updateUserData available globally for other scripts
 window.updateUserData = updateUserData;
+window.refreshUserData = refreshUserData;

@@ -6,7 +6,561 @@
     <title>Admin Panel - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1e293b;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: #334155;
+            color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .coin-balance-display {
+            background-color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* 3D Card Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 1rem 1rem 0 0;
+            transform: translateZ(10px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-card::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -80px;
+            right: -80px;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -60px;
+            left: -60px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .warning-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-disabled {
+            background-color: #9ca3af;
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .floating-coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .coin-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .coin-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+        
+        .coin-3 {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .admin-table th {
+            background-color: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .admin-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-requested {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.75rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .user-email {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .amount-display {
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        
+        .pkr-amount {
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            background: white;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .access-denied-icon {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+        
+        .access-denied-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        
+        .access-denied-message {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen bg-gray-100">
     <div id="app-container" class="w-full flex-grow">
@@ -35,7 +589,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span>Withdraw</span>
                 </a>
-                 <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                 <a href="admin.html" id="admin-nav-link" class="nav-link active">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span>Admin</span>
                 </a>
@@ -47,31 +601,615 @@
         </aside>
 
         <div class="main-content">
-            <header class="content-header">
-                <h2 class="text-2xl font-bold text-gray-800">Admin Panel: User Management</h2>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
-            </header>
+            <!-- Access Denied Message (Hidden by default) -->
+            <div id="access-denied" class="access-denied" style="display: none;">
+                <div class="access-denied-icon">🚫</div>
+                <h2 class="access-denied-title">Access Denied</h2>
+                <p class="access-denied-message">You do not have permission to access the admin panel.</p>
+                <a href="dashboard.html" class="btn btn-primary">Return to Dashboard</a>
+            </div>
 
-            <main>
-                <div class="card overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Coins</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Status</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-user-list" class="bg-white divide-y divide-gray-200">
-                                </tbody>
-                        </table>
+            <!-- Admin Panel Content (Hidden by default) -->
+            <div id="admin-panel" style="display: none;">
+                <header class="content-header">
+                    <h2 class="text-2xl font-bold text-gray-800">Admin Panel</h2>
+                    <div id="coin-balance-display" class="coin-balance-display">Welcome, Admin!</div>
+                </header>
+
+                <main>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="card stats-card card-3d">
+                            <div class="floating-coin coin-1"></div>
+                            <div class="floating-coin coin-2"></div>
+                            <div class="floating-coin coin-3"></div>
+                            
+                            <h4 class="text-white font-medium opacity-90">Total Users</h4>
+                            <p class="text-4xl font-bold text-white mt-2">1,284</p>
+                            <p class="text-white opacity-80 mt-1">Active Players</p>
+                            
+                            <div class="stats-grid mt-4">
+                                <div class="stat-item">
+                                    <div class="stat-value">+42</div>
+                                    <div class="stat-label">This Week</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">85%</div>
+                                    <div class="stat-label">Active</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card info-card card-3d">
+                            <h4 class="text-white font-medium opacity-90">Withdrawals</h4>
+                            <p class="text-4xl font-bold text-white mt-2">PKR 12,450</p>
+                            <p class="text-white opacity-80 mt-1">Total Paid Out</p>
+                            
+                            <div class="stats-grid mt-4">
+                                <div class="stat-item">
+                                    <div class="stat-value">84</div>
+                                    <div class="stat-label">Completed</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">12</div>
+                                    <div class="stat-label">Pending</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card warning-card card-3d">
+                            <h4 class="text-white font-medium opacity-90">Pending Requests</h4>
+                            <p class="text-4xl font-bold text-white mt-2">8</p>
+                            <p class="text-white opacity-80 mt-1">Need Review</p>
+                            
+                            <div class="stats-grid mt-4">
+                                <div class="stat-item">
+                                    <div class="stat-value">PKR 2,150</div>
+                                    <div class="stat-label">Total Value</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">Today</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stats-card card-3d">
+                            <h4 class="text-white font-medium opacity-90">Revenue</h4>
+                            <p class="text-4xl font-bold text-white mt-2">PKR 8,750</p>
+                            <p class="text-white opacity-80 mt-1">Net Profit</p>
+                            
+                            <div class="stats-grid mt-4">
+                                <div class="stat-item">
+                                    <div class="stat-value">+15%</div>
+                                    <div class="stat-label">This Month</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">PKR 3.2K</div>
+                                    <div class="stat-label">Ad Revenue</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </main>
+
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <div class="tab active" data-tab="withdrawals">Withdrawal Requests</div>
+                        <div class="tab" data-tab="users">User Management</div>
+                        <div class="tab" data-tab="reports">Reports & Analytics</div>
+                        <div class="tab" data-tab="settings">System Settings</div>
+                    </div>
+
+                    <!-- Search and Filters -->
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <div class="search-container flex-1">
+                            <input type="text" id="search-input" class="search-input" placeholder="Search by user, email, or transaction ID...">
+                        </div>
+                        <div class="filter-container">
+                            <select id="status-filter" class="filter-select">
+                                <option value="all">All Status</option>
+                                <option value="requested">Requested</option>
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <select id="method-filter" class="filter-select">
+                                <option value="all">All Methods</option>
+                                <option value="easypaisa">EasyPaisa</option>
+                                <option value="jazzcash">JazzCash</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                            <select id="date-filter" class="filter-select">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Withdrawals Tab -->
+                    <div class="tab-content active" id="withdrawals-tab">
+                        <div class="card">
+                            <h4 class="card-header">Withdrawal Requests</h4>
+                            <div class="overflow-x-auto">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Amount</th>
+                                            <th>Method</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="withdrawal-requests">
+                                        <!-- Withdrawal data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Tab -->
+                    <div class="tab-content" id="users-tab">
+                        <div class="card">
+                            <h4 class="card-header">User Management</h4>
+                            <div class="overflow-x-auto">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Coins</th>
+                                            <th>PKR Value</th>
+                                            <th>Joined</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-management">
+                                        <!-- User data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="tab-content" id="reports-tab">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="card">
+                                <h4 class="card-header">Revenue Report</h4>
+                                <div class="p-4">
+                                    <p class="text-gray-600">Revenue analytics and reports will be displayed here.</p>
+                                    <!-- In a real app, you would have charts and graphs here -->
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h4 class="card-header">User Activity</h4>
+                                <div class="p-4">
+                                    <p class="text-gray-600">User activity metrics and analytics will be displayed here.</p>
+                                    <!-- In a real app, you would have charts and graphs here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-content" id="settings-tab">
+                        <div class="card">
+                            <h4 class="card-header">System Settings</h4>
+                            <div class="space-y-6">
+                                <div class="form-group">
+                                    <label class="form-label">Conversion Rate (Coins to PKR)</label>
+                                    <input type="number" class="form-input" value="100" step="1">
+                                    <p class="text-sm text-gray-600 mt-1">Current: 100 Coins = 1 PKR</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Minimum Withdrawal (Coins)</label>
+                                    <input type="number" class="form-input" value="25000" step="1000">
+                                    <p class="text-sm text-gray-600 mt-1">Current: 25,000 Coins = PKR 250</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Daily Reward Amount (Coins)</label>
+                                    <input type="number" class="form-input" value="50" step="5">
+                                    <p class="text-sm text-gray-600 mt-1">Base daily reward amount</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Admin Email</label>
+                                    <input type="email" class="form-input" value="Ghazimalik1997@gmail.com" readonly>
+                                    <p class="text-sm text-gray-600 mt-1">Master admin account</p>
+                                </div>
+                                
+                                <div class="pt-2">
+                                    <button class="btn btn-primary">Save Settings</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
-    <script src="main.js"></script>
+    
+    <!-- Status Update Modal -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Withdrawal Status</h3>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <form id="status-form">
+                <input type="hidden" id="withdrawal-id">
+                <div class="form-group">
+                    <label class="form-label">User</label>
+                    <input type="text" id="modal-user" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <input type="text" id="modal-amount" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Method</label>
+                    <input type="text" id="modal-method" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="modal-status" class="form-input">
+                        <option value="requested">Requested</option>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Admin Notes (Optional)</label>
+                    <textarea id="modal-notes" class="form-textarea" placeholder="Add any notes about this transaction..."></textarea>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="btn btn-primary flex-1">Update Status</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Master admin email
+        const MASTER_ADMIN_EMAIL = "Ghazimalik1997@gmail.com";
+        
+        // Sample data
+        const adminData = {
+            totalUsers: 1284,
+            totalWithdrawals: 12450,
+            pendingRequests: 8,
+            revenue: 8750,
+            withdrawals: [
+                { 
+                    id: 1, 
+                    user: { name: "Ali Khan", email: "ali.khan@example.com" }, 
+                    coins: 50000, 
+                    pkr: 500, 
+                    method: "easypaisa", 
+                    date: "2024-01-15", 
+                    status: "requested",
+                    account: "0345-1234567"
+                },
+                { 
+                    id: 2, 
+                    user: { name: "Sara Ahmed", email: "sara.ahmed@example.com" }, 
+                    coins: 35000, 
+                    pkr: 350, 
+                    method: "jazzcash", 
+                    date: "2024-01-14", 
+                    status: "pending",
+                    account: "0300-9876543"
+                },
+                { 
+                    id: 3, 
+                    user: { name: "Usman Raza", email: "usman.raza@example.com" }, 
+                    coins: 40000, 
+                    pkr: 400, 
+                    method: "bank", 
+                    date: "2024-01-13", 
+                    status: "paid",
+                    account: "HBL - 12345678901"
+                },
+                { 
+                    id: 4, 
+                    user: { name: "Fatima Noor", email: "fatima.noor@example.com" }, 
+                    coins: 25000, 
+                    pkr: 250, 
+                    method: "easypaisa", 
+                    date: "2024-01-12", 
+                    status: "rejected",
+                    account: "0321-4567890"
+                },
+                { 
+                    id: 5, 
+                    user: { name: "Bilal Sheikh", email: "bilal.sheikh@example.com" }, 
+                    coins: 60000, 
+                    pkr: 600, 
+                    method: "jazzcash", 
+                    date: "2024-01-11", 
+                    status: "requested",
+                    account: "0333-1122334"
+                }
+            ],
+            users: [
+                { id: 1, name: "Ali Khan", email: "ali.khan@example.com", coins: 12500, joined: "2023-11-15", status: "active" },
+                { id: 2, name: "Sara Ahmed", email: "sara.ahmed@example.com", coins: 8700, joined: "2023-12-03", status: "active" },
+                { id: 3, name: "Usman Raza", email: "usman.raza@example.com", coins: 15300, joined: "2023-10-22", status: "active" },
+                { id: 4, name: "Fatima Noor", email: "fatima.noor@example.com", coins: 4200, joined: "2024-01-05", status: "active" },
+                { id: 5, name: "Bilal Sheikh", email: "bilal.sheikh@example.com", coins: 9800, joined: "2023-12-18", status: "active" }
+            ]
+        };
+
+        // DOM elements
+        const accessDenied = document.getElementById('access-denied');
+        const adminPanel = document.getElementById('admin-panel');
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const withdrawalRequests = document.getElementById('withdrawal-requests');
+        const userManagement = document.getElementById('user-management');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const statusModal = document.getElementById('status-modal');
+        const closeModal = document.getElementById('close-modal');
+        const cancelModal = document.getElementById('cancel-modal');
+        const statusForm = document.getElementById('status-form');
+        const searchInput = document.getElementById('search-input');
+        const statusFilter = document.getElementById('status-filter');
+        const methodFilter = document.getElementById('method-filter');
+        const dateFilter = document.getElementById('date-filter');
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAccess();
+            setupEventListeners();
+            setupTabs();
+            updateWithdrawalTable();
+            updateUserTable();
+        });
+
+        // Check if user has admin access
+        function checkAdminAccess() {
+            // In a real app, this would check server authentication
+            // For demo, we'll check localStorage or prompt for admin email
+            const currentUser = localStorage.getItem('currentUser') || 'user@example.com';
+            userEmailDisplay.textContent = currentUser;
+            
+            if (currentUser === MASTER_ADMIN_EMAIL) {
+                // User is admin, show admin panel
+                adminPanel.style.display = 'block';
+                accessDenied.style.display = 'none';
+            } else {
+                // User is not admin, show access denied
+                adminPanel.style.display = 'none';
+                accessDenied.style.display = 'block';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Modal controls
+            closeModal.addEventListener('click', function() {
+                statusModal.style.display = 'none';
+            });
+            
+            cancelModal.addEventListener('click', function() {
+                statusModal.style.display = 'none';
+            });
+            
+            // Status form submission
+            statusForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateWithdrawalStatus();
+            });
+            
+            // Search and filter inputs
+            searchInput.addEventListener('input', filterTable);
+            statusFilter.addEventListener('change', filterTable);
+            methodFilter.addEventListener('change', filterTable);
+            dateFilter.addEventListener('change', filterTable);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === statusModal) {
+                    statusModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Setup tabs functionality
+        function setupTabs() {
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+
+        // Update withdrawal table with data
+        function updateWithdrawalTable() {
+            withdrawalRequests.innerHTML = '';
+            
+            adminData.withdrawals.forEach(withdrawal => {
+                const row = document.createElement('tr');
+                
+                // User avatar initial
+                const avatarInitial = withdrawal.user.name.charAt(0).toUpperCase();
+                
+                // Status badge class
+                let statusClass = 'status-requested';
+                if (withdrawal.status === 'pending') statusClass = 'status-pending';
+                else if (withdrawal.status === 'paid') statusClass = 'status-paid';
+                else if (withdrawal.status === 'rejected') statusClass = 'status-rejected';
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${avatarInitial}</div>
+                            <div>
+                                <div class="user-name">${withdrawal.user.name}</div>
+                                <div class="user-email">${withdrawal.user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount-display">${withdrawal.coins.toLocaleString()} Coins</div>
+                        <div class="pkr-amount">PKR ${withdrawal.pkr}</div>
+                    </td>
+                    <td>${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)}</td>
+                    <td>${withdrawal.date}</td>
+                    <td><span class="status-badge ${statusClass}">${withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}</span></td>
+                    <td>
+                        <div class="admin-actions">
+                            <button class="btn btn-primary" data-action="edit" data-id="${withdrawal.id}">Edit</button>
+                            <button class="btn btn-${withdrawal.status === 'paid' ? 'success' : 'secondary'}" data-action="view" data-id="${withdrawal.id}">View</button>
+                        </div>
+                    </td>
+                `;
+                
+                withdrawalRequests.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('[data-action="edit"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const withdrawalId = this.getAttribute('data-id');
+                    openStatusModal(withdrawalId);
+                });
+            });
+            
+            document.querySelectorAll('[data-action="view"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const withdrawalId = this.getAttribute('data-id');
+                    viewWithdrawalDetails(withdrawalId);
+                });
+            });
+        }
+
+        // Update user table with data
+        function updateUserTable() {
+            userManagement.innerHTML = '';
+            
+            adminData.users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                // User avatar initial
+                const avatarInitial = user.name.charAt(0).toUpperCase();
+                
+                // PKR value
+                const pkrValue = user.coins * 0.01; // 100 coins = 1 PKR
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${avatarInitial}</div>
+                            <div>
+                                <div class="user-name">${user.name}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount-display">${user.coins.toLocaleString()}</div>
+                    </td>
+                    <td>
+                        <div class="pkr-amount">PKR ${pkrValue.toFixed(2)}</div>
+                    </td>
+                    <td>${user.joined}</td>
+                    <td><span class="status-badge status-paid">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span></td>
+                    <td>
+                        <div class="admin-actions">
+                            <button class="btn btn-secondary">View</button>
+                            <button class="btn btn-warning">Edit</button>
+                        </div>
+                    </td>
+                `;
+                
+                userManagement.appendChild(row);
+            });
+        }
+
+        // Open status modal for editing withdrawal
+        function openStatusModal(withdrawalId) {
+            const withdrawal = adminData.withdrawals.find(w => w.id == withdrawalId);
+            
+            if (withdrawal) {
+                document.getElementById('withdrawal-id').value = withdrawal.id;
+                document.getElementById('modal-user').value = `${withdrawal.user.name} (${withdrawal.user.email})`;
+                document.getElementById('modal-amount').value = `${withdrawal.coins.toLocaleString()} Coins (PKR ${withdrawal.pkr})`;
+                document.getElementById('modal-method').value = `${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)} - ${withdrawal.account}`;
+                document.getElementById('modal-status').value = withdrawal.status;
+                document.getElementById('modal-notes').value = '';
+                
+                statusModal.style.display = 'flex';
+            }
+        }
+
+        // View withdrawal details
+        function viewWithdrawalDetails(withdrawalId) {
+            const withdrawal = adminData.withdrawals.find(w => w.id == withdrawalId);
+            
+            if (withdrawal) {
+                alert(`Withdrawal Details:\n\nUser: ${withdrawal.user.name} (${withdrawal.user.email})\nAmount: ${withdrawal.coins.toLocaleString()} Coins (PKR ${withdrawal.pkr})\nMethod: ${withdrawal.method}\nAccount: ${withdrawal.account}\nDate: ${withdrawal.date}\nStatus: ${withdrawal.status}`);
+            }
+        }
+
+        // Update withdrawal status
+        function updateWithdrawalStatus() {
+            const withdrawalId = document.getElementById('withdrawal-id').value;
+            const newStatus = document.getElementById('modal-status').value;
+            const notes = document.getElementById('modal-notes').value;
+            
+            // Find and update withdrawal
+            const withdrawal = adminData.withdrawals.find(w => w.id == withdrawalId);
+            if (withdrawal) {
+                withdrawal.status = newStatus;
+                
+                // In a real app, this would send to server
+                console.log(`Updated withdrawal ${withdrawalId} to status: ${newStatus}`);
+                if (notes) {
+                    console.log(`Admin notes: ${notes}`);
+                }
+                
+                // Update table
+                updateWithdrawalTable();
+                
+                // Close modal
+                statusModal.style.display = 'none';
+                
+                // Show success message
+                alert(`Withdrawal status updated to: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+            }
+        }
+
+        // Filter table based on search and filters
+        function filterTable() {
+            // In a real app, this would filter the data
+            console.log('Filtering table with:', {
+                search: searchInput.value,
+                status: statusFilter.value,
+                method: methodFilter.value,
+                date: dateFilter.value
+            });
+            
+            // For demo, we'll just log the filter values
+            // In a real implementation, you would filter the adminData.withdrawals array
+            // and then call updateWithdrawalTable() with the filtered data
+        }
+    </script>
 </body>
 </html>

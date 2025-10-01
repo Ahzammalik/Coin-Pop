@@ -3,60 +3,645 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Coin Pop</title>
+    <title>Coin Pop - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        .dark-theme {
+            --primary-color: #60a5fa;
+            --primary-dark: #3b82f6;
+            --secondary-color: #a78bfa;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            --bg-color: #0f172a;
+            --card-color: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .auth-container {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-theme .auth-container {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .floating-coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .coin-1 {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .coin-2 {
+            top: 60%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+
+        .coin-3 {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+
+        .input-field {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            width: 300px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+        }
+
+        .dark-theme .settings-panel {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 90;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--card-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-theme .modal-content {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .auth-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .theme-toggle, .settings-toggle {
+                width: 40px;
+                height: 40px;
+                top: 10px;
+            }
+
+            .theme-toggle {
+                right: 10px;
+            }
+
+            .settings-toggle {
+                left: 10px;
+            }
+
+            .settings-panel {
+                width: calc(100% - 40px);
+                left: 20px;
+                right: 20px;
+            }
+        }
     </style>
 </head>
-<body class="antialiased bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="antialiased flex items-center justify-center min-h-screen p-4">
+    <!-- Floating Coins -->
+    <div class="floating-coin coin-1"></div>
+    <div class="floating-coin coin-2"></div>
+    <div class="floating-coin coin-3"></div>
 
-    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
-        <div>
-            <h1 class="text-3xl font-bold text-center text-blue-600">Coin Pop</h1>
-            <h2 class="mt-2 text-xl font-semibold text-center text-gray-800">Welcome Back!</h2>
-            <p class="mt-2 text-center text-sm text-gray-600">Sign in to continue to your dashboard.</p>
-        </div>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
 
-        <form id="login-form" class="mt-8 space-y-6">
-            <div class="space-y-4 rounded-md shadow-sm">
-                <div>
-                    <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="Email address" value="test@example.com">
-                </div>
-                <div>
-                    <label for="password" class="sr-only">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required
-                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="Password" value="password123">
-                </div>
-            </div>
+    <!-- Settings Toggle -->
+    <div class="settings-toggle" id="settings-toggle">
+        <i class="fas fa-cog"></i>
+    </div>
 
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+        <h3 class="text-lg font-bold mb-4">Settings</h3>
+        
+        <div class="space-y-4">
             <div>
-                <button type="submit"
-                    class="group relative flex justify-center w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Sign in
-                </button>
+                <label class="block text-sm font-medium mb-2">Theme</label>
+                <div class="flex gap-2">
+                    <button class="btn-primary flex-1 py-2 rounded" id="light-theme-btn">Light</button>
+                    <button class="btn-secondary flex-1 py-2 rounded border border-gray-300 dark:border-gray-600" id="dark-theme-btn">Dark</button>
+                    <button class="btn-secondary flex-1 py-2 rounded border border-gray-300 dark:border-gray-600" id="auto-theme-btn">Auto</button>
+                </div>
             </div>
-            <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
-        </form>
-         <div class="text-center">
-            <p class="text-sm text-gray-600">
-                Don't have an account?
-                <a href="#" id="signup-link" class="font-medium text-blue-600 hover:text-blue-500">
-                    Sign up
-                </a>
-            </p>
+            
+            <div>
+                <label class="block text-sm font-medium mb-2">Language</label>
+                <select class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option>English</option>
+                    <option>Urdu</option>
+                    <option>Arabic</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium mb-2">Notifications</label>
+                <div class="flex items-center justify-between">
+                    <span>Push Notifications</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button class="btn-primary w-full py-2 rounded mb-2" id="reset-data-btn">Reset All Data</button>
+                <button class="btn-secondary w-full py-2 rounded border border-gray-300 dark:border-gray-600" id="export-data-btn">Export Data</button>
+            </div>
         </div>
     </div>
 
-    <script src="main.js"></script>
+    <!-- Auth Container -->
+    <div class="w-full max-w-md auth-container rounded-2xl p-8 space-y-8">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-blue-600">Coin Pop</h1>
+            <h2 class="mt-2 text-xl font-semibold">Welcome Back!</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Sign in to continue to your dashboard.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 dark:border-gray-700">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="signup">Sign Up</div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="tab-content active" id="login-tab">
+            <form id="login-form" class="space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium mb-1">Email address</label>
+                        <input id="login-email" name="email" type="email" autocomplete="email" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Email address" value="test@example.com">
+                    </div>
+                    <div class="password-container">
+                        <label for="login-password" class="block text-sm font-medium mb-1">Password</label>
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Password" value="password123">
+                        <button type="button" class="password-toggle" id="login-password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember me</label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot your password?</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                        class="btn-primary group relative flex justify-center w-full px-4 py-3 text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Sign in
+                    </button>
+                </div>
+                <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="tab-content" id="signup-tab">
+            <form id="signup-form" class="space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium mb-1">Full Name</label>
+                        <input id="signup-name" name="name" type="text" autocomplete="name" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Full Name">
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium mb-1">Email address</label>
+                        <input id="signup-email" name="email" type="email" autocomplete="email" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Email address">
+                    </div>
+                    <div class="password-container">
+                        <label for="signup-password" class="block text-sm font-medium mb-1">Password</label>
+                        <input id="signup-password" name="password" type="password" autocomplete="new-password" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Password">
+                        <button type="button" class="password-toggle" id="signup-password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-container">
+                        <label for="confirm-password" class="block text-sm font-medium mb-1">Confirm Password</label>
+                        <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
+                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
+                            placeholder="Confirm Password">
+                        <button type="button" class="password-toggle" id="confirm-password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <input id="agree-terms" name="agree-terms" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="agree-terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms and Conditions</a>
+                    </label>
+                </div>
+
+                <div>
+                    <button type="submit"
+                        class="btn-primary group relative flex justify-center w-full px-4 py-3 text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Create Account
+                    </button>
+                </div>
+                <p id="signup-error" class="text-center text-sm text-red-600 mt-2"></p>
+            </form>
+        </div>
+
+        <!-- Social Login -->
+        <div class="mt-6">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <i class="fab fa-google text-red-500 mr-2"></i>
+                    Google
+                </button>
+
+                <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <i class="fab fa-facebook text-blue-600 mr-2"></i>
+                    Facebook
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Data Confirmation Modal -->
+    <div id="reset-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Reset All Data</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to reset all data? This action cannot be undone and will delete all your progress, coins, and settings.</p>
+            <div class="flex gap-2">
+                <button class="btn-danger flex-1 py-2 rounded" id="confirm-reset">Reset Data</button>
+                <button class="btn-secondary flex-1 py-2 rounded border border-gray-300 dark:border-gray-600" id="cancel-reset">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsPanel = document.getElementById('settings-panel');
+        const resetDataBtn = document.getElementById('reset-data-btn');
+        const resetModal = document.getElementById('reset-modal');
+        const confirmReset = document.getElementById('confirm-reset');
+        const cancelReset = document.getElementById('cancel-reset');
+        const lightThemeBtn = document.getElementById('light-theme-btn');
+        const darkThemeBtn = document.getElementById('dark-theme-btn');
+        const autoThemeBtn = document.getElementById('auto-theme-btn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const loginPasswordToggle = document.getElementById('login-password-toggle');
+        const signupPasswordToggle = document.getElementById('signup-password-toggle');
+        const confirmPasswordToggle = document.getElementById('confirm-password-toggle');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const loginError = document.getElementById('login-error');
+        const signupError = document.getElementById('signup-error');
+
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (savedTheme === 'auto' && prefersDark)) {
+                document.body.classList.add('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        // Toggle theme
+        themeToggle.addEventListener('click', function() {
+            if (document.body.classList.contains('dark-theme')) {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            } else {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        });
+
+        // Theme buttons
+        lightThemeBtn.addEventListener('click', function() {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        });
+
+        darkThemeBtn.addEventListener('click', function() {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        });
+
+        autoThemeBtn.addEventListener('click', function() {
+            localStorage.setItem('theme', 'auto');
+            initTheme();
+        });
+
+        // Toggle settings panel
+        settingsToggle.addEventListener('click', function() {
+            settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close settings panel when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!settingsToggle.contains(event.target) && !settingsPanel.contains(event.target)) {
+                settingsPanel.style.display = 'none';
+            }
+        });
+
+        // Reset data modal
+        resetDataBtn.addEventListener('click', function() {
+            resetModal.style.display = 'flex';
+        });
+
+        confirmReset.addEventListener('click', function() {
+            // In a real app, this would reset all data
+            localStorage.clear();
+            alert('All data has been reset successfully!');
+            resetModal.style.display = 'none';
+            window.location.reload();
+        });
+
+        cancelReset.addEventListener('click', function() {
+            resetModal.style.display = 'none';
+        });
+
+        // Tab functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Password toggle functionality
+        function setupPasswordToggle(toggleBtn, passwordField) {
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        setupPasswordToggle(loginPasswordToggle, document.getElementById('login-password'));
+        setupPasswordToggle(signupPasswordToggle, document.getElementById('signup-password'));
+        setupPasswordToggle(confirmPasswordToggle, document.getElementById('confirm-password'));
+
+        // Form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simple validation
+            if (!email || !password) {
+                loginError.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            // In a real app, this would send to server
+            // For demo, we'll simulate successful login
+            localStorage.setItem('currentUser', email);
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const agreeTerms = document.getElementById('agree-terms').checked;
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                signupError.textContent = 'Please fill in all fields';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                signupError.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            if (!agreeTerms) {
+                signupError.textContent = 'You must agree to the terms and conditions';
+                return;
+            }
+            
+            // In a real app, this would send to server
+            // For demo, we'll simulate successful signup
+            localStorage.setItem('currentUser', email);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', name);
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            
+            // Check if user is already logged in
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
 </body>
 </html>
-<a href="rewards.html" class="nav-link">
-  ...
-  <span>Daily Rewards</span>
-</a>

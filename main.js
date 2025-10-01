@@ -624,3 +624,43 @@ function handleAdminPage(currentUserData, updateUserData) {
 
     renderUserTable();
 }
+// Clear existing data and create accounts
+localStorage.clear();
+
+// Create test user
+const testUser = {
+    email: 'test@example.com',
+    password: 'password123',
+    coins: 100,
+    isAdmin: true,
+    lastClaimTime: null,
+    name: 'Test User'
+};
+localStorage.setItem('user_test@example.com', JSON.stringify(testUser));
+
+// Create admin account with correct spelling
+const adminUser = {
+    email: 'Ghazimalik1997@gmail.com',
+    password: 'Ghazi123$',
+    coins: 10000,
+    isAdmin: true,
+    lastClaimTime: null,
+    name: 'Ghazi Malik'
+};
+localStorage.setItem('user_Ghazimalik1997@gmail.com', JSON.stringify(adminUser));
+
+// Also create the typo version
+const adminUserTypo = {
+    email: 'Ghazimailk1997@gmail.com',
+    password: 'Ghazi123$',
+    coins: 10000,
+    isAdmin: true,
+    lastClaimTime: null,
+    name: 'Ghazi Malik'
+};
+localStorage.setItem('user_Ghazimailk1997@gmail.com', JSON.stringify(adminUserTypo));
+
+console.log('Accounts created successfully!');
+console.log('Login with: Ghazimalik1997@gmail.com / Ghazi123$');
+console.log('Or: Ghazimailk1997@gmail.com / Ghazi123$');
+console.log('Or: test@example.com / password123');

@@ -472,3 +472,179 @@ function handleAdminPage(currentUserData, updateUserData) {
     // Initial render of the user table
     renderUserTable();
 }
+// Add to main.js - Contact Management for Admin Panel
+function handleAdminContactPage(currentUserData) {
+    const contactMessagesBody = document.getElementById('contact-messages-body');
+    if (!contactMessagesBody) return;
+
+    // Security check
+    if (!currentUserData.isAdmin) {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
+    function renderContactMessages() {
+        contactMessagesBody.innerHTML = '';
+        let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+        
+        if (messages.length === 0) {
+            contactMessagesBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        No contact messages received yet.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Sort by timestamp (newest first)
+        messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        messages.forEach(message => {
+            const row = document.createElement('tr');
+            const date = new Date(message.timestamp).toLocaleDateString();
+            const time = new Date(message.timestamp).toLocaleTimeString();
+            
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="font-medium">${message.name}</div>
+                    <div class="text-sm text-gray-500">${message.email}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="capitalize">${message.subject}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="max-w-xs truncate">${message.message}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm">${date}</div>
+                    <div class="text-xs text-gray-500">${time}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full ${message.status === 'unread' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                        ${message.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="view-message-btn text-blue-600 hover:text-blue-900 mr-3" data-id="${message.id}">
+                        View
+                    </button>
+                    <button class="delete-message-btn text-red-600 hover:text-red-900" data-id="${message.id}">
+                        Delete
+                    </button>
+                </td>
+            `;
+            contactMessagesBody.appendChild(row);
+        });
+
+        // Add event listeners
+        document.querySelectorAll('.view-message-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const messageId = this.getAttribute('data-id');
+                viewMessageDetails(messageId);
+            });
+        });
+
+        document.querySelectorAll('.delete-message-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const messageId = this.getAttribute('data-id');
+                deleteMessage(messageId);
+            });
+        });
+    }
+
+    function viewMessageDetails(messageId) {
+        let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+        const message = messages.find(m => m.id == messageId);
+        
+        if (message) {
+            // Mark as read
+            message.status = 'read';
+            localStorage.setItem('contactMessages', JSON.stringify(messages));
+            
+            // Show modal with message details
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-90vh overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Message from ${message.name}</h3>
+                        <button class="close-modal text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <strong>Email:</strong> ${message.email}
+                        </div>
+                        <div>
+                            <strong>Subject:</strong> ${message.subject}
+                        </div>
+                        <div>
+                            <strong>Date:</strong> ${new Date(message.timestamp).toLocaleString()}
+                        </div>
+                        <div>
+                            <strong>Message:</strong>
+                            <p class="mt-2 p-4 bg-gray-50 dark:bg-gray-700 rounded">${message.message}</p>
+                        </div>
+                        ${message.replies && message.replies.length > 0 ? `
+                        <div>
+                            <strong>Replies:</strong>
+                            ${message.replies.map(reply => `
+                                <div class="mt-2 p-3 bg-blue-50 dark:bg-blue-900 rounded">
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">${new Date(reply.timestamp).toLocaleString()}</div>
+                                    <div>${reply.message}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+                        <div class="mt-4">
+                            <textarea id="reply-message" class="w-full p-3 border rounded" placeholder="Type your reply here..."></textarea>
+                            <button id="send-reply" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Send Reply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                renderContactMessages();
+            });
+            
+            // Send reply
+            modal.querySelector('#send-reply').addEventListener('click', () => {
+                const replyText = modal.querySelector('#reply-message').value;
+                if (replyText.trim()) {
+                    if (!message.replies) message.replies = [];
+                    message.replies.push({
+                        message: replyText,
+                        timestamp: new Date().toISOString(),
+                        admin: true
+                    });
+                    localStorage.setItem('contactMessages', JSON.stringify(messages));
+                    modal.querySelector('#reply-message').value = '';
+                    alert('Reply sent successfully!');
+                    document.body.removeChild(modal);
+                    renderContactMessages();
+                }
+            });
+        }
+    }
+
+    function deleteMessage(messageId) {
+        if (confirm('Are you sure you want to delete this message?')) {
+            let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            messages = messages.filter(m => m.id != messageId);
+            localStorage.setItem('contactMessages', JSON.stringify(messages));
+            renderContactMessages();
+        }
+    }
+
+    renderContactMessages();
+}

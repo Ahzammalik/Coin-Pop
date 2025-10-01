@@ -17,6 +17,9 @@
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
         }
 
         .dark-theme {
@@ -27,6 +30,9 @@
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --border-color: #334155;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
         }
 
         body {
@@ -225,6 +231,214 @@
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
+        /* New styles for enhanced contact page */
+        .message-history {
+            margin-top: 2rem;
+        }
+
+        .message-item {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            background: var(--card-color);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-subject {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .message-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .message-preview {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .message-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: color-mix(in srgb, var(--warning-color) 20%, transparent);
+            color: var(--warning-color);
+        }
+
+        .status-answered {
+            background: color-mix(in srgb, var(--success-color) 20%, transparent);
+            color: var(--success-color);
+        }
+
+        .status-closed {
+            background: color-mix(in srgb, var(--danger-color) 20%, transparent);
+            color: var(--danger-color);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notification-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .notification-error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .notification-info {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .form-error {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group.error .form-input,
+        .form-group.error .form-textarea {
+            border-color: var(--danger-color);
+        }
+
+        .form-group.error .form-error {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .message-detail {
+            background: var(--card-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .message-replies {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .reply-item {
+            background: color-mix(in srgb, var(--bg-color) 50%, transparent);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .reply-author {
+            font-weight: 600;
+        }
+
+        .reply-date {
+            color: var(--text-secondary);
+        }
+
+        .reply-content {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -311,41 +525,66 @@
                     </div>
                 </div>
 
-                <!-- Contact Form -->
-                <div class="card">
-                    <h3 class="card-header">Send us a Message</h3>
-                    <form id="contact-form">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div class="form-group">
-                                <label class="form-label">Your Name</label>
-                                <input type="text" id="contact-name" class="form-input" placeholder="Enter your name" required>
+                <!-- Tabs for Contact Form and Message History -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="contact-form">Send Message</div>
+                    <div class="tab" data-tab="message-history">My Messages</div>
+                </div>
+
+                <!-- Contact Form Tab -->
+                <div class="tab-content active" id="contact-form-tab">
+                    <div class="card">
+                        <h3 class="card-header">Send us a Message</h3>
+                        <form id="contact-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="form-group">
+                                    <label class="form-label">Your Name</label>
+                                    <input type="text" id="contact-name" class="form-input" placeholder="Enter your name" required>
+                                    <div class="form-error" id="name-error">Please enter your name</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Your Email</label>
+                                    <input type="email" id="contact-email" class="form-input" placeholder="Enter your email" required>
+                                    <div class="form-error" id="email-error">Please enter a valid email address</div>
+                                </div>
                             </div>
+                            
                             <div class="form-group">
-                                <label class="form-label">Your Email</label>
-                                <input type="email" id="contact-email" class="form-input" placeholder="Enter your email" required>
+                                <label class="form-label">Subject</label>
+                                <select id="contact-subject" class="form-input" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="withdrawal">Withdrawal Issue</option>
+                                    <option value="bug">Bug Report</option>
+                                    <option value="suggestion">Feature Suggestion</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="form-error" id="subject-error">Please select a subject</div>
                             </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Message</label>
+                                <textarea id="contact-message" class="form-textarea" placeholder="Please describe your issue or question in detail..." required></textarea>
+                                <div class="form-error" id="message-error">Please enter your message</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" id="submit-btn">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Message History Tab -->
+                <div class="tab-content" id="message-history-tab">
+                    <div class="card">
+                        <h3 class="card-header">My Messages</h3>
+                        <div id="messages-container">
+                            <!-- Messages will be populated by JavaScript -->
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Subject</label>
-                            <select id="contact-subject" class="form-input" required>
-                                <option value="">Select a subject</option>
-                                <option value="general">General Inquiry</option>
-                                <option value="technical">Technical Support</option>
-                                <option value="withdrawal">Withdrawal Issue</option>
-                                <option value="bug">Bug Report</option>
-                                <option value="suggestion">Feature Suggestion</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Message</label>
-                            <textarea id="contact-message" class="form-textarea" placeholder="Please describe your issue or question in detail..." required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Send Message</button>
-                    </form>
+                    </div>
                 </div>
 
                 <!-- FAQ Section -->
@@ -405,10 +644,80 @@
                 document.getElementById('admin-nav-link').style.display = 'flex';
             }
 
+            // Setup tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // If switching to message history, load messages
+                    if (tabId === 'message-history') {
+                        loadUserMessages();
+                    }
+                });
+            });
+
             // Contact form submission
             document.getElementById('contact-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
+                if (validateForm()) {
+                    submitContactForm();
+                }
+            });
+
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                
+                // Reset errors
+                document.querySelectorAll('.form-group').forEach(group => {
+                    group.classList.remove('error');
+                });
+                
+                // Validate name
+                const name = document.getElementById('contact-name').value.trim();
+                if (!name) {
+                    document.getElementById('contact-name').closest('.form-group').classList.add('error');
+                    isValid = false;
+                }
+                
+                // Validate email
+                const email = document.getElementById('contact-email').value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailRegex.test(email)) {
+                    document.getElementById('contact-email').closest('.form-group').classList.add('error');
+                    isValid = false;
+                }
+                
+                // Validate subject
+                const subject = document.getElementById('contact-subject').value;
+                if (!subject) {
+                    document.getElementById('contact-subject').closest('.form-group').classList.add('error');
+                    isValid = false;
+                }
+                
+                // Validate message
+                const message = document.getElementById('contact-message').value.trim();
+                if (!message) {
+                    document.getElementById('contact-message').closest('.form-group').classList.add('error');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+
+            // Submit contact form
+            function submitContactForm() {
                 const name = document.getElementById('contact-name').value;
                 const email = document.getElementById('contact-email').value;
                 const subject = document.getElementById('contact-subject').value;
@@ -422,7 +731,7 @@
                     subject: subject,
                     message: message,
                     timestamp: new Date().toISOString(),
-                    status: 'unread',
+                    status: 'pending',
                     replies: []
                 };
 
@@ -431,11 +740,229 @@
                 messages.push(contactMessage);
                 localStorage.setItem('contactMessages', JSON.stringify(messages));
 
-                alert('Thank you for your message! We will get back to you within 24 hours.');
+                // Show success notification
+                showNotification('Thank you for your message! We will get back to you within 24 hours.', 'success');
+                
+                // Reset form
                 document.getElementById('contact-form').reset();
                 document.getElementById('contact-name').value = userData.name || currentUserEmail.split('@')[0];
                 document.getElementById('contact-email').value = currentUserEmail;
-            });
+                
+                // Switch to message history tab
+                document.querySelector('.tab[data-tab="message-history"]').click();
+            }
+
+            // Load user messages
+            function loadUserMessages() {
+                const messagesContainer = document.getElementById('messages-container');
+                const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+                const userMessages = messages.filter(msg => msg.email === currentUserEmail);
+                
+                if (userMessages.length === 0) {
+                    messagesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">No messages yet</h3>
+                            <p class="text-gray-600 dark:text-gray-400">You haven't sent any messages to our support team.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort messages by timestamp (newest first)
+                userMessages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                let messagesHTML = '';
+                
+                userMessages.forEach(message => {
+                    const date = new Date(message.timestamp);
+                    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = 'Pending';
+                    
+                    if (message.status === 'answered') {
+                        statusClass = 'status-answered';
+                        statusText = 'Answered';
+                    } else if (message.status === 'closed') {
+                        statusClass = 'status-closed';
+                        statusText = 'Closed';
+                    }
+                    
+                    messagesHTML += `
+                        <div class="message-item" data-message-id="${message.id}">
+                            <div class="message-header">
+                                <div class="message-subject">${getSubjectText(message.subject)}</div>
+                                <div class="message-date">${formattedDate}</div>
+                            </div>
+                            <div class="message-preview">${message.message.substring(0, 100)}${message.message.length > 100 ? '...' : ''}</div>
+                            <div>
+                                <span class="message-status ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                messagesContainer.innerHTML = messagesHTML;
+                
+                // Add click event to message items
+                document.querySelectorAll('.message-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const messageId = this.getAttribute('data-message-id');
+                        showMessageDetail(messageId);
+                    });
+                });
+            }
+
+            // Show message detail
+            function showMessageDetail(messageId) {
+                const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+                const message = messages.find(msg => msg.id == messageId);
+                
+                if (!message) return;
+                
+                const date = new Date(message.timestamp);
+                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                let statusClass = 'status-pending';
+                let statusText = 'Pending';
+                
+                if (message.status === 'answered') {
+                    statusClass = 'status-answered';
+                    statusText = 'Answered';
+                } else if (message.status === 'closed') {
+                    statusClass = 'status-closed';
+                    statusText = 'Closed';
+                }
+                
+                let repliesHTML = '';
+                
+                if (message.replies && message.replies.length > 0) {
+                    message.replies.forEach(reply => {
+                        const replyDate = new Date(reply.timestamp);
+                        const formattedReplyDate = replyDate.toLocaleDateString() + ' ' + replyDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        
+                        repliesHTML += `
+                            <div class="reply-item">
+                                <div class="reply-header">
+                                    <div class="reply-author">${reply.author}</div>
+                                    <div class="reply-date">${formattedReplyDate}</div>
+                                </div>
+                                <div class="reply-content">${reply.content}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    repliesHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">No replies yet. Our team will respond soon.</p>
+                        </div>
+                    `;
+                }
+                
+                const modalHTML = `
+                    <div class="modal" id="message-detail-modal">
+                        <div class="modal-content" style="max-width: 700px;">
+                            <div class="modal-header">
+                                <h3 class="modal-title">Message Details</h3>
+                                <button class="modal-close" id="close-modal">&times;</button>
+                            </div>
+                            <div class="message-detail">
+                                <div class="message-header">
+                                    <div class="message-subject">${getSubjectText(message.subject)}</div>
+                                    <div>
+                                        <span class="message-status ${statusClass}">${statusText}</span>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">From: ${message.name} (${message.email})</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Date: ${formattedDate}</div>
+                                </div>
+                                <div class="message-content">
+                                    <p>${message.message}</p>
+                                </div>
+                            </div>
+                            <div class="message-replies">
+                                <h4 class="font-semibold mb-4">Replies</h4>
+                                ${repliesHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('message-detail-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to page
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                document.getElementById('message-detail-modal').style.display = 'flex';
+                
+                // Close modal event
+                document.getElementById('close-modal').addEventListener('click', function() {
+                    document.getElementById('message-detail-modal').style.display = 'none';
+                });
+                
+                // Close modal when clicking outside
+                document.getElementById('message-detail-modal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            }
+
+            // Get subject text from value
+            function getSubjectText(subjectValue) {
+                const subjects = {
+                    'general': 'General Inquiry',
+                    'technical': 'Technical Support',
+                    'withdrawal': 'Withdrawal Issue',
+                    'bug': 'Bug Report',
+                    'suggestion': 'Feature Suggestion',
+                    'other': 'Other'
+                };
+                
+                return subjects[subjectValue] || 'Unknown Subject';
+            }
+
+            // Show notification
+            function showNotification(message, type = 'info') {
+                // Remove existing notification if any
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                
+                let icon = 'fa-info-circle';
+                if (type === 'success') icon = 'fa-check-circle';
+                if (type === 'error') icon = 'fa-exclamation-circle';
+                
+                notification.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                `;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
 
             // Theme toggle
             const themeToggle = document.getElementById('theme-toggle');

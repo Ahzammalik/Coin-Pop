@@ -14,13 +14,13 @@ function handleLoginPage(form) {
         return;
     }
 
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
+    const emailInput = document.getElementById('login-email'); // Fixed ID
+    const passwordInput = document.getElementById('login-password'); // Fixed ID
     const loginError = document.getElementById('login-error');
     const signupLink = document.getElementById('signup-link');
 
     // Check if elements exist before adding event listeners
-    if (!emailInput || !passwordInput || !loginError || !signupLink) {
+    if (!emailInput || !passwordInput || !loginError) {
         console.error('Login page elements not found');
         return;
     }
@@ -39,56 +39,65 @@ function handleLoginPage(form) {
 
         const storedUser = localStorage.getItem(`user_${email}`);
         if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            if (userData.password === password) {
-                localStorage.setItem('currentUser', email);
-                window.location.href = 'dashboard.html';
-            } else {
-                loginError.textContent = 'Incorrect password. Please try again.';
+            try {
+                const userData = JSON.parse(storedUser);
+                if (userData.password === password) {
+                    localStorage.setItem('currentUser', email);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    loginError.textContent = 'Incorrect password. Please try again.';
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                loginError.textContent = 'Error reading user data. Please try again.';
             }
         } else {
             loginError.textContent = 'No user found with that email address.';
         }
     });
 
-    signupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        const email = prompt("Please enter an email for your new account:", "newuser@example.com");
-        if (!email) return;
+    // Handle signup link if it exists
+    if (signupLink) {
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = prompt("Please enter an email for your new account:", "newuser@example.com");
+            if (!email) return;
 
-        // Email validation
-        if (!email.includes('@') || !email.includes('.')) {
-            alert("Please enter a valid email address.");
-            return;
-        }
+            // Email validation
+            if (!email.includes('@') || !email.includes('.')) {
+                alert("Please enter a valid email address.");
+                return;
+            }
 
-        if (localStorage.getItem(`user_${email}`)) {
-            alert("This email is already registered. Please log in.");
-            return;
-        }
+            if (localStorage.getItem(`user_${email}`)) {
+                alert("This email is already registered. Please log in.");
+                return;
+            }
 
-        const password = prompt("Please enter a password:");
-        if (!password) return;
+            const password = prompt("Please enter a password:");
+            if (!password) return;
 
-        // Password validation
-        if (password.length < 6) {
-            alert("Password must be at least 6 characters long.");
-            return;
-        }
+            // Password validation
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                return;
+            }
 
-        const newUser = { 
-            email, 
-            password, 
-            coins: 50, 
-            isAdmin: false, 
-            lastClaimTime: null 
-        };
-        localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
-        alert("Account created successfully! You can now log in.");
-        
-        if (emailInput) emailInput.value = email;
-        if (passwordInput) passwordInput.value = '';
-    });
+            const newUser = { 
+                email, 
+                password, 
+                coins: 50, 
+                isAdmin: false, 
+                lastClaimTime: null,
+                name: email.split('@')[0] // Add name field for consistency
+            };
+            localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
+            alert("Account created successfully! You can now log in.");
+            
+            if (emailInput) emailInput.value = email;
+            if (passwordInput) passwordInput.value = '';
+        });
+    }
 }
 
 function handleAuthenticatedPages() {
@@ -98,11 +107,19 @@ function handleAuthenticatedPages() {
         return;
     }
 
-    // Centralized User Data Management
-    let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
-
     // Initialize dummy user if needed
     initializeDummyUser();
+
+    // Centralized User Data Management
+    let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+    
+    // Check if user data exists
+    if (!userData) {
+        console.error('User data not found, redirecting to login');
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+        return;
+    }
 
     const userEmailDisplay = document.getElementById('user-email-display');
     const coinBalanceDisplay = document.getElementById('coin-balance-display');
@@ -125,7 +142,8 @@ function handleAuthenticatedPages() {
 
     function setActiveNavLink() {
         const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
-        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+        const navLinks = document.querySelectorAll('.sidebar-nav .nav-link, .nav-link');
+        navLinks.forEach(link => {
             if (link.getAttribute('href') === currentPage) {
                 link.classList.add('active');
             } else {
@@ -145,13 +163,17 @@ function handleAuthenticatedPages() {
     updateUI();
     setActiveNavLink();
 
-    // Page-specific logic
-    handleDashboardPage(userData, updateUserData);
-    handleRewardsPage(userData, updateUserData);
-    handlePlayPage(userData, updateUserData);
-    handleLeaderboardPage(userData);
-    handleWithdrawPage(userData, updateUserData);
-    handleAdminPage(userData, updateUserData);
+    // Page-specific logic with error handling
+    try {
+        handleDashboardPage(userData, updateUserData);
+        handleRewardsPage(userData, updateUserData);
+        handlePlayPage(userData, updateUserData);
+        handleLeaderboardPage(userData);
+        handleWithdrawPage(userData, updateUserData);
+        handleAdminPage(userData, updateUserData);
+    } catch (error) {
+        console.error('Error initializing page:', error);
+    }
 }
 
 function initializeDummyUser() {
@@ -161,7 +183,8 @@ function initializeDummyUser() {
             password: 'password123', 
             coins: 100, 
             isAdmin: true, 
-            lastClaimTime: null 
+            lastClaimTime: null,
+            name: 'Test User'
         };
         localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
     }
@@ -190,16 +213,27 @@ function handleRewardsPage(userData, updateUserData) {
     function enableClaimButton() {
         claimButton.disabled = false;
         claimButton.textContent = `Claim ${REWARD_AMOUNT} Coins`;
-        if (rewardMessage) rewardMessage.textContent = 'Your daily reward is ready. Claim it now!';
-        if (timerMessage) timerMessage.style.display = 'none';
+        if (rewardMessage) {
+            rewardMessage.textContent = 'Your daily reward is ready. Claim it now!';
+            rewardMessage.className = 'text-green-600 text-sm font-medium';
+        }
+        if (timerMessage) {
+            timerMessage.style.display = 'none';
+        }
         if (countdownInterval) clearInterval(countdownInterval);
     }
 
     function disableClaimButton(duration) {
         claimButton.disabled = true;
         claimButton.textContent = 'Reward Claimed';
-        if (rewardMessage) rewardMessage.textContent = 'You have already claimed your reward for today.';
-        if (timerMessage) timerMessage.style.display = 'block';
+        if (rewardMessage) {
+            rewardMessage.textContent = 'You have already claimed your reward for today.';
+            rewardMessage.className = 'text-gray-600 text-sm';
+        }
+        if (timerMessage) {
+            timerMessage.style.display = 'block';
+            timerMessage.className = 'text-red-500 text-sm font-medium';
+        }
         startCountdown(duration);
     }
 
@@ -231,6 +265,7 @@ function handleRewardsPage(userData, updateUserData) {
         checkRewardStatus();
     });
 
+    // Initialize reward status
     checkRewardStatus();
 }
 
@@ -243,14 +278,22 @@ function handleDashboardPage(userData, updateUserData) {
     const dashboardRewardTimer = document.getElementById('dashboard-reward-timer');
 
     if (dashboardCoins) dashboardCoins.textContent = userData.coins;
-    welcomeMessage.textContent = `Welcome back, ${userData.email.split('@')[0]}!`;
+    
+    // Use name if available, otherwise use email prefix
+    const displayName = userData.name || userData.email.split('@')[0];
+    welcomeMessage.textContent = `Welcome back, ${displayName}!`;
 
     function calculateRank() {
         const allUsers = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith('user_')) {
-                allUsers.push(JSON.parse(localStorage.getItem(key)));
+                try {
+                    const user = JSON.parse(localStorage.getItem(key));
+                    allUsers.push(user);
+                } catch (error) {
+                    console.error('Error parsing user data for key:', key, error);
+                }
             }
         }
         allUsers.sort((a, b) => b.coins - a.coins);
@@ -269,13 +312,11 @@ function handleDashboardPage(userData, updateUserData) {
         
         if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
             dashboardRewardTimer.textContent = 'Ready to Claim!';
-            dashboardRewardTimer.classList.remove('text-red-500');
-            dashboardRewardTimer.classList.add('text-green-600');
+            dashboardRewardTimer.className = 'text-green-600 font-semibold';
             if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
         } else {
             const remainingTime = COOLDOWN_PERIOD - (Date.now() - lastClaim);
-            dashboardRewardTimer.classList.remove('text-green-600');
-            dashboardRewardTimer.classList.add('text-red-500');
+            dashboardRewardTimer.className = 'text-red-500 font-semibold';
             startRewardCountdown(remainingTime);
         }
     }
@@ -317,10 +358,19 @@ function handlePlayPage(userData, updateUserData) {
 
         if (resultMessage) {
             resultMessage.textContent = `You won ${coinsWon} coins!`;
+            resultMessage.className = 'text-green-600 font-semibold text-center';
+            
+            // Clear previous message after 2 seconds
+            setTimeout(() => {
+                resultMessage.textContent = 'Click the coin to earn more coins!';
+                resultMessage.className = 'text-gray-600 text-center';
+            }, 2000);
         }
 
+        // Add animation class
         popButton.classList.add('pop-animation');
         
+        // Remove animation class after animation completes
         setTimeout(() => {
             popButton.classList.remove('pop-animation');
         }, 300);
@@ -335,7 +385,12 @@ function handleLeaderboardPage(currentUserData) {
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith('user_')) {
-            allUsers.push(JSON.parse(localStorage.getItem(key)));
+            try {
+                const user = JSON.parse(localStorage.getItem(key));
+                allUsers.push(user);
+            } catch (error) {
+                console.error('Error parsing user data for key:', key, error);
+            }
         }
     }
 
@@ -353,20 +408,25 @@ function handleLeaderboardPage(currentUserData) {
 
         const row = document.createElement('tr');
         if (isCurrentUser) {
-            row.className = 'bg-blue-50 font-semibold';
+            row.className = 'bg-blue-50 font-semibold dark:bg-blue-900';
+        } else {
+            row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
         }
 
         const rankCell = document.createElement('td');
-        rankCell.className = 'px-6 py-4 whitespace-nowrap';
+        rankCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium';
         rankCell.textContent = `#${rank}`;
 
         const playerCell = document.createElement('td');
-        playerCell.className = 'px-6 py-4 whitespace-nowrap';
-        playerCell.textContent = user.email.split('@')[0];
+        playerCell.className = 'px-6 py-4 whitespace-nowrap text-sm';
+        
+        // Use name if available, otherwise use email prefix
+        const displayName = user.name || user.email.split('@')[0];
+        playerCell.textContent = displayName;
         if (isCurrentUser) playerCell.textContent += ' (You)';
 
         const coinsCell = document.createElement('td');
-        coinsCell.className = 'px-6 py-4 whitespace-nowrap text-blue-600 font-bold';
+        coinsCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600 dark:text-blue-400';
         coinsCell.textContent = user.coins;
 
         row.appendChild(rankCell);
@@ -416,6 +476,12 @@ function handleWithdrawPage(userData, updateUserData) {
             return;
         }
 
+        if (amountToWithdraw < CONVERSION_RATE) {
+            messageDisplay.textContent = `Minimum withdrawal is ${CONVERSION_RATE} coins.`;
+            messageDisplay.classList.add('text-red-500');
+            return;
+        }
+
         // Process withdrawal
         updateUserData({
             coins: userData.coins - amountToWithdraw
@@ -423,15 +489,15 @@ function handleWithdrawPage(userData, updateUserData) {
 
         const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked');
         if (selectedMethod) {
-            messageDisplay.textContent = `Success! Your ${selectedMethod.value} reward is being processed.`;
+            messageDisplay.textContent = `Success! Your ${selectedMethod.value} withdrawal of PKR ${(amountToWithdraw / CONVERSION_RATE).toFixed(2)} is being processed.`;
         } else {
-            messageDisplay.textContent = 'Success! Your withdrawal is being processed.';
+            messageDisplay.textContent = `Success! Your withdrawal of PKR ${(amountToWithdraw / CONVERSION_RATE).toFixed(2)} is being processed.`;
         }
         messageDisplay.classList.add('text-green-500');
 
         // Reset form
         if (amountInput) amountInput.value = '';
-        if (cashValueDisplay) cashValueDisplay.textContent = 'Rs 0.00';
+        if (cashValueDisplay) cashValueDisplay.textContent = 'PKR 0.00';
     });
 }
 
@@ -452,7 +518,12 @@ function handleAdminPage(currentUserData, updateUserData) {
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith('user_')) {
-                allUsers.push(JSON.parse(localStorage.getItem(key)));
+                try {
+                    const user = JSON.parse(localStorage.getItem(key));
+                    allUsers.push(user);
+                } catch (error) {
+                    console.error('Error parsing user data for key:', key, error);
+                }
             }
         }
 
@@ -463,18 +534,22 @@ function handleAdminPage(currentUserData, updateUserData) {
 
         allUsers.forEach(user => {
             const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
+            
             row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${user.email}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">${user.coins}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${user.email}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${user.coins}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <button data-email="${user.email}" class="toggle-admin-btn px-3 py-1 text-sm font-medium rounded-md ${user.isAdmin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                    <button data-email="${user.email}" class="toggle-admin-btn px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                        user.isAdmin ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'
+                    }">
                         ${user.isAdmin ? 'Admin' : 'User'}
                     </button>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex items-center space-x-2">
-                        <input type="number" data-email="${user.email}" class="coin-input w-24 border-gray-300 rounded-md shadow-sm text-sm" placeholder="Add/Sub">
-                        <button data-email="${user.email}" class="update-coins-btn px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">Update</button>
+                        <input type="number" data-email="${user.email}" class="coin-input w-20 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Amount">
+                        <button data-email="${user.email}" class="update-coins-btn px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-xs">Update</button>
                     </div>
                 </td>
             `;
@@ -492,6 +567,26 @@ function handleAdminPage(currentUserData, updateUserData) {
         if (target.classList.contains('toggle-admin-btn')) {
             const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
             if (userToUpdate) {
+                // Prevent removing last admin
+                if (userToUpdate.isAdmin) {
+                    const allUsers = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('user_')) {
+                            try {
+                                const user = JSON.parse(localStorage.getItem(key));
+                                if (user.isAdmin) allUsers.push(user);
+                            } catch (error) {
+                                console.error('Error parsing user data:', error);
+                            }
+                        }
+                    }
+                    if (allUsers.length <= 1) {
+                        alert('Cannot remove the last admin user.');
+                        return;
+                    }
+                }
+                
                 userToUpdate.isAdmin = !userToUpdate.isAdmin;
                 localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
                 renderUserTable();

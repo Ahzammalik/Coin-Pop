@@ -1,103 +1,207 @@
+// Global user data management
+let currentUserData = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        handleLoginPage(loginForm);
+    const signupForm = document.getElementById('signup-form');
+    
+    if (loginForm || signupForm) {
+        handleAuthPages(loginForm, signupForm);
     } else {
         handleAuthenticatedPages();
     }
 });
 
-function handleLoginPage(form) {
+function handleAuthPages(loginForm, signupForm) {
     // Redirect if already logged in
     if (localStorage.getItem('currentUser')) {
         window.location.href = 'dashboard.html';
         return;
     }
 
-    const emailInput = document.getElementById('login-email'); // Fixed ID
-    const passwordInput = document.getElementById('login-password'); // Fixed ID
-    const loginError = document.getElementById('login-error');
-    const signupLink = document.getElementById('signup-link');
+    // Handle login form
+    if (loginForm) {
+        handleLoginForm(loginForm);
+    }
 
-    // Check if elements exist before adding event listeners
-    if (!emailInput || !passwordInput || !loginError) {
-        console.error('Login page elements not found');
+    // Handle signup form
+    if (signupForm) {
+        handleSignupForm(signupForm);
+    }
+
+    // Create admin account if it doesn't exist
+    createAdminAccount();
+}
+
+function handleLoginForm(form) {
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    const loginSubmitBtn = document.getElementById('login-submit-btn');
+    const loginBtnText = document.getElementById('login-btn-text');
+    const loginLoading = document.getElementById('login-loading');
+
+    if (!emailInput || !passwordInput) {
+        console.error('Login form elements not found');
         return;
     }
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        loginError.textContent = '';
+        
+        if (loginError) loginError.textContent = '';
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
         // Basic validation
         if (!email || !password) {
-            loginError.textContent = 'Please enter both email and password.';
+            showFormError(loginError, 'Please enter both email and password.');
             return;
         }
 
-        const storedUser = localStorage.getItem(`user_${email}`);
-        if (storedUser) {
-            try {
+        // Email validation
+        if (!isValidEmail(email)) {
+            showFormError(loginError, 'Please enter a valid email address.');
+            return;
+        }
+
+        // Set loading state
+        setButtonLoading(loginSubmitBtn, loginBtnText, loginLoading, true);
+
+        try {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const storedUser = localStorage.getItem(`user_${email}`);
+            if (storedUser) {
                 const userData = JSON.parse(storedUser);
                 if (userData.password === password) {
                     localStorage.setItem('currentUser', email);
-                    window.location.href = 'dashboard.html';
+                    showNotification('Success', 'Login successful! Redirecting...', 'success');
+                    
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
                 } else {
-                    loginError.textContent = 'Incorrect password. Please try again.';
+                    showFormError(loginError, 'Incorrect password. Please try again.');
                 }
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                loginError.textContent = 'Error reading user data. Please try again.';
+            } else {
+                showFormError(loginError, 'No user found with that email address.');
             }
-        } else {
-            loginError.textContent = 'No user found with that email address.';
+        } catch (error) {
+            console.error('Login error:', error);
+            showFormError(loginError, 'An error occurred during login. Please try again.');
+        } finally {
+            setButtonLoading(loginSubmitBtn, loginBtnText, loginLoading, false);
         }
     });
+}
 
-    // Handle signup link if it exists
-    if (signupLink) {
-        signupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            const email = prompt("Please enter an email for your new account:", "newuser@example.com");
-            if (!email) return;
+function handleSignupForm(form) {
+    const nameInput = document.getElementById('signup-name');
+    const emailInput = document.getElementById('signup-email');
+    const passwordInput = document.getElementById('signup-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const agreeTermsInput = document.getElementById('agree-terms');
+    const signupError = document.getElementById('signup-error');
+    const signupSubmitBtn = document.getElementById('signup-submit-btn');
+    const signupBtnText = document.getElementById('signup-btn-text');
+    const signupLoading = document.getElementById('signup-loading');
 
-            // Email validation
-            if (!email.includes('@') || !email.includes('.')) {
-                alert("Please enter a valid email address.");
-                return;
-            }
+    if (!form) return;
 
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (signupError) signupError.textContent = '';
+        const name = nameInput ? nameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const password = passwordInput ? passwordInput.value : '';
+        const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+        const agreeTerms = agreeTermsInput ? agreeTermsInput.checked : false;
+
+        // Validation
+        if (!name || !email || !password || !confirmPassword) {
+            showFormError(signupError, 'Please fill in all required fields.');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showFormError(signupError, 'Please enter a valid email address.');
+            return;
+        }
+
+        if (password.length < 6) {
+            showFormError(signupError, 'Password must be at least 6 characters long.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showFormError(signupError, 'Passwords do not match.');
+            return;
+        }
+
+        if (!agreeTerms) {
+            showFormError(signupError, 'You must agree to the terms and conditions.');
+            return;
+        }
+
+        // Prevent creating account with admin email
+        if (email === 'Ghazimalik1997@gmail.com') {
+            showFormError(signupError, 'This email address is reserved for administration.');
+            return;
+        }
+
+        // Set loading state
+        setButtonLoading(signupSubmitBtn, signupBtnText, signupLoading, true);
+
+        try {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Check if user already exists
             if (localStorage.getItem(`user_${email}`)) {
-                alert("This email is already registered. Please log in.");
+                showFormError(signupError, 'User with this email already exists.');
                 return;
             }
 
-            const password = prompt("Please enter a password:");
-            if (!password) return;
-
-            // Password validation
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters long.");
-                return;
-            }
-
-            const newUser = { 
-                email, 
-                password, 
-                coins: 50, 
-                isAdmin: false, 
+            // Create new user
+            const newUser = {
+                email: email,
+                password: password,
+                name: name,
+                coins: 50,
+                isAdmin: false,
                 lastClaimTime: null,
-                name: email.split('@')[0] // Add name field for consistency
+                createdAt: new Date().toISOString(),
+                sessions: 0,
+                activities: [
+                    {
+                        icon: 'fa-user-plus',
+                        title: 'Account Created',
+                        time: new Date().toISOString(),
+                        type: 'account'
+                    }
+                ]
             };
+
             localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
-            alert("Account created successfully! You can now log in.");
+            localStorage.setItem('currentUser', email);
             
-            if (emailInput) emailInput.value = email;
-            if (passwordInput) passwordInput.value = '';
-        });
-    }
+            showNotification('Success', 'Account created successfully! Redirecting...', 'success');
+            
+            // Redirect after short delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        } catch (error) {
+            console.error('Signup error:', error);
+            showFormError(signupError, 'An error occurred during registration. Please try again.');
+        } finally {
+            setButtonLoading(signupSubmitBtn, signupBtnText, signupLoading, false);
+        }
+    });
 }
 
 function handleAuthenticatedPages() {
@@ -107,50 +211,61 @@ function handleAuthenticatedPages() {
         return;
     }
 
-    // Initialize dummy user if needed
-    initializeDummyUser();
-
-    // Centralized User Data Management
-    let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+    // Load user data
+    currentUserData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
     
     // Check if user data exists
-    if (!userData) {
+    if (!currentUserData) {
         console.error('User data not found, redirecting to login');
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
         return;
     }
 
+    // Update UI elements
+    updateUI();
+
+    // Set active navigation link
+    setActiveNavLink();
+
+    // Setup event listeners
+    setupEventListeners();
+
+    // Initialize page-specific functionality
+    initializePageFeatures();
+}
+
+function updateUI() {
     const userEmailDisplay = document.getElementById('user-email-display');
+    const userNameDisplay = document.getElementById('user-name-display');
     const coinBalanceDisplay = document.getElementById('coin-balance-display');
     const adminNavLink = document.getElementById('admin-nav-link');
-    const logoutBtn = document.getElementById('logout-btn');
 
-    function updateUserData(newData) {
-        userData = { ...userData, ...newData };
-        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-        updateUI();
+    if (userEmailDisplay) userEmailDisplay.textContent = currentUserData.email;
+    if (userNameDisplay) userNameDisplay.textContent = currentUserData.name || currentUserData.email.split('@')[0];
+    if (coinBalanceDisplay) coinBalanceDisplay.textContent = `Coins: ${currentUserData.coins || 0}`;
+    if (adminNavLink) {
+        adminNavLink.style.display = currentUserData.isAdmin ? 'flex' : 'none';
     }
+}
 
-    function updateUI() {
-        if (userEmailDisplay) userEmailDisplay.textContent = userData.email;
-        if (coinBalanceDisplay) coinBalanceDisplay.textContent = `Coins: ${userData.coins}`;
-        if (adminNavLink) {
-            adminNavLink.style.display = userData.isAdmin ? 'flex' : 'none';
+function setActiveNavLink() {
+    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
         }
-    }
+    });
+}
 
-    function setActiveNavLink() {
-        const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
-        const navLinks = document.querySelectorAll('.sidebar-nav .nav-link, .nav-link');
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
-    }
+function setupEventListeners() {
+    const logoutBtn = document.getElementById('logout-btn');
+    const refreshBtn = document.getElementById('refresh-btn');
 
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -159,38 +274,59 @@ function handleAuthenticatedPages() {
         });
     }
 
-    // Initial setup
-    updateUI();
-    setActiveNavLink();
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            location.reload();
+        });
+    }
+}
 
-    // Page-specific logic with error handling
+function initializePageFeatures() {
+    // Page-specific initialization
     try {
-        handleDashboardPage(userData, updateUserData);
-        handleRewardsPage(userData, updateUserData);
-        handlePlayPage(userData, updateUserData);
-        handleLeaderboardPage(userData);
-        handleWithdrawPage(userData, updateUserData);
-        handleAdminPage(userData, updateUserData);
+        if (document.getElementById('claim-reward-btn')) {
+            handleRewardsPage();
+        }
+        
+        if (document.getElementById('pop-coin-btn')) {
+            handlePlayPage();
+        }
+        
+        if (document.getElementById('withdraw-form')) {
+            handleWithdrawPage();
+        }
+        
+        if (document.getElementById('admin-user-list')) {
+            handleAdminPage();
+        }
+        
+        if (document.getElementById('leaderboard-body')) {
+            handleLeaderboardPage();
+        }
+        
+        // Always handle dashboard updates
+        handleDashboardUpdates();
+        
     } catch (error) {
-        console.error('Error initializing page:', error);
+        console.error('Error initializing page features:', error);
     }
 }
 
-function initializeDummyUser() {
-    if (!localStorage.getItem('user_test@example.com')) {
-        const dummyUser = { 
-            email: 'test@example.com', 
-            password: 'password123', 
-            coins: 100, 
-            isAdmin: true, 
-            lastClaimTime: null,
-            name: 'Test User'
-        };
-        localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
+function handleDashboardUpdates() {
+    const dashboardCoins = document.getElementById('dashboard-coins');
+    const welcomeMessage = document.getElementById('welcome-message');
+    
+    if (dashboardCoins) {
+        dashboardCoins.textContent = currentUserData.coins || 0;
+    }
+    
+    if (welcomeMessage) {
+        const displayName = currentUserData.name || currentUserData.email.split('@')[0];
+        welcomeMessage.textContent = `Welcome back, ${displayName}!`;
     }
 }
 
-function handleRewardsPage(userData, updateUserData) {
+function handleRewardsPage() {
     const claimButton = document.getElementById('claim-reward-btn');
     if (!claimButton) return;
     
@@ -201,7 +337,7 @@ function handleRewardsPage(userData, updateUserData) {
     let countdownInterval;
 
     function checkRewardStatus() {
-        const lastClaim = userData.lastClaimTime;
+        const lastClaim = currentUserData.lastClaimTime;
         if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
             enableClaimButton();
         } else {
@@ -258,10 +394,17 @@ function handleRewardsPage(userData, updateUserData) {
 
     claimButton.addEventListener('click', () => {
         if (claimButton.disabled) return;
+        
+        // Update user data
         updateUserData({
-            coins: userData.coins + REWARD_AMOUNT,
+            coins: (currentUserData.coins || 0) + REWARD_AMOUNT,
             lastClaimTime: Date.now()
         });
+        
+        // Add activity
+        addUserActivity('Daily reward claimed', `Claimed ${REWARD_AMOUNT} coins`, 'fa-gift');
+        
+        showNotification('Reward Claimed', `You received ${REWARD_AMOUNT} coins!`, 'success');
         checkRewardStatus();
     });
 
@@ -269,81 +412,7 @@ function handleRewardsPage(userData, updateUserData) {
     checkRewardStatus();
 }
 
-function handleDashboardPage(userData, updateUserData) {
-    const welcomeMessage = document.getElementById('welcome-message');
-    if (!welcomeMessage) return;
-
-    const dashboardCoins = document.getElementById('dashboard-coins');
-    const dashboardRank = document.getElementById('dashboard-rank');
-    const dashboardRewardTimer = document.getElementById('dashboard-reward-timer');
-
-    if (dashboardCoins) dashboardCoins.textContent = userData.coins;
-    
-    // Use name if available, otherwise use email prefix
-    const displayName = userData.name || userData.email.split('@')[0];
-    welcomeMessage.textContent = `Welcome back, ${displayName}!`;
-
-    function calculateRank() {
-        const allUsers = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('user_')) {
-                try {
-                    const user = JSON.parse(localStorage.getItem(key));
-                    allUsers.push(user);
-                } catch (error) {
-                    console.error('Error parsing user data for key:', key, error);
-                }
-            }
-        }
-        allUsers.sort((a, b) => b.coins - a.coins);
-        const userRank = allUsers.findIndex(user => user.email === userData.email) + 1;
-        if (dashboardRank) dashboardRank.textContent = `#${userRank}`;
-    }
-
-    calculateRank();
-
-    let rewardCountdownInterval;
-    function checkRewardStatus() {
-        const COOLDOWN_PERIOD = 86400000; // 24 hours
-        const lastClaim = userData.lastClaimTime;
-        
-        if (!dashboardRewardTimer) return;
-        
-        if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
-            dashboardRewardTimer.textContent = 'Ready to Claim!';
-            dashboardRewardTimer.className = 'text-green-600 font-semibold';
-            if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
-        } else {
-            const remainingTime = COOLDOWN_PERIOD - (Date.now() - lastClaim);
-            dashboardRewardTimer.className = 'text-red-500 font-semibold';
-            startRewardCountdown(remainingTime);
-        }
-    }
-
-    function startRewardCountdown(duration) {
-        let timer = duration;
-        if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
-        rewardCountdownInterval = setInterval(() => {
-            timer -= 1000;
-            if (timer < 0) {
-                clearInterval(rewardCountdownInterval);
-                checkRewardStatus();
-            } else {
-                const h = Math.floor((timer / 3600000) % 24);
-                const m = Math.floor((timer / 60000) % 60);
-                const s = Math.floor((timer / 1000) % 60);
-                if (dashboardRewardTimer) {
-                    dashboardRewardTimer.textContent = `${h}h ${m}m ${s}s`;
-                }
-            }
-        }, 1000);
-    }
-
-    checkRewardStatus();
-}
-
-function handlePlayPage(userData, updateUserData) {
+function handlePlayPage() {
     const popButton = document.getElementById('pop-coin-btn');
     if (!popButton) return;
 
@@ -352,91 +421,37 @@ function handlePlayPage(userData, updateUserData) {
     popButton.addEventListener('click', () => {
         const coinsWon = Math.floor(Math.random() * 5) + 1;
 
+        // Update user data
         updateUserData({
-            coins: userData.coins + coinsWon
+            coins: (currentUserData.coins || 0) + coinsWon,
+            sessions: (currentUserData.sessions || 0) + 1
         });
 
         if (resultMessage) {
             resultMessage.textContent = `You won ${coinsWon} coins!`;
             resultMessage.className = 'text-green-600 font-semibold text-center';
             
-            // Clear previous message after 2 seconds
+            // Clear message after 2 seconds
             setTimeout(() => {
                 resultMessage.textContent = 'Click the coin to earn more coins!';
                 resultMessage.className = 'text-gray-600 text-center';
             }, 2000);
         }
 
-        // Add animation class
+        // Add animation
         popButton.classList.add('pop-animation');
-        
-        // Remove animation class after animation completes
         setTimeout(() => {
             popButton.classList.remove('pop-animation');
         }, 300);
+
+        // Add activity for significant wins
+        if (coinsWon >= 3) {
+            addUserActivity('Big win!', `Won ${coinsWon} coins in a game`, 'fa-coins');
+        }
     });
 }
 
-function handleLeaderboardPage(currentUserData) {
-    const leaderboardBody = document.getElementById('leaderboard-body');
-    if (!leaderboardBody) return;
-
-    const allUsers = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('user_')) {
-            try {
-                const user = JSON.parse(localStorage.getItem(key));
-                allUsers.push(user);
-            } catch (error) {
-                console.error('Error parsing user data for key:', key, error);
-            }
-        }
-    }
-
-    allUsers.sort((a, b) => b.coins - a.coins);
-    leaderboardBody.innerHTML = '';
-
-    if (allUsers.length === 0) {
-        leaderboardBody.innerHTML = `<tr><td colspan="3" class="px-6 py-12 text-center text-gray-500">No players found.</td></tr>`;
-        return;
-    }
-
-    allUsers.forEach((user, index) => {
-        const rank = index + 1;
-        const isCurrentUser = user.email === currentUserData.email;
-
-        const row = document.createElement('tr');
-        if (isCurrentUser) {
-            row.className = 'bg-blue-50 font-semibold dark:bg-blue-900';
-        } else {
-            row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
-        }
-
-        const rankCell = document.createElement('td');
-        rankCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium';
-        rankCell.textContent = `#${rank}`;
-
-        const playerCell = document.createElement('td');
-        playerCell.className = 'px-6 py-4 whitespace-nowrap text-sm';
-        
-        // Use name if available, otherwise use email prefix
-        const displayName = user.name || user.email.split('@')[0];
-        playerCell.textContent = displayName;
-        if (isCurrentUser) playerCell.textContent += ' (You)';
-
-        const coinsCell = document.createElement('td');
-        coinsCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600 dark:text-blue-400';
-        coinsCell.textContent = user.coins;
-
-        row.appendChild(rankCell);
-        row.appendChild(playerCell);
-        row.appendChild(coinsCell);
-        leaderboardBody.appendChild(row);
-    });
-}
-
-function handleWithdrawPage(userData, updateUserData) {
+function handleWithdrawPage() {
     const withdrawForm = document.getElementById('withdraw-form');
     if (!withdrawForm) return;
 
@@ -445,6 +460,7 @@ function handleWithdrawPage(userData, updateUserData) {
     const messageDisplay = document.getElementById('withdraw-message');
 
     const CONVERSION_RATE = 1000; // 1000 coins = PKR 1
+    const MIN_WITHDRAWAL = 25000; // 25,000 coins = PKR 25
 
     if (amountInput && cashValueDisplay) {
         amountInput.addEventListener('input', () => {
@@ -465,35 +481,35 @@ function handleWithdrawPage(userData, updateUserData) {
 
         // Validation
         if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
-            messageDisplay.textContent = 'Please enter a valid, positive number.';
-            messageDisplay.classList.add('text-red-500');
+            showMessage(messageDisplay, 'Please enter a valid, positive number.', 'error');
             return;
         }
 
-        if (amountToWithdraw > userData.coins) {
-            messageDisplay.textContent = 'Insufficient coin balance for this withdrawal.';
-            messageDisplay.classList.add('text-red-500');
+        if (amountToWithdraw > currentUserData.coins) {
+            showMessage(messageDisplay, 'Insufficient coin balance for this withdrawal.', 'error');
             return;
         }
 
-        if (amountToWithdraw < CONVERSION_RATE) {
-            messageDisplay.textContent = `Minimum withdrawal is ${CONVERSION_RATE} coins.`;
-            messageDisplay.classList.add('text-red-500');
+        if (amountToWithdraw < MIN_WITHDRAWAL) {
+            showMessage(messageDisplay, `Minimum withdrawal is ${MIN_WITHDRAWAL.toLocaleString()} coins (PKR ${(MIN_WITHDRAWAL/CONVERSION_RATE).toFixed(2)}).`, 'error');
             return;
         }
 
         // Process withdrawal
         updateUserData({
-            coins: userData.coins - amountToWithdraw
+            coins: currentUserData.coins - amountToWithdraw
         });
 
         const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked');
-        if (selectedMethod) {
-            messageDisplay.textContent = `Success! Your ${selectedMethod.value} withdrawal of PKR ${(amountToWithdraw / CONVERSION_RATE).toFixed(2)} is being processed.`;
-        } else {
-            messageDisplay.textContent = `Success! Your withdrawal of PKR ${(amountToWithdraw / CONVERSION_RATE).toFixed(2)} is being processed.`;
-        }
-        messageDisplay.classList.add('text-green-500');
+        const methodName = selectedMethod ? selectedMethod.value : 'withdrawal';
+        
+        // Record payout
+        recordPayout(amountToWithdraw, methodName);
+        
+        // Add activity
+        addUserActivity('Withdrawal requested', `${amountToWithdraw.toLocaleString()} coins (PKR ${(amountToWithdraw/CONVERSION_RATE).toFixed(2)})`, 'fa-money-bill-wave');
+
+        showMessage(messageDisplay, `Success! Your ${methodName} withdrawal of PKR ${(amountToWithdraw / CONVERSION_RATE).toFixed(2)} is being processed.`, 'success');
 
         // Reset form
         if (amountInput) amountInput.value = '';
@@ -501,7 +517,70 @@ function handleWithdrawPage(userData, updateUserData) {
     });
 }
 
-function handleAdminPage(currentUserData, updateUserData) {
+function handleLeaderboardPage() {
+    const leaderboardBody = document.getElementById('leaderboard-body');
+    if (!leaderboardBody) return;
+
+    function renderLeaderboard() {
+        const allUsers = getAllUsers();
+        allUsers.sort((a, b) => (b.coins || 0) - (a.coins || 0));
+        
+        leaderboardBody.innerHTML = '';
+
+        if (allUsers.length === 0) {
+            leaderboardBody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">No players found.</td></tr>`;
+            return;
+        }
+
+        allUsers.forEach((user, index) => {
+            const rank = index + 1;
+            const isCurrentUser = user.email === currentUserData.email;
+
+            const row = document.createElement('tr');
+            if (isCurrentUser) {
+                row.className = 'user-highlight';
+            }
+
+            // Rank badge
+            let rankClass = 'rank-other';
+            if (rank === 1) rankClass = 'rank-1';
+            else if (rank === 2) rankClass = 'rank-2';
+            else if (rank === 3) rankClass = 'rank-3';
+
+            // Player info
+            const displayName = user.name || user.email.split('@')[0];
+            const level = Math.floor((user.coins || 0) / 1000) + 1;
+            const pkrValue = Math.floor((user.coins || 0) / 1000);
+
+            row.innerHTML = `
+                <td>
+                    <div class="rank-badge ${rankClass}">${rank}</div>
+                </td>
+                <td>
+                    <div class="player-info">
+                        <div class="player-avatar">${displayName.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="player-name">${displayName}${isCurrentUser ? ' (You)' : ''}</div>
+                            <div class="player-level">Level ${level}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${level}</td>
+                <td class="coins-amount">${(user.coins || 0).toLocaleString()}</td>
+                <td class="payout-amount">PKR ${pkrValue}</td>
+                <td>
+                    <span class="payout-status status-completed">Active</span>
+                </td>
+            `;
+
+            leaderboardBody.appendChild(row);
+        });
+    }
+
+    renderLeaderboard();
+}
+
+function handleAdminPage() {
     const userListBody = document.getElementById('admin-user-list');
     if (!userListBody) return;
 
@@ -512,20 +591,8 @@ function handleAdminPage(currentUserData, updateUserData) {
     }
 
     function renderUserTable() {
+        const allUsers = getAllUsers();
         userListBody.innerHTML = '';
-        
-        const allUsers = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('user_')) {
-                try {
-                    const user = JSON.parse(localStorage.getItem(key));
-                    allUsers.push(user);
-                } catch (error) {
-                    console.error('Error parsing user data for key:', key, error);
-                }
-            }
-        }
 
         if (allUsers.length === 0) {
             userListBody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-500">No users found.</td></tr>`;
@@ -533,12 +600,23 @@ function handleAdminPage(currentUserData, updateUserData) {
         }
 
         allUsers.forEach(user => {
+            const isCurrentUser = user.email === currentUserData.email;
             const row = document.createElement('tr');
             row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
             
             row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${user.email}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">${user.coins}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="player-info">
+                        <div class="player-avatar">${(user.name || user.email).charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="player-name">${user.name || user.email.split('@')[0]}${isCurrentUser ? ' (You)' : ''}</div>
+                            <div class="player-email">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <input type="number" data-email="${user.email}" class="coin-input w-24 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" value="${user.coins || 0}">
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <button data-email="${user.email}" class="toggle-admin-btn px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                         user.isAdmin ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'
@@ -548,8 +626,8 @@ function handleAdminPage(currentUserData, updateUserData) {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div class="flex items-center space-x-2">
-                        <input type="number" data-email="${user.email}" class="coin-input w-20 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Amount">
                         <button data-email="${user.email}" class="update-coins-btn px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-xs">Update</button>
+                        ${!isCurrentUser ? `<button data-email="${user.email}" class="delete-user-btn px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-xs">Delete</button>` : ''}
                     </div>
                 </td>
             `;
@@ -565,102 +643,253 @@ function handleAdminPage(currentUserData, updateUserData) {
         if (!userEmail) return;
 
         if (target.classList.contains('toggle-admin-btn')) {
-            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
-            if (userToUpdate) {
-                // Prevent removing last admin
-                if (userToUpdate.isAdmin) {
-                    const allUsers = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key.startsWith('user_')) {
-                            try {
-                                const user = JSON.parse(localStorage.getItem(key));
-                                if (user.isAdmin) allUsers.push(user);
-                            } catch (error) {
-                                console.error('Error parsing user data:', error);
-                            }
-                        }
-                    }
-                    if (allUsers.length <= 1) {
-                        alert('Cannot remove the last admin user.');
-                        return;
-                    }
-                }
-                
-                userToUpdate.isAdmin = !userToUpdate.isAdmin;
-                localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-                renderUserTable();
-            }
+            toggleAdminStatus(userEmail);
         }
 
         if (target.classList.contains('update-coins-btn')) {
-            const input = userListBody.querySelector(`.coin-input[data-email="${userEmail}"]`);
-            if (!input) return;
+            updateUserCoins(userEmail);
+        }
 
-            const amount = parseInt(input.value, 10);
-            if (isNaN(amount)) {
-                alert('Please enter a valid number.');
-                return;
-            }
-
-            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
-            if (userToUpdate) {
-                userToUpdate.coins += amount;
-                // Ensure coins don't go negative
-                if (userToUpdate.coins < 0) userToUpdate.coins = 0;
-                
-                localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-                
-                // Update current user data if it's the same user
-                if (userEmail === currentUserData.email) {
-                    updateUserData({ coins: userToUpdate.coins });
-                }
-
-                renderUserTable();
-                input.value = ''; // Clear input after update
-            }
+        if (target.classList.contains('delete-user-btn')) {
+            deleteUser(userEmail);
         }
     });
 
     renderUserTable();
 }
-// Clear existing data and create accounts
-localStorage.clear();
 
-// Create test user
-const testUser = {
-    email: 'test@example.com',
-    password: 'password123',
-    coins: 100,
-    isAdmin: true,
-    lastClaimTime: null,
-    name: 'Test User'
-};
-localStorage.setItem('user_test@example.com', JSON.stringify(testUser));
+// Utility Functions
+function updateUserData(newData) {
+    currentUserData = { ...currentUserData, ...newData };
+    localStorage.setItem(`user_${currentUserData.email}`, JSON.stringify(currentUserData));
+    updateUI();
+}
 
-// Create admin account with correct spelling
-const adminUser = {
-    email: 'Ghazimalik1997@gmail.com',
-    password: 'Ghazi123$',
-    coins: 10000,
-    isAdmin: true,
-    lastClaimTime: null,
-    name: 'Ghazi Malik'
-};
-localStorage.setItem('user_Ghazimalik1997@gmail.com', JSON.stringify(adminUser));
+function addUserActivity(title, description, icon) {
+    if (!currentUserData.activities) {
+        currentUserData.activities = [];
+    }
+    
+    currentUserData.activities.push({
+        icon: icon,
+        title: title,
+        description: description,
+        time: new Date().toISOString()
+    });
+    
+    // Keep only last 10 activities
+    if (currentUserData.activities.length > 10) {
+        currentUserData.activities = currentUserData.activities.slice(-10);
+    }
+    
+    updateUserData({ activities: currentUserData.activities });
+}
 
-// Also create the typo version
-const adminUserTypo = {
-    email: 'Ghazimailk1997@gmail.com',
-    password: 'Ghazi123$',
-    coins: 10000,
-    isAdmin: true,
-    lastClaimTime: null,
-    name: 'Ghazi Malik'
-};
-localStorage.setItem('user_Ghazimailk1997@gmail.com', JSON.stringify(adminUserTypo));
+function getAllUsers() {
+    const allUsers = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('user_')) {
+            try {
+                const user = JSON.parse(localStorage.getItem(key));
+                allUsers.push(user);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    }
+    return allUsers;
+}
 
-console.log('Accounts created successfully!');
-console.log('Login with: Ghazimalik1997@gmail.com / Ghazi123$');
-console.log('Or: Ghazimailk1997@gmail.com / Ghazi123$');
-console.log('Or: test@example.com / password123');
+function createAdminAccount() {
+    const adminEmail = "Ghazimalik1997@gmail.com";
+    const adminPassword = "Ghazi123$";
+    
+    if (!localStorage.getItem(`user_${adminEmail}`)) {
+        const adminUser = {
+            email: adminEmail,
+            password: adminPassword,
+            coins: 10000,
+            isAdmin: true,
+            lastClaimTime: null,
+            name: "Ghazi Malik",
+            status: "active",
+            createdAt: new Date().toISOString(),
+            activities: [
+                {
+                    icon: 'fa-user-shield',
+                    title: 'Admin Account Created',
+                    time: new Date().toISOString(),
+                    type: 'admin'
+                }
+            ]
+        };
+        localStorage.setItem(`user_${adminEmail}`, JSON.stringify(adminUser));
+        console.log("Admin account created successfully");
+    }
+}
+
+function recordPayout(amount, method) {
+    const payouts = JSON.parse(localStorage.getItem('payouts') || '[]');
+    const payout = {
+        id: Date.now(),
+        player: currentUserData.name || currentUserData.email.split('@')[0],
+        amount: Math.floor(amount / 1000), // Convert coins to PKR
+        method: method,
+        date: new Date().toISOString(),
+        status: 'Pending'
+    };
+    payouts.push(payout);
+    localStorage.setItem('payouts', JSON.stringify(payouts));
+}
+
+function toggleAdminStatus(userEmail) {
+    const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+    if (!userToUpdate) return;
+
+    // Prevent removing last admin
+    if (userToUpdate.isAdmin) {
+        const adminUsers = getAllUsers().filter(user => user.isAdmin);
+        if (adminUsers.length <= 1) {
+            showNotification('Error', 'Cannot remove the last admin user.', 'error');
+            return;
+        }
+    }
+    
+    userToUpdate.isAdmin = !userToUpdate.isAdmin;
+    localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
+    
+    // Update current user data if it's the same user
+    if (userEmail === currentUserData.email) {
+        currentUserData.isAdmin = userToUpdate.isAdmin;
+        updateUI();
+    }
+    
+    showNotification('Success', `Admin status updated for ${userToUpdate.name || userEmail}`, 'success');
+    
+    // Re-render the table
+    if (document.getElementById('admin-user-list')) {
+        handleAdminPage();
+    }
+}
+
+function updateUserCoins(userEmail) {
+    const input = document.querySelector(`.coin-input[data-email="${userEmail}"]`);
+    if (!input) return;
+
+    const amount = parseInt(input.value, 10);
+    if (isNaN(amount)) {
+        showNotification('Error', 'Please enter a valid number.', 'error');
+        return;
+    }
+
+    const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+    if (userToUpdate) {
+        userToUpdate.coins = Math.max(0, amount); // Ensure coins don't go negative
+        localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
+        
+        // Update current user data if it's the same user
+        if (userEmail === currentUserData.email) {
+            currentUserData.coins = userToUpdate.coins;
+            updateUI();
+        }
+        
+        showNotification('Success', `Coins updated for ${userToUpdate.name || userEmail}`, 'success');
+        
+        // Re-render the table
+        if (document.getElementById('admin-user-list')) {
+            handleAdminPage();
+        }
+    }
+}
+
+function deleteUser(userEmail) {
+    if (userEmail === currentUserData.email) {
+        showNotification('Error', 'You cannot delete your own account.', 'error');
+        return;
+    }
+
+    if (confirm(`Are you sure you want to delete user ${userEmail}? This action cannot be undone.`)) {
+        localStorage.removeItem(`user_${userEmail}`);
+        showNotification('Success', `User ${userEmail} has been deleted.`, 'success');
+        
+        // Re-render the table
+        if (document.getElementById('admin-user-list')) {
+            handleAdminPage();
+        }
+    }
+}
+
+// Helper Functions
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function showFormError(element, message) {
+    if (element) {
+        element.textContent = message;
+        element.style.display = 'block';
+    }
+}
+
+function showMessage(element, message, type) {
+    if (element) {
+        element.textContent = message;
+        element.className = type === 'error' ? 'text-red-500' : 'text-green-500';
+    }
+}
+
+function setButtonLoading(button, btnText, loading, isLoading) {
+    if (!button) return;
+    
+    if (isLoading) {
+        button.disabled = true;
+        if (btnText) btnText.textContent = 'Processing...';
+        if (loading) loading.style.display = 'inline-block';
+    } else {
+        button.disabled = false;
+        if (btnText) {
+            if (button.id === 'login-submit-btn') btnText.textContent = 'Sign in';
+            if (button.id === 'signup-submit-btn') btnText.textContent = 'Create Account';
+        }
+        if (loading) loading.style.display = 'none';
+    }
+}
+
+function showNotification(title, message, type = 'info') {
+    // Create notification element if it doesn't exist
+    let notification = document.getElementById('notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'notification';
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <i class="fas fa-info-circle"></i>
+            <div class="notification-content">
+                <div class="notification-title"></div>
+                <div class="notification-message"></div>
+            </div>
+        `;
+        document.body.appendChild(notification);
+    }
+
+    const notificationTitle = notification.querySelector('.notification-title');
+    const notificationMessage = notification.querySelector('.notification-message');
+    
+    // Set notification content and type
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = message;
+    notification.className = `notification notification-${type}`;
+    
+    // Show notification
+    notification.classList.add('show');
+    
+    // Hide after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 5000);
+}
+
+// Make updateUserData available globally for other scripts
+window.updateUserData = updateUserData;

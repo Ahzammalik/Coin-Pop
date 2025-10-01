@@ -6,22 +6,47 @@
     <title>Play Game - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Animation for the coin pop */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
         }
-        .pop-animation {
-            animation: pop 0.3s ease-in-out;
+
+        .dark-theme {
+            --primary-color: #60a5fa;
+            --primary-dark: #3b82f6;
+            --secondary-color: #a78bfa;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            --bg-color: #0f172a;
+            --card-color: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
         }
-        
-        /* Sidebar styles */
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
         .sidebar {
             width: 250px;
-            background-color: #1e293b;
-            color: white;
+            background-color: var(--card-color);
+            border-right: 1px solid var(--border-color);
             height: 100vh;
             position: fixed;
             left: 0;
@@ -29,99 +54,104 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid var(--border-color);
         }
-        
+
         .sidebar-nav {
             flex: 1;
             padding: 1rem 0;
         }
-        
+
         .nav-link {
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
-            color: #cbd5e1;
+            color: var(--text-secondary);
             text-decoration: none;
             transition: all 0.2s;
         }
-        
-        .nav-link:hover {
-            background-color: #334155;
-            color: white;
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--border-color);
+            color: var(--text-primary);
         }
-        
+
         .nav-link svg {
             margin-right: 0.75rem;
         }
-        
+
         .sidebar-footer {
             padding: 1rem 1.5rem;
-            border-top: 1px solid #334155;
+            border-top: 1px solid var(--border-color);
         }
-        
+
         .logout-btn {
             width: 100%;
             padding: 0.5rem;
-            background-color: #3b82f6;
+            background-color: #ef4444;
             color: white;
             border: none;
             border-radius: 0.375rem;
             cursor: pointer;
             margin-top: 0.5rem;
         }
-        
-        /* Main content styles */
+
         .main-content {
             margin-left: 250px;
             padding: 2rem;
             min-height: 100vh;
-            background-color: #f8fafc;
         }
-        
+
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
-        
+
         .coin-balance-display {
-            background-color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background-color: var(--card-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             font-weight: 600;
         }
-        
+
         .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            padding: 2rem;
+            background-color: var(--card-color);
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
         }
-        
+
         .card-header {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            color: #1e293b;
+            color: var(--text-primary);
         }
-        
+
         /* Game container styles */
         #game-container {
             position: relative;
             width: 100%;
-            height: 70vh;
+            height: 60vh;
             background: linear-gradient(to bottom, #87CEEB, #E0F7FF);
             border-radius: 0.75rem;
             overflow: hidden;
             margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
         }
-        
+
+        .dark-theme #game-container {
+            background: linear-gradient(to bottom, #1e3a8a, #3b82f6);
+        }
+
         .balloon {
             position: absolute;
             border-radius: 50%;
@@ -130,7 +160,7 @@
             box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2),
                         inset 10px 10px 20px rgba(255,255,255,0.4);
         }
-        
+
         .balloon-string {
             position: absolute;
             background-color: #333;
@@ -139,40 +169,42 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        
+
         .game-stats {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .stat-box {
-            background-color: white;
+            background-color: var(--card-color);
             padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             text-align: center;
-            flex: 1;
-            margin: 0 0.5rem;
+            border: 1px solid var(--border-color);
         }
-        
+
         .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #3b82f6;
+            color: var(--primary-color);
         }
-        
+
         .stat-label {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--text-secondary);
         }
-        
+
         .game-controls {
             display: flex;
             justify-content: center;
             gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
-        
+
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
@@ -180,32 +212,55 @@
             cursor: pointer;
             transition: all 0.2s;
             border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
+
         .btn-primary {
-            background-color: #3b82f6;
+            background-color: var(--primary-color);
             color: white;
         }
-        
+
         .btn-primary:hover {
-            background-color: #2563eb;
+            background-color: var(--primary-dark);
         }
-        
+
         .btn-secondary {
-            background-color: #e2e8f0;
-            color: #475569;
+            background-color: var(--border-color);
+            color: var(--text-primary);
         }
-        
+
         .btn-secondary:hover {
-            background-color: #cbd5e1;
+            background-color: color-mix(in srgb, var(--border-color) 80%, black);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: color-mix(in srgb, var(--success-color) 80%, black);
+        }
+
+        /* Animation for the coin pop */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
         }
         
+        .pop-animation {
+            animation: pop 0.3s ease-in-out;
+        }
+
         .pop-effect {
             position: absolute;
             pointer-events: none;
             animation: popEffect 0.5s forwards;
         }
-        
+
         @keyframes popEffect {
             0% {
                 transform: scale(1);
@@ -216,7 +271,7 @@
                 opacity: 0;
             }
         }
-        
+
         .ad-container {
             position: fixed;
             top: 0;
@@ -231,32 +286,33 @@
             z-index: 1000;
             display: none;
         }
-        
+
         .ad-content {
-            background-color: white;
+            background-color: var(--card-color);
             padding: 2rem;
             border-radius: 1rem;
             text-align: center;
             max-width: 500px;
             width: 90%;
+            border: 1px solid var(--border-color);
         }
-        
+
         .ad-message {
             font-size: 1.25rem;
             margin-bottom: 1.5rem;
-            color: #1e293b;
+            color: var(--text-primary);
         }
-        
+
         .ad-countdown {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #3b82f6;
+            color: var(--primary-color);
             margin-bottom: 1.5rem;
         }
-        
+
         .ad-skip-btn {
-            background-color: #e2e8f0;
-            color: #475569;
+            background-color: var(--border-color);
+            color: var(--text-primary);
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
@@ -264,11 +320,11 @@
             border: none;
             transition: all 0.2s;
         }
-        
+
         .ad-skip-btn:hover {
-            background-color: #cbd5e1;
+            background-color: color-mix(in srgb, var(--border-color) 80%, black);
         }
-        
+
         .level-complete {
             position: fixed;
             top: 0;
@@ -283,69 +339,185 @@
             z-index: 1000;
             display: none;
         }
-        
+
         .level-complete-content {
-            background-color: white;
+            background-color: var(--card-color);
             padding: 2rem;
             border-radius: 1rem;
             text-align: center;
             max-width: 500px;
             width: 90%;
+            border: 1px solid var(--border-color);
         }
-        
+
         .level-complete-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #10b981;
+            color: var(--success-color);
             margin-bottom: 1rem;
         }
-        
+
         .level-complete-message {
             font-size: 1.25rem;
             margin-bottom: 1.5rem;
-            color: #1e293b;
+            color: var(--text-primary);
         }
-        
+
         .level-complete-reward {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #f59e0b;
+            color: var(--warning-color);
             margin-bottom: 1.5rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .refresh-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .refresh-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+
+        .refresh-btn.rotating {
+            animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 400px;
+            width: 90%;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .notification-error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .notification-info {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .game-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
-<body class="antialiased flex flex-col min-h-screen bg-gray-100">
-    <div id="app-container" class="w-full flex-grow">
+<body class="antialiased">
+    <div id="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="dashboard.html" class="text-2xl font-bold text-blue-600">Coin Pop</a>
             </div>
+            
             <nav class="sidebar-nav">
                 <a href="dashboard.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <i class="fas fa-home w-6 h-6"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="play.html" class="nav-link">
-                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <a href="play.html" class="nav-link active">
+                    <i class="fas fa-gamepad w-6 h-6"></i>
                     <span>Play</span>
                 </a>
                 <a href="leaderboard.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <i class="fas fa-trophy w-6 h-6"></i>
                     <span>Leaderboard</span>
                 </a>
                 <a href="rewards.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    <i class="fas fa-gift w-6 h-6"></i>
                     <span>Daily Rewards</span>
                 </a>
-                <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <a href="withdraw.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave w-6 h-6"></i>
                     <span>Withdraw</span>
                 </a>
-                 <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                    <i class="fas fa-cog w-6 h-6"></i>
                     <span>Admin</span>
                 </a>
             </nav>
+            
             <div class="sidebar-footer">
                 <div id="user-email-display" class="text-sm truncate">user@example.com</div>
                 <button id="logout-btn" class="logout-btn">Sign Out</button>
@@ -353,15 +525,30 @@
         </aside>
 
         <div class="main-content">
-            <header class="content-header">
-                <h2 class="text-2xl font-bold text-gray-800">Balloon Pop Game</h2>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 125.75</div>
-            </header>
+            <div class="content-header">
+                <div>
+                    <h1 class="page-title">Balloon Pop Game</h1>
+                    <p class="text-secondary mt-1">Pop balloons to earn coins and complete levels!</p>
+                </div>
+                <div class="header-actions flex items-center">
+                    <button id="refresh-btn" class="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
+                    <div class="coin-balance-display">
+                        <i class="fas fa-coins"></i>
+                        <span id="coin-balance-display">0 Coins</span>
+                    </div>
+                </div>
+            </div>
 
             <main>
                 <div class="card max-w-4xl mx-auto">
-                    <h3 class="card-header">Pop 100 Balloons to Complete Level</h3>
-                    <p class="text-gray-600 mb-8">Pop balloons to earn coins. Complete levels to get 0.20 coins reward.</p>
+                    <div class="card-header">
+                        <i class="fas fa-gamepad text-blue-500"></i>
+                        Balloon Pop Challenge
+                    </div>
+                    <p class="text-secondary mb-6">Pop balloons to earn coins. Complete levels to get bonus rewards!</p>
                     
                     <div class="game-stats">
                         <div class="stat-box">
@@ -369,11 +556,11 @@
                             <div class="stat-label">Current Level</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="balloons-popped">0/100</div>
+                            <div class="stat-value" id="balloons-popped">0/20</div>
                             <div class="stat-label">Balloons Popped</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="coins-earned">125.75</div>
+                            <div class="stat-value" id="coins-earned">0</div>
                             <div class="stat-label">Coins Earned</div>
                         </div>
                     </div>
@@ -381,12 +568,27 @@
                     <div id="game-container"></div>
                     
                     <div class="game-controls">
-                        <button id="start-game-btn" class="btn btn-primary">Start Game</button>
-                        <button id="reset-game-btn" class="btn btn-secondary">Reset Game</button>
+                        <button id="start-game-btn" class="btn btn-primary">
+                            <i class="fas fa-play mr-2"></i>
+                            Start Game
+                        </button>
+                        <button id="reset-game-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo mr-2"></i>
+                            Reset Game
+                        </button>
+                        <button id="bonus-coins-btn" class="btn btn-success">
+                            <i class="fas fa-star mr-2"></i>
+                            Get Bonus Coins
+                        </button>
                     </div>
                 </div>
             </main>
         </div>
+    </div>
+    
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
     </div>
     
     <!-- Ad Container -->
@@ -407,18 +609,29 @@
             <button id="continue-btn" class="btn btn-primary">Continue</button>
         </div>
     </div>
-    
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <div class="notification-content">
+            <div class="notification-title" id="notification-title">Notification</div>
+            <div class="notification-message" id="notification-message">This is a notification message</div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
     <script>
         // Game state
         const gameState = {
-            coins: 125.75,
+            coins: 0,
             level: 1,
             balloonsPopped: 0,
-            balloonsPerLevel: 100,
+            balloonsPerLevel: 20,
             coinRewardPerLevel: 0.20,
+            coinRewardPerBalloon: 0.01,
             gameActive: false,
             balloons: [],
-            pkrRate: 0.01 // 100 coins = 1 PKR (0.01 PKR per coin)
+            animationFrameId: null
         };
 
         // DOM elements
@@ -429,20 +642,110 @@
         const coinsEarnedDisplay = document.getElementById('coins-earned');
         const startGameBtn = document.getElementById('start-game-btn');
         const resetGameBtn = document.getElementById('reset-game-btn');
+        const bonusCoinsBtn = document.getElementById('bonus-coins-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
         const adContainer = document.getElementById('ad-container');
         const adCountdown = document.getElementById('ad-countdown');
         const adSkipBtn = document.getElementById('ad-skip-btn');
         const levelComplete = document.getElementById('level-complete');
         const completedLevel = document.getElementById('completed-level');
         const continueBtn = document.getElementById('continue-btn');
+        const themeToggle = document.getElementById('theme-toggle');
 
         // Initialize game
         function initGame() {
+            // Load user data
+            loadUserData();
+            
             updateUI();
-            startGameBtn.addEventListener('click', startGame);
+            setupEventListeners();
+            setupThemeToggle();
+        }
+
+        // Load user data from localStorage
+        function loadUserData() {
+            const currentUserEmail = localStorage.getItem('currentUser');
+            if (currentUserEmail) {
+                const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`) || '{}');
+                gameState.coins = userData.coins || 0;
+                
+                // Show admin link if user is admin
+                if (userData.isAdmin) {
+                    document.getElementById('admin-nav-link').style.display = 'flex';
+                }
+                
+                // Update user email display
+                document.getElementById('user-email-display').textContent = currentUserEmail;
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            startGameBtn.addEventListener('click', toggleGame);
             resetGameBtn.addEventListener('click', resetGame);
+            bonusCoinsBtn.addEventListener('click', getBonusCoins);
+            refreshBtn.addEventListener('click', refreshData);
             adSkipBtn.addEventListener('click', skipAd);
             continueBtn.addEventListener('click', continueGame);
+            
+            // Sign out
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+        }
+
+        // Setup theme toggle
+        function setupThemeToggle() {
+            function initTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            }
+
+            themeToggle.addEventListener('click', function() {
+                if (document.body.classList.contains('dark-theme')) {
+                    document.body.classList.remove('dark-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.body.classList.add('dark-theme');
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+
+            initTheme();
+        }
+
+        // Refresh data
+        function refreshData() {
+            refreshBtn.classList.add('rotating');
+            
+            // Reload user data
+            loadUserData();
+            updateUI();
+            
+            // Show notification
+            showNotification('Data Refreshed', 'Your game data has been updated!', 'success');
+            
+            setTimeout(() => {
+                refreshBtn.classList.remove('rotating');
+            }, 1000);
+        }
+
+        // Toggle game (start/pause)
+        function toggleGame() {
+            if (gameState.gameActive) {
+                pauseGame();
+            } else {
+                startGame();
+            }
         }
 
         // Start the game
@@ -450,18 +753,38 @@
             if (gameState.gameActive) return;
             
             gameState.gameActive = true;
-            startGameBtn.textContent = 'Game Running...';
-            startGameBtn.disabled = true;
+            startGameBtn.innerHTML = '<i class="fas fa-pause mr-2"></i>Pause Game';
+            resetGameBtn.disabled = false;
             
             // Create initial balloons
-            createBalloons(10);
+            createBalloons(8);
+            
+            // Start game loop
+            gameLoop();
+        }
+
+        // Pause the game
+        function pauseGame() {
+            gameState.gameActive = false;
+            startGameBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Resume Game';
+            
+            // Cancel animation frame
+            if (gameState.animationFrameId) {
+                cancelAnimationFrame(gameState.animationFrameId);
+                gameState.animationFrameId = null;
+            }
         }
 
         // Reset the game
         function resetGame() {
+            // Cancel animation frame
+            if (gameState.animationFrameId) {
+                cancelAnimationFrame(gameState.animationFrameId);
+                gameState.animationFrameId = null;
+            }
+            
             gameState.gameActive = false;
             gameState.balloonsPopped = 0;
-            gameState.level = 1;
             
             // Clear all balloons
             gameState.balloons.forEach(balloon => {
@@ -471,10 +794,38 @@
             });
             gameState.balloons = [];
             
-            startGameBtn.textContent = 'Start Game';
-            startGameBtn.disabled = false;
+            startGameBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Start Game';
+            resetGameBtn.disabled = true;
             
             updateUI();
+        }
+
+        // Get bonus coins
+        function getBonusCoins() {
+            // Add bonus coins
+            const bonusCoins = 5;
+            gameState.coins += bonusCoins;
+            
+            // Update user data
+            updateUserCoins(bonusCoins);
+            
+            // Show notification
+            showNotification('Bonus Coins', `You received ${bonusCoins} bonus coins!`, 'success');
+            
+            updateUI();
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!gameState.gameActive) return;
+            
+            // Move all balloons
+            gameState.balloons.forEach(balloon => {
+                moveBalloon(balloon);
+            });
+            
+            // Continue the game loop
+            gameState.animationFrameId = requestAnimationFrame(gameLoop);
         }
 
         // Create balloons
@@ -494,7 +845,6 @@
             
             // Random position
             const xPos = Math.random() * (gameContainer.offsetWidth - balloonSize);
-            const yPos = gameContainer.offsetHeight;
             
             balloon.style.width = `${balloonSize}px`;
             balloon.style.height = `${balloonSize}px`;
@@ -522,21 +872,17 @@
                 element: balloon,
                 speed: Math.random() * 2 + 1, // 1-3 pixels per frame
                 xPos: xPos,
-                yPos: -balloonSize
+                yPos: -balloonSize,
+                size: balloonSize
             };
             
             gameState.balloons.push(balloonData);
-            
-            // Animate balloon
-            animateBalloon(balloonData);
         }
 
-        // Animate balloon movement
-        function animateBalloon(balloonData) {
-            if (!gameState.gameActive) return;
-            
+        // Move balloon
+        function moveBalloon(balloonData) {
             const balloon = balloonData.element;
-            let yPos = parseFloat(balloon.style.bottom) || -parseInt(balloon.style.height);
+            let yPos = parseFloat(balloon.style.bottom) || -balloonData.size;
             
             // Move balloon upward
             yPos += balloonData.speed;
@@ -561,9 +907,6 @@
                 
                 // Create new balloon to replace it
                 createBalloon();
-            } else {
-                // Continue animation
-                requestAnimationFrame(() => animateBalloon(balloonData));
             }
         }
 
@@ -597,6 +940,10 @@
             
             // Update game state
             gameState.balloonsPopped++;
+            gameState.coins += gameState.coinRewardPerBalloon;
+            
+            // Update user data
+            updateUserCoins(gameState.coinRewardPerBalloon);
             
             // Remove from balloons array
             const balloonIndex = gameState.balloons.findIndex(b => b.element === balloon);
@@ -619,43 +966,28 @@
         function completeLevel() {
             // Pause the game
             gameState.gameActive = false;
+            startGameBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Start Game';
             
-            // Show ad after level completion
-            showAd();
-        }
-
-        // Show ad
-        function showAd() {
-            let countdown = 5;
-            adCountdown.textContent = countdown;
-            adContainer.style.display = 'flex';
-            
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                adCountdown.textContent = countdown;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    closeAd();
-                }
-            }, 1000);
-        }
-
-        // Skip ad
-        function skipAd() {
-            closeAd();
-        }
-
-        // Close ad and show level complete
-        function closeAd() {
-            adContainer.style.display = 'none';
-            
-            // Add coin reward
-            gameState.coins += gameState.coinRewardPerLevel;
+            // Cancel animation frame
+            if (gameState.animationFrameId) {
+                cancelAnimationFrame(gameState.animationFrameId);
+                gameState.animationFrameId = null;
+            }
             
             // Show level complete message
             completedLevel.textContent = gameState.level;
             levelComplete.style.display = 'flex';
+            
+            // Add level reward
+            gameState.coins += gameState.coinRewardPerLevel;
+            updateUserCoins(gameState.coinRewardPerLevel);
+            
+            updateUI();
+        }
+
+        // Skip ad
+        function skipAd() {
+            adContainer.style.display = 'none';
         }
 
         // Continue to next level
@@ -666,42 +998,57 @@
             gameState.level++;
             gameState.balloonsPopped = 0;
             
-            // Resume game
-            gameState.gameActive = true;
-            startGameBtn.textContent = 'Game Running...';
-            startGameBtn.disabled = true;
+            // Increase difficulty
+            gameState.balloonsPerLevel = Math.min(20 + (gameState.level - 1) * 5, 50);
             
             updateUI();
-            
-            // Create new balloons for the next level
-            createBalloons(10);
         }
 
         // Update UI
         function updateUI() {
-            coinBalanceDisplay.textContent = `Coins: ${gameState.coins.toFixed(2)}`;
+            coinBalanceDisplay.textContent = `${gameState.coins.toFixed(2)} Coins`;
             levelDisplay.textContent = gameState.level;
             balloonsPoppedDisplay.textContent = `${gameState.balloonsPopped}/${gameState.balloonsPerLevel}`;
             coinsEarnedDisplay.textContent = gameState.coins.toFixed(2);
         }
 
+        // Update user coins in localStorage
+        function updateUserCoins(amount) {
+            const currentUserEmail = localStorage.getItem('currentUser');
+            if (currentUserEmail) {
+                const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`) || '{}');
+                userData.coins = (userData.coins || 0) + amount;
+                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                
+                // Update global user data in main.js if available
+                if (window.updateUserData) {
+                    window.updateUserData({ coins: userData.coins });
+                }
+            }
+        }
+
+        // Show notification
+        function showNotification(title, message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // Set notification content and type
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notification.className = `notification notification-${type}`;
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
         // Initialize the game when page loads
         window.addEventListener('DOMContentLoaded', initGame);
-        
-        // Google AdMob Integration (Placeholder for actual implementation)
-        // In a real implementation, you would initialize AdMob here
-        function initializeAdMob() {
-            // This is where you would initialize Google AdMob
-            // For example:
-            // admob.initialize().then(() => {
-            //     console.log('AdMob initialized');
-            // });
-            
-            console.log('AdMob would be initialized here in a real implementation');
-        }
-        
-        // Call AdMob initialization
-        initializeAdMob();
     </script>
 </body>
 </html>

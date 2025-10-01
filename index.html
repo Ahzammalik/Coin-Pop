@@ -594,6 +594,7 @@
             // For demo, we'll simulate successful login
             localStorage.setItem('currentUser', email);
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', email.split('@')[0]);
             
             // Redirect to dashboard
             window.location.href = 'dashboard.html';

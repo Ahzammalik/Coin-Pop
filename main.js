@@ -648,3 +648,11 @@ function handleAdminContactPage(currentUserData) {
 
     renderContactMessages();
 }
+function handleAdminPage(currentUserData, updateUserData) {
+    // ... existing code ...
+    
+    // Add contact messages handling
+    handleAdminContactPage(currentUserData);
+    
+    // ... rest of the function
+}

@@ -45,6 +45,8 @@
             top: 0;
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 100;
         }
 
         .sidebar-header {
@@ -91,10 +93,25 @@
             margin-top: 0.5rem;
         }
 
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            background: var(--card-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
         .main-content {
             margin-left: 250px;
             padding: 2rem;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         .content-header {
@@ -119,6 +136,12 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
         }
 
         .card-header {
@@ -283,11 +306,104 @@
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 90px;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength.weak {
+            background-color: #ef4444;
+            width: 25%;
+        }
+
+        .password-strength.medium {
+            background-color: #f59e0b;
+            width: 50%;
+        }
+
+        .password-strength.strong {
+            background-color: #10b981;
+            width: 100%;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
+    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <div id="app-container" class="w-full flex-grow">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="dashboard.html" class="text-2xl font-bold text-blue-600">Coin Pop</a>
             </div>
@@ -442,7 +558,8 @@
                         <div class="form-group">
                             <label class="form-label">Change Password</label>
                             <input type="password" id="new-password" class="form-input mb-2" placeholder="New password">
-                            <input type="password" id="confirm-password" class="form-input" placeholder="Confirm new password">
+                            <div id="password-strength" class="password-strength"></div>
+                            <input type="password" id="confirm-password" class="form-input mt-3" placeholder="Confirm new password">
                         </div>
                         <button id="change-password" class="btn btn-primary">Update Password</button>
                     </div>
@@ -468,6 +585,11 @@
         <i class="fas fa-moon"></i>
     </div>
 
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notification-message"></span>
+    </div>
+
     <script>
         // Check authentication
         document.addEventListener('DOMContentLoaded', function() {
@@ -482,6 +604,22 @@
             if (!userData) {
                 window.location.href = 'index.html';
                 return;
+            }
+
+            // DOM Elements
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+
+            // Show notification
+            function showNotification(message, type = 'success') {
+                notificationMessage.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
             }
 
             // Update UI
@@ -508,6 +646,21 @@
             if (userData.isAdmin) {
                 document.getElementById('admin-nav-link').style.display = 'flex';
             }
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 1024 && 
+                    !sidebar.contains(event.target) && 
+                    !mobileMenuBtn.contains(event.target) &&
+                    sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            });
 
             // Payment method selection
             document.querySelectorAll('.payment-method').forEach(method => {
@@ -550,14 +703,14 @@
                 const userName = document.getElementById('user-name').value;
                 userData.name = userName;
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                alert('Profile updated successfully!');
+                showNotification('Profile updated successfully!');
             });
 
             // Save payment details
             document.getElementById('save-payment').addEventListener('click', function() {
                 const selectedMethod = document.querySelector('.payment-method.selected');
                 if (!selectedMethod) {
-                    alert('Please select a payment method first');
+                    showNotification('Please select a payment method first', 'warning');
                     return;
                 }
 
@@ -566,7 +719,7 @@
                 const accountName = document.getElementById('account-name').value;
 
                 if (!accountNumber || !accountName) {
-                    alert('Please fill in all payment details');
+                    showNotification('Please fill in all payment details', 'warning');
                     return;
                 }
 
@@ -580,7 +733,34 @@
                 };
 
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                alert('Payment details saved successfully!');
+                showNotification('Payment details saved successfully!');
+            });
+
+            // Password strength checker
+            document.getElementById('new-password').addEventListener('input', function() {
+                const password = this.value;
+                const strengthBar = document.getElementById('password-strength');
+                
+                if (password.length === 0) {
+                    strengthBar.className = 'password-strength';
+                    return;
+                }
+                
+                // Simple password strength algorithm
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^a-zA-Z0-9]/.test(password)) strength++;
+                
+                if (strength <= 2) {
+                    strengthBar.className = 'password-strength weak';
+                } else if (strength <= 4) {
+                    strengthBar.className = 'password-strength medium';
+                } else {
+                    strengthBar.className = 'password-strength strong';
+                }
             });
 
             // Change password
@@ -589,21 +769,27 @@
                 const confirmPassword = document.getElementById('confirm-password').value;
 
                 if (!newPassword || !confirmPassword) {
-                    alert('Please fill in both password fields');
+                    showNotification('Please fill in both password fields', 'warning');
                     return;
                 }
 
                 if (newPassword !== confirmPassword) {
-                    alert('Passwords do not match');
+                    showNotification('Passwords do not match', 'error');
+                    return;
+                }
+
+                if (newPassword.length < 6) {
+                    showNotification('Password must be at least 6 characters long', 'warning');
                     return;
                 }
 
                 userData.password = newPassword;
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                alert('Password updated successfully!');
+                showNotification('Password updated successfully!');
                 
                 document.getElementById('new-password').value = '';
                 document.getElementById('confirm-password').value = '';
+                document.getElementById('password-strength').className = 'password-strength';
             });
 
             // Delete account
@@ -611,8 +797,10 @@
                 if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
                     localStorage.removeItem(`user_${currentUserEmail}`);
                     localStorage.removeItem('currentUser');
-                    alert('Account deleted successfully');
-                    window.location.href = 'index.html';
+                    showNotification('Account deleted successfully', 'warning');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
                 }
             });
 

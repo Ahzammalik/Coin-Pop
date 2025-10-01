@@ -1213,3 +1213,29 @@
     </script>
 </body>
 </html>
+<!-- Add this to the tabs section in admin.html -->
+<div class="tab" data-tab="messages">Contact Messages</div>
+
+<!-- Add this to the tab contents in admin.html -->
+<div class="tab-content" id="messages-tab">
+    <div class="card">
+        <h4 class="card-header">Contact Messages</h4>
+        <div class="overflow-x-auto">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="contact-messages-body">
+                    <!-- Messages will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

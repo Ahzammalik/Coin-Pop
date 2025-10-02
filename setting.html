@@ -127,6 +127,24 @@
             border-radius: 0.75rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background-color: var(--border-color);
+            transform: rotate(90deg);
         }
 
         .card {
@@ -361,6 +379,31 @@
             width: 100%;
         }
 
+        .password-requirements {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .requirement.met {
+            color: #10b981;
+        }
+
+        .requirement.unmet {
+            color: #ef4444;
+        }
+
+        .requirement i {
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
         /* Mobile responsiveness */
         @media (max-width: 1024px) {
             .sidebar {
@@ -450,7 +493,12 @@
         <div class="main-content">
             <header class="content-header">
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Settings</h2>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
+                <div id="coin-balance-display" class="coin-balance-display">
+                    <span id="coins-value">Coins: 0</span>
+                    <button id="refresh-btn" class="refresh-btn" title="Refresh balance">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </header>
 
             <main>
@@ -559,6 +607,28 @@
                             <label class="form-label">Change Password</label>
                             <input type="password" id="new-password" class="form-input mb-2" placeholder="New password">
                             <div id="password-strength" class="password-strength"></div>
+                            <div id="password-requirements" class="password-requirements">
+                                <div class="requirement" id="req-length">
+                                    <i class="fas fa-circle"></i>
+                                    <span>At least 8 characters</span>
+                                </div>
+                                <div class="requirement" id="req-uppercase">
+                                    <i class="fas fa-circle"></i>
+                                    <span>One uppercase letter</span>
+                                </div>
+                                <div class="requirement" id="req-lowercase">
+                                    <i class="fas fa-circle"></i>
+                                    <span>One lowercase letter</span>
+                                </div>
+                                <div class="requirement" id="req-number">
+                                    <i class="fas fa-circle"></i>
+                                    <span>One number</span>
+                                </div>
+                                <div class="requirement" id="req-special">
+                                    <i class="fas fa-circle"></i>
+                                    <span>One special character</span>
+                                </div>
+                            </div>
                             <input type="password" id="confirm-password" class="form-input mt-3" placeholder="Confirm new password">
                         </div>
                         <button id="change-password" class="btn btn-primary">Update Password</button>
@@ -611,6 +681,7 @@
             const sidebar = document.getElementById('sidebar');
             const notification = document.getElementById('notification');
             const notificationMessage = document.getElementById('notification-message');
+            const refreshBtn = document.getElementById('refresh-btn');
 
             // Show notification
             function showNotification(message, type = 'success') {
@@ -623,10 +694,15 @@
             }
 
             // Update UI
-            document.getElementById('user-email-display').textContent = currentUserEmail;
-            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-            document.getElementById('user-email').value = currentUserEmail;
-            document.getElementById('user-name').value = userData.name || currentUserEmail.split('@')[0];
+            function updateUI() {
+                document.getElementById('user-email-display').textContent = currentUserEmail;
+                document.getElementById('coins-value').textContent = `Coins: ${userData.coins || 0}`;
+                document.getElementById('user-email').value = currentUserEmail;
+                document.getElementById('user-name').value = userData.name || currentUserEmail.split('@')[0];
+            }
+
+            // Initialize UI
+            updateUI();
 
             // Load payment methods
             if (userData.paymentMethods) {
@@ -659,6 +735,23 @@
                     !mobileMenuBtn.contains(event.target) &&
                     sidebar.classList.contains('open')) {
                     sidebar.classList.remove('open');
+                }
+            });
+
+            // Refresh button
+            refreshBtn.addEventListener('click', function() {
+                // Add rotation animation
+                this.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    this.style.transform = 'rotate(0deg)';
+                }, 500);
+                
+                // Reload user data
+                const updatedUserData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+                if (updatedUserData) {
+                    Object.assign(userData, updatedUserData);
+                    updateUI();
+                    showNotification('Balance updated successfully!');
                 }
             });
 
@@ -736,31 +829,50 @@
                 showNotification('Payment details saved successfully!');
             });
 
-            // Password strength checker
-            document.getElementById('new-password').addEventListener('input', function() {
-                const password = this.value;
+            // Password validation
+            function validatePassword(password) {
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /[0-9]/.test(password),
+                    special: /[^A-Za-z0-9]/.test(password)
+                };
+
+                // Update requirement indicators
+                document.getElementById('req-length').className = `requirement ${requirements.length ? 'met' : 'unmet'}`;
+                document.getElementById('req-uppercase').className = `requirement ${requirements.uppercase ? 'met' : 'unmet'}`;
+                document.getElementById('req-lowercase').className = `requirement ${requirements.lowercase ? 'met' : 'unmet'}`;
+                document.getElementById('req-number').className = `requirement ${requirements.number ? 'met' : 'unmet'}`;
+                document.getElementById('req-special').className = `requirement ${requirements.special ? 'met' : 'unmet'}`;
+
+                // Update icons
+                document.querySelectorAll('.requirement i').forEach(icon => {
+                    if (icon.parentElement.className.includes('met')) {
+                        icon.className = 'fas fa-check-circle';
+                    } else {
+                        icon.className = 'fas fa-circle';
+                    }
+                });
+
+                // Calculate strength
+                const metCount = Object.values(requirements).filter(Boolean).length;
                 const strengthBar = document.getElementById('password-strength');
                 
-                if (password.length === 0) {
-                    strengthBar.className = 'password-strength';
-                    return;
-                }
-                
-                // Simple password strength algorithm
-                let strength = 0;
-                if (password.length >= 8) strength++;
-                if (/[a-z]/.test(password)) strength++;
-                if (/[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^a-zA-Z0-9]/.test(password)) strength++;
-                
-                if (strength <= 2) {
+                if (metCount <= 2) {
                     strengthBar.className = 'password-strength weak';
-                } else if (strength <= 4) {
+                } else if (metCount <= 4) {
                     strengthBar.className = 'password-strength medium';
                 } else {
                     strengthBar.className = 'password-strength strong';
                 }
+
+                return Object.values(requirements).every(Boolean);
+            }
+
+            // Password strength checker
+            document.getElementById('new-password').addEventListener('input', function() {
+                validatePassword(this.value);
             });
 
             // Change password
@@ -778,8 +890,8 @@
                     return;
                 }
 
-                if (newPassword.length < 6) {
-                    showNotification('Password must be at least 6 characters long', 'warning');
+                if (!validatePassword(newPassword)) {
+                    showNotification('Password does not meet all requirements', 'warning');
                     return;
                 }
 
@@ -790,6 +902,12 @@
                 document.getElementById('new-password').value = '';
                 document.getElementById('confirm-password').value = '';
                 document.getElementById('password-strength').className = 'password-strength';
+                
+                // Reset requirement indicators
+                document.querySelectorAll('.requirement').forEach(req => {
+                    req.className = 'requirement';
+                    req.querySelector('i').className = 'fas fa-circle';
+                });
             });
 
             // Delete account

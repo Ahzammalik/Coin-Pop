@@ -4,353 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coin Pop - Sign In</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 30px;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4a6cf7;
-        }
-        
-        .settings {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .theme-selector {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .theme-btn {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .theme-btn.active {
-            background: #4a6cf7;
-            color: white;
-            border-color: #4a6cf7;
-        }
-        
-        .language-select {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .main-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 70vh;
-        }
-        
-        .auth-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-        }
-        
-        .welcome-text {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .welcome-text h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .welcome-text p {
-            color: #666;
-        }
-        
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .auth-tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .auth-tab.active {
-            border-bottom: 2px solid #4a6cf7;
-            color: #4a6cf7;
-        }
-        
-        .auth-form {
-            display: none;
-        }
-        
-        .auth-form.active {
-            display: block;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        
-        .form-control:focus {
-            border-color: #4a6cf7;
-            outline: none;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .checkbox-group input {
-            margin-right: 8px;
-        }
-        
-        .forgot-password {
-            color: #4a6cf7;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: #4a6cf7;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #3a5ce5;
-        }
-        
-        .divider {
-            text-align: center;
-            margin: 25px 0;
-            position: relative;
-        }
-        
-        .divider::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e0e0e0;
-        }
-        
-        .divider span {
-            background: white;
-            padding: 0 15px;
-            color: #666;
-        }
-        
-        .social-login {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .social-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .social-btn:hover {
-            background: #f5f5f5;
-        }
-        
-        .reset-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .reset-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .reset-btn:hover {
-            background: #ff3742;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .modal p {
-            margin-bottom: 25px;
-            color: #666;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-        }
-        
-        .modal-btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .modal-btn.cancel {
-            background: #f1f2f6;
-            border: 1px solid #ddd;
-        }
-        
-        .modal-btn.reset {
-            background: #ff4757;
-            color: white;
-            border: none;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px 0;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        @media (max-width: 768px) {
-            .auth-container {
-                padding: 20px;
-            }
-            
-            .social-login {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="logo">Coin Pop</div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="signin.html" class="active">Sign In</a>
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+            </nav>
             <div class="settings">
                 <div class="theme-selector">
-                    <button class="theme-btn active">Light</button>
-                    <button class="theme-btn">Dark</button>
-                    <button class="theme-btn">Auto</button>
+                    <button class="theme-btn active" data-theme="light">Light</button>
+                    <button class="theme-btn" data-theme="dark">Dark</button>
+                    <button class="theme-btn" data-theme="auto">Auto</button>
                 </div>
-                <select class="language-select">
-                    <option>English</option>
-                    <option>Español</option>
-                    <option>Français</option>
+                <select class="language-select" id="language-select">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
                 </select>
             </div>
         </header>
@@ -384,7 +59,7 @@
                         <a href="#" class="forgot-password" style="margin-left: auto;">Forgot your password?</a>
                     </div>
                     
-                    <button type="submit" class="btn">Sign In</button>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
                     
                     <div class="divider">
                         <span>Or continue with</span>
@@ -435,7 +110,7 @@
                         <label for="terms">I agree to the Terms and Conditions</label>
                     </div>
                     
-                    <button type="submit" class="btn">Create Account</button>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
                     
                     <div class="divider">
                         <span>Or continue with</span>
@@ -467,7 +142,29 @@
         </main>
         
         <footer>
-            <p>Coin Pop &copy; 2023. All rights reserved.</p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Coin Pop</h3>
+                    <p>Your trusted cryptocurrency tracking companion.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="signin.html">Sign In</a>
+                    <a href="#features">Features</a>
+                    <a href="#about">About</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Coin Pop &copy; 2023. All rights reserved.</p>
+            </div>
         </footer>
     </div>
     
@@ -482,97 +179,6 @@
         </div>
     </div>
     
-    <script>
-        // Tab switching functionality
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Update active tab
-                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Show corresponding form
-                const tabId = tab.getAttribute('data-tab');
-                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-                document.getElementById(`${tabId}-form`).classList.add('active');
-            });
-        });
-        
-        // Form submission
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Basic validation
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            // In a real app, you would send this to a server
-            console.log('Login attempt:', { email, password });
-            alert('Login functionality would connect to backend in a real application');
-        });
-        
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('fullname').value;
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const terms = document.getElementById('terms').checked;
-            
-            // Validation
-            if (!fullName || !email || !password || !confirmPassword) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
-            
-            if (!terms) {
-                alert('Please agree to the Terms and Conditions');
-                return;
-            }
-            
-            // In a real app, you would send this to a server
-            console.log('Signup attempt:', { fullName, email, password });
-            alert('Account creation would connect to backend in a real application');
-        });
-        
-        // Reset data modal
-        const resetModal = document.getElementById('reset-modal');
-        const resetBtn = document.getElementById('reset-data-btn');
-        const cancelReset = document.getElementById('cancel-reset');
-        const confirmReset = document.getElementById('confirm-reset');
-        
-        resetBtn.addEventListener('click', () => {
-            resetModal.classList.add('active');
-        });
-        
-        cancelReset.addEventListener('click', () => {
-            resetModal.classList.remove('active');
-        });
-        
-        confirmReset.addEventListener('click', () => {
-            // In a real app, this would reset user data
-            alert('All data has been reset (simulated)');
-            resetModal.classList.remove('active');
-        });
-        
-        // Theme switching (basic implementation)
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // In a real app, this would change the theme
-                console.log('Theme changed to:', btn.textContent);
-            });
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>

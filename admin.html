@@ -112,6 +112,11 @@
             color: var(--danger-color);
         }
         
+        .status-completed {
+            background: color-mix(in srgb, var(--success-color) 20%, transparent);
+            color: var(--success-color);
+        }
+        
         .status-active {
             background: color-mix(in srgb, var(--success-color) 20%, transparent);
             color: var(--success-color);
@@ -271,6 +276,11 @@
         
         .action-btn-warning {
             background: var(--warning-color);
+            color: white;
+        }
+        
+        .action-btn-success {
+            background: var(--success-color);
             color: white;
         }
         
@@ -568,7 +578,8 @@
                                 <thead>
                                     <tr>
                                         <th>User</th>
-                                        <th>Amount</th>
+                                        <th>Amount (PKR)</th>
+                                        <th>Coins Used</th>
                                         <th>Method</th>
                                         <th>Date</th>
                                         <th>Status</th>
@@ -727,7 +738,6 @@
         </div>
     </div>
 
-    <script src="main.js"></script>
     <script>
         // Create admin account if it doesn't exist
         function createAdminAccount() {
@@ -779,6 +789,9 @@
                         // Load user data
                         loadUserData();
                         
+                        // Load withdrawal requests
+                        loadWithdrawalRequests();
+                        
                         // Setup admin tabs
                         setupAdminTabs();
                         
@@ -815,6 +828,9 @@
                         // Load user data
                         loadUserData();
                         
+                        // Load withdrawal requests
+                        loadWithdrawalRequests();
+                        
                         // Setup admin tabs
                         setupAdminTabs();
                     } else {
@@ -829,6 +845,7 @@
             document.getElementById('refresh-data').addEventListener('click', function() {
                 updateAdminStats();
                 loadUserData();
+                loadWithdrawalRequests();
                 showNotification('Data refreshed successfully!', 'success');
             });
             
@@ -953,18 +970,18 @@
             return allUsers;
         }
 
-        // Get withdrawal requests (placeholder function)
+        // Get withdrawal requests from localStorage
         function getWithdrawalRequests() {
-            // In a real app, this would come from a database
-            // For now, we'll use localStorage
-            const requests = JSON.parse(localStorage.getItem('withdrawal_requests') || '[]');
+            const requests = JSON.parse(localStorage.getItem('adminWithdrawalRequests') || '[]');
             return requests;
         }
 
         // Calculate total revenue (placeholder function)
         function calculateTotalRevenue() {
-            // In a real app, this would be calculated from actual transactions
-            return 0;
+            const requests = getWithdrawalRequests();
+            const completedRequests = requests.filter(req => req.status === 'completed');
+            const totalAmount = completedRequests.reduce((sum, req) => sum + req.amount, 0);
+            return totalAmount;
         }
 
         // Load user data into the table
@@ -1034,6 +1051,122 @@
                     }
                 });
             });
+        }
+
+        // Load withdrawal requests into the table
+        function loadWithdrawalRequests() {
+            const requests = getWithdrawalRequests();
+            const requestsList = document.getElementById('withdrawal-requests-list');
+            requestsList.innerHTML = '';
+            
+            if (requests.length === 0) {
+                requestsList.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-4xl mb-4"></i>
+                            <p>No withdrawal requests found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            requests.forEach(request => {
+                const userData = JSON.parse(localStorage.getItem(`user_${request.userEmail}`) || '{}');
+                const userName = userData.name || request.userEmail.split('@')[0];
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${userName.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div class="font-medium">${userName}</div>
+                                <div class="text-sm text-secondary">${request.userEmail}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="font-semibold">PKR ${request.amount.toFixed(2)}</td>
+                    <td>${request.coins.toLocaleString()}</td>
+                    <td>
+                        <span class="capitalize">${request.method}</span>
+                    </td>
+                    <td>${new Date(request.timestamp).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge ${request.status === 'pending' ? 'status-pending' : 
+                                                   request.status === 'approved' ? 'status-approved' : 
+                                                   request.status === 'rejected' ? 'status-rejected' : 
+                                                   'status-completed'}">
+                            ${request.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="admin-actions">
+                            ${request.status === 'pending' ? `
+                                <button class="action-btn action-btn-success approve-withdrawal" data-id="${request.id}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="action-btn action-btn-danger reject-withdrawal" data-id="${request.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                            <button class="action-btn action-btn-primary view-withdrawal" data-id="${request.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                requestsList.appendChild(row);
+            });
+            
+            // Add event listeners for withdrawal actions
+            document.querySelectorAll('.approve-withdrawal').forEach(button => {
+                button.addEventListener('click', function() {
+                    const requestId = this.getAttribute('data-id');
+                    updateWithdrawalStatus(requestId, 'completed');
+                });
+            });
+            
+            document.querySelectorAll('.reject-withdrawal').forEach(button => {
+                button.addEventListener('click', function() {
+                    const requestId = this.getAttribute('data-id');
+                    updateWithdrawalStatus(requestId, 'rejected');
+                });
+            });
+            
+            document.querySelectorAll('.view-withdrawal').forEach(button => {
+                button.addEventListener('click', function() {
+                    const requestId = this.getAttribute('data-id');
+                    viewWithdrawalDetails(requestId);
+                });
+            });
+        }
+
+        // Update withdrawal status
+        function updateWithdrawalStatus(requestId, newStatus) {
+            const requests = getWithdrawalRequests();
+            const requestIndex = requests.findIndex(req => req.id == requestId);
+            
+            if (requestIndex !== -1) {
+                requests[requestIndex].status = newStatus;
+                localStorage.setItem('adminWithdrawalRequests', JSON.stringify(requests));
+                
+                // Update UI
+                updateAdminStats();
+                loadWithdrawalRequests();
+                
+                showNotification(`Withdrawal request ${newStatus === 'completed' ? 'approved' : 'rejected'}!`, 'success');
+            }
+        }
+
+        // View withdrawal details (placeholder function)
+        function viewWithdrawalDetails(requestId) {
+            const requests = getWithdrawalRequests();
+            const request = requests.find(req => req.id == requestId);
+            
+            if (request) {
+                alert(`Withdrawal Details:\n\nUser: ${request.userEmail}\nAmount: PKR ${request.amount}\nMethod: ${request.method}\nStatus: ${request.status}\nDate: ${new Date(request.timestamp).toLocaleString()}`);
+            }
         }
 
         // Update user coins
@@ -1115,6 +1248,11 @@
                     this.classList.add('active');
                     const tabId = this.getAttribute('data-tab');
                     document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Load specific data when tab changes
+                    if (tabId === 'withdrawals') {
+                        loadWithdrawalRequests();
+                    }
                 });
             });
         }
@@ -1163,9 +1301,3 @@
     </script>
 </body>
 </html>
-/* Remove specific floating coins */
-.coin-1,
-.coin-2,
-.coin-3 {
-    display: none !important;
-}

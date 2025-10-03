@@ -941,3 +941,9 @@ select:focus-visible {
     backdrop-filter: blur(15px);
     border: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
 }
+/* Remove specific floating coins */
+.coin-1,
+.coin-2,
+.coin-3 {
+    display: none !important;
+}

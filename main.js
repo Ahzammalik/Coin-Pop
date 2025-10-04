@@ -271,6 +271,7 @@ handleDashboardPage(userData);
 handleRewardsPage(userData, updateUserData);
 handlePlayPage(userData, updateUserData);
 handleLeaderboardPage(userData); // <-- ADD THIS LINE
+handleWithdrawPage(userData, updateUserData);
 
 // --- NEW FUNCTION for the Leaderboard Page ---
 function handleLeaderboardPage(currentUserData) {
@@ -333,5 +334,59 @@ function handleLeaderboardPage(currentUserData) {
 
         // Append the row to the table body
         leaderboardBody.appendChild(row);
+    });
+}
+// --- NEW FUNCTION for the Withdraw Page ---
+function handleWithdrawPage(userData, updateUserData) {
+    const withdrawForm = document.getElementById('withdraw-form');
+    if (!withdrawForm) return; // Only run on the Withdraw page
+
+    const amountInput = document.getElementById('withdraw-amount');
+    const cashValueDisplay = document.getElementById('cash-value');
+    const messageDisplay = document.getElementById('withdraw-message');
+
+    const CONVERSION_RATE = 1000; // 1000 coins = $1
+
+    // Update cash value as the user types
+    amountInput.addEventListener('input', () => {
+        const amount = parseInt(amountInput.value, 10) || 0;
+        const value = (amount / CONVERSION_RATE).toFixed(2);
+        cashValueDisplay.textContent = `$${value}`;
+    });
+
+    // Handle form submission
+    withdrawForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        messageDisplay.textContent = '';
+        messageDisplay.classList.remove('text-red-500', 'text-green-500');
+
+        const amountToWithdraw = parseInt(amountInput.value, 10);
+
+        // --- Validation ---
+        if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
+            messageDisplay.textContent = 'Please enter a valid, positive number.';
+            messageDisplay.classList.add('text-red-500');
+            return;
+        }
+
+        if (amountToWithdraw > userData.coins) {
+            messageDisplay.textContent = 'Insufficient coin balance for this withdrawal.';
+            messageDisplay.classList.add('text-red-500');
+            return;
+        }
+
+        // --- Process Withdrawal ---
+        updateUserData({
+            coins: userData.coins - amountToWithdraw
+        });
+
+        // Show success message
+        const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked').value;
+        messageDisplay.textContent = `Success! Your ${selectedMethod} reward is being processed.`;
+        messageDisplay.classList.add('text-green-500');
+
+        // Reset form
+        amountInput.value = '';
+        cashValueDisplay.textContent = '$0.00';
     });
 }

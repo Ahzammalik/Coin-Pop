@@ -224,3 +224,79 @@ handleRewardsPage(); // Run logic for the Daily Rewards page
 // --- PAGE-SPECIFIC LOGIC ---
 handleRewardsPage();
 handleDashboardPage(); // Run logic for the Dashboard page
+function handleDashboardPage() {
+    const welcomeMessage = document.getElementById('welcome-message');
+    // Only run if we are on the dashboard page
+    if (!welcomeMessage) return;
+
+    const dashboardCoins = document.getElementById('dashboard-coins');
+    const dashboardRank = document.getElementById('dashboard-rank');
+    const dashboardRewardTimer = document.getElementById('dashboard-reward-timer');
+    let rewardCountdownInterval;
+
+    const currentUserEmail = localStorage.getItem('currentUser');
+    const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+
+    // 1. Set Welcome Message and Coin Balance
+    welcomeMessage.textContent = `Welcome back, ${userData.email.split('@')[0]}!`;
+    dashboardCoins.textContent = userData.coins;
+
+    // 2. Calculate and Display Leaderboard Rank
+    function calculateRank() {
+        const allUsers = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('user_')) {
+                allUsers.push(JSON.parse(localStorage.getItem(key)));
+            }
+        }
+        
+        // Sort users by coins in descending order
+        allUsers.sort((a, b) => b.coins - a.coins);
+        
+        // Find the rank (index + 1) of the current user
+        const userRank = allUsers.findIndex(user => user.email === currentUserEmail) + 1;
+        
+        dashboardRank.textContent = `#${userRank}`;
+    }
+    
+    calculateRank();
+
+    // 3. Display Daily Reward Status
+    function checkRewardStatus() {
+        const COOLDOWN_PERIOD = 24 * 60 * 60 * 1000;
+        const lastClaim = userData.lastClaimTime;
+
+        if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
+            dashboardRewardTimer.textContent = 'Ready to Claim!';
+            dashboardRewardTimer.classList.remove('text-red-500');
+            dashboardRewardTimer.classList.add('text-green-600');
+            if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
+        } else {
+            const remainingTime = COOLDOWN_PERIOD - (Date.now() - lastClaim);
+            dashboardRewardTimer.classList.remove('text-green-600');
+            dashboardRewardTimer.classList.add('text-red-500');
+            startRewardCountdown(remainingTime);
+        }
+    }
+
+    function startRewardCountdown(duration) {
+        let timer = duration;
+        if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
+
+        rewardCountdownInterval = setInterval(() => {
+            timer -= 1000;
+            if (timer < 0) {
+                clearInterval(rewardCountdownInterval);
+                checkRewardStatus();
+            } else {
+                const hours = Math.floor((timer / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((timer / (1000 * 60)) % 60);
+                const seconds = Math.floor((timer / 1000) % 60);
+                dashboardRewardTimer.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            }
+        }, 1000);
+    }
+    
+    checkRewardStatus();
+}

@@ -272,6 +272,7 @@ handleRewardsPage(userData, updateUserData);
 handlePlayPage(userData, updateUserData);
 handleLeaderboardPage(userData); // <-- ADD THIS LINE
 handleWithdrawPage(userData, updateUserData);
+handleAdminPage(userData, updateUserData);
 
 // --- NEW FUNCTION for the Leaderboard Page ---
 function handleLeaderboardPage(currentUserData) {
@@ -389,4 +390,89 @@ function handleWithdrawPage(userData, updateUserData) {
         amountInput.value = '';
         cashValueDisplay.textContent = '$0.00';
     });
+}
+// --- NEW FUNCTION for the Admin Page ---
+function handleAdminPage(currentUserData, updateUserData) {
+    const userListBody = document.getElementById('admin-user-list');
+    if (!userListBody) return; // Only run on the Admin page
+
+    // --- SECURITY CHECK ---
+    // If the current user is not an admin, redirect them immediately.
+    if (!currentUserData.isAdmin) {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
+    function renderUserTable() {
+        userListBody.innerHTML = ''; // Clear the table before re-rendering
+        
+        const allUsers = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('user_')) {
+                allUsers.push(JSON.parse(localStorage.getItem(key)));
+            }
+        }
+
+        allUsers.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${user.email}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-500">${user.coins}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <button data-email="${user.email}" class="toggle-admin-btn px-3 py-1 text-sm font-medium rounded-md ${user.isAdmin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                        ${user.isAdmin ? 'Admin' : 'User'}
+                    </button>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex items-center space-x-2">
+                        <input type="number" data-email="${user.email}" class="coin-input w-24 border-gray-300 rounded-md shadow-sm text-sm" placeholder="Add/Sub">
+                        <button data-email="${user.email}" class="update-coins-btn px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">Update</button>
+                    </div>
+                </td>
+            `;
+            userListBody.appendChild(row);
+        });
+    }
+
+    // Event Delegation for the entire table body
+    userListBody.addEventListener('click', (e) => {
+        const target = e.target;
+        const userEmail = target.dataset.email;
+
+        if (!userEmail) return;
+
+        // Handle toggling admin status
+        if (target.classList.contains('toggle-admin-btn')) {
+            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+            userToUpdate.isAdmin = !userToUpdate.isAdmin;
+            localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
+            renderUserTable(); // Re-render the table to show the change
+        }
+
+        // Handle updating coins
+        if (target.classList.contains('update-coins-btn')) {
+            const input = userListBody.querySelector(`.coin-input[data-email="${userEmail}"]`);
+            const amount = parseInt(input.value, 10);
+
+            if (isNaN(amount)) {
+                alert('Please enter a valid number.');
+                return;
+            }
+
+            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+            userToUpdate.coins += amount;
+            localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
+            
+            // If the admin is updating their own coins, update their session data too
+            if (userEmail === currentUserData.email) {
+                updateUserData({ coins: userToUpdate.coins });
+            }
+
+            renderUserTable(); // Re-render the table with new coin values
+        }
+    });
+    
+    // Initial render of the user table
+    renderUserTable();
 }

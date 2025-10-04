@@ -3,214 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Pop - Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Login - Coin Pop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="antialiased flex items-center justify-center min-h-screen p-4">
-    <!-- Floating Coins -->
-    <div class="floating-coin coin-1"></div>
-    <div class="floating-coin coin-2"></div>
-    <div class="floating-coin coin-3"></div>
+<body class="antialiased bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <!-- Theme Toggle -->
-    <div class="theme-toggle" id="theme-toggle">
-        <i class="fas fa-moon"></i>
-    </div>
-
-    <!-- Settings Toggle -->
-    <div class="settings-toggle" id="settings-toggle">
-        <i class="fas fa-cog"></i>
-    </div>
-
-    <!-- Settings Panel -->
-    <div class="settings-panel" id="settings-panel">
-        <h3 class="text-lg font-bold mb-4">Settings</h3>
-        
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium mb-2">Theme</label>
-                <div class="flex gap-2">
-                    <button class="btn-primary flex-1 py-2 rounded" id="light-theme-btn">Light</button>
-                    <button class="btn-secondary flex-1 py-2 rounded" id="dark-theme-btn">Dark</button>
-                    <button class="btn-secondary flex-1 py-2 rounded" id="auto-theme-btn">Auto</button>
-                </div>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium mb-2">Language</label>
-                <select class="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                    <option>English</option>
-                    <option>Urdu</option>
-                    <option>Arabic</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium mb-2">Notifications</label>
-                <div class="flex items-center justify-between">
-                    <span>Push Notifications</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                </div>
-            </div>
-            
-            <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button class="btn-primary w-full py-2 rounded mb-2" id="reset-data-btn">Reset All Data</button>
-                <button class="btn-secondary w-full py-2 rounded" id="export-data-btn">Export Data</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Auth Container -->
-    <div class="w-full max-w-md auth-container rounded-2xl p-8 space-y-8">
-        <div class="text-center">
-            <h1 class="text-3xl font-bold text-blue-600">Coin Pop</h1>
-            <h2 class="mt-2 text-xl font-semibold">Welcome Back!</h2>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Sign in to continue to your dashboard.</p>
+    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
+        <div>
+            <h1 class="text-3xl font-bold text-center text-blue-600">Coin Pop</h1>
+            <h2 class="mt-2 text-xl font-semibold text-center text-gray-800">Welcome Back!</h2>
+            <p class="mt-2 text-center text-sm text-gray-600">Sign in to continue to your dashboard.</p>
         </div>
 
-        <!-- Tabs -->
-        <div class="flex border-b border-gray-200 dark:border-gray-700">
-            <div class="tab active" data-tab="login">Login</div>
-            <div class="tab" data-tab="signup">Sign Up</div>
-        </div>
-
-        <!-- Login Form -->
-        <div class="tab-content active" id="login-tab">
-            <form id="login-form" class="space-y-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="login-email" class="block text-sm font-medium mb-1">Email address</label>
-                        <input id="login-email" name="email" type="email" autocomplete="email" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Email address" value="test@example.com">
-                    </div>
-                    <div class="password-container">
-                        <label for="login-password" class="block text-sm font-medium mb-1">Password</label>
-                        <input id="login-password" name="password" type="password" autocomplete="current-password" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Password" value="password123">
-                        <button type="button" class="password-toggle" id="login-password-toggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember me</label>
-                    </div>
-
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot your password?</a>
-                    </div>
-                </div>
-
+        <form id="login-form" class="mt-8 space-y-6">
+            <div class="space-y-4 rounded-md shadow-sm">
                 <div>
-                    <button type="submit"
-                        class="btn-primary group relative flex justify-center w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Sign in
-                    </button>
+                    <label for="email" class="sr-only">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required
+                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Email address" value="test@example.com">
                 </div>
-                <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
-            </form>
-        </div>
-
-        <!-- Signup Form -->
-        <div class="tab-content" id="signup-tab">
-            <form id="signup-form" class="space-y-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="signup-name" class="block text-sm font-medium mb-1">Full Name</label>
-                        <input id="signup-name" name="name" type="text" autocomplete="name" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Full Name">
-                    </div>
-                    <div>
-                        <label for="signup-email" class="block text-sm font-medium mb-1">Email address</label>
-                        <input id="signup-email" name="email" type="email" autocomplete="email" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Email address">
-                    </div>
-                    <div class="password-container">
-                        <label for="signup-password" class="block text-sm font-medium mb-1">Password</label>
-                        <input id="signup-password" name="password" type="password" autocomplete="new-password" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Password">
-                        <button type="button" class="password-toggle" id="signup-password-toggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="password-container">
-                        <label for="confirm-password" class="block text-sm font-medium mb-1">Confirm Password</label>
-                        <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
-                            class="input-field relative block w-full px-3 py-3 rounded-md focus:outline-none focus:z-10 sm:text-sm"
-                            placeholder="Confirm Password">
-                        <button type="button" class="password-toggle" id="confirm-password-toggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <input id="agree-terms" name="agree-terms" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="agree-terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                        I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms and Conditions</a>
-                    </label>
-                </div>
-
                 <div>
-                    <button type="submit"
-                        class="btn-primary group relative flex justify-center w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Create Account
-                    </button>
-                </div>
-                <p id="signup-error" class="text-center text-sm text-red-600 mt-2"></p>
-            </form>
-        </div>
-
-        <!-- Social Login -->
-        <div class="mt-6">
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Password" value="password123">
                 </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-2 gap-3">
-                <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <i class="fab fa-google text-red-500 mr-2"></i>
-                    Google
-                </button>
-
-                <button type="button" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <i class="fab fa-facebook text-blue-600 mr-2"></i>
-                    Facebook
+            <div>
+                <button type="submit"
+                    class="group relative flex justify-center w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Sign in
                 </button>
             </div>
+            <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
+        </form>
+         <div class="text-center">
+            <p class="text-sm text-gray-600">
+                Don't have an account?
+                <a href="#" id="signup-link" class="font-medium text-blue-600 hover:text-blue-500">
+                    Sign up
+                </a>
+            </p>
         </div>
     </div>
 
-    <!-- Reset Data Confirmation Modal -->
-    <div id="reset-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold mb-4">Reset All Data</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to reset all data? This action cannot be undone and will delete all your progress, coins, and settings.</p>
-            <div class="flex gap-2">
-                <button class="btn-danger flex-1 py-2 rounded" id="confirm-reset">Reset Data</button>
-                <button class="btn-secondary flex-1 py-2 rounded" id="cancel-reset">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

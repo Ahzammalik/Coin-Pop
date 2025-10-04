@@ -53,6 +53,13 @@ body {
     margin-right: 0.75rem; /* Space between icon and text */
 }
 
+/* Style for the active navigation link */
+.nav-link.active {
+    background-color: #eef2ff; /* Light blue background */
+    color: #4338ca; /* Indigo text color */
+    font-weight: 600;
+}
+
 /* Sidebar footer for user info and logout */
 .sidebar-footer {
     padding: 1.5rem;

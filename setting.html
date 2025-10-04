@@ -9,225 +9,233 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --primary-dark: #2563eb;
-            --bg-color: #f8fafc;
-            --card-color: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
         }
-
-        .dark-theme {
-            --primary-color: #60a5fa;
-            --primary-dark: #3b82f6;
-            --bg-color: #0f172a;
-            --card-color: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-        }
-
-        body {
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
         }
-
+        
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
         .sidebar {
-            width: 250px;
-            background-color: var(--card-color);
-            border-right: 1px solid var(--border-color);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             z-index: 100;
         }
-
+        
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
+        
         .sidebar-nav {
-            flex: 1;
             padding: 1rem 0;
+            flex-grow: 1;
         }
-
+        
         .nav-link {
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
         }
-
+        
         .nav-link:hover, .nav-link.active {
-            background-color: var(--border-color);
-            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
         }
-
-        .nav-link svg {
-            margin-right: 0.75rem;
-        }
-
+        
         .sidebar-footer {
             padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .logout-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 101;
-            background: var(--card-color);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            padding: 0.5rem;
-            cursor: pointer;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
+        
         .content-header {
+            background-color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Settings-specific styles */
+        .settings-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .settings-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .settings-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-30%, 30%);
+        }
+        
+        .settings-section {
             margin-bottom: 2rem;
         }
-
-        .coin-balance-display {
-            background-color: var(--card-color);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        
+        .section-header {
+            font-size: 1.25rem;
             font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-
-        .refresh-btn {
-            background: none;
-            border: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 50%;
-            transition: all 0.2s;
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
         }
-
-        .refresh-btn:hover {
-            background-color: var(--border-color);
-            transform: rotate(90deg);
-        }
-
-        .card {
-            background-color: var(--card-color);
-            border-radius: 1rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
-        }
-
-        .card-header {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
+        
         .form-group {
             margin-bottom: 1.5rem;
         }
-
+        
         .form-label {
             display: block;
-            font-weight: 600;
+            font-weight: 500;
             margin-bottom: 0.5rem;
-            color: var(--text-primary);
+            color: #374151;
         }
-
+        
         .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             font-size: 1rem;
-            background-color: var(--card-color);
-            color: var(--text-primary);
-            transition: all 0.2s;
+            background-color: white;
+            color: #1f2937;
+            transition: all 0.2s ease;
         }
-
+        
         .form-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
-
+        
         .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             border: none;
+            outline: none;
         }
-
+        
         .btn-primary {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
         }
-
+        
         .btn-primary:hover {
             background-color: var(--primary-dark);
         }
-
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
         .toggle-switch {
             position: relative;
             display: inline-block;
             width: 60px;
             height: 34px;
         }
-
+        
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
+        
         .slider {
             position: absolute;
             cursor: pointer;
@@ -235,11 +243,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #d1d5db;
             transition: .4s;
             border-radius: 34px;
         }
-
+        
         .slider:before {
             position: absolute;
             content: "";
@@ -251,33 +259,33 @@
             transition: .4s;
             border-radius: 50%;
         }
-
+        
         input:checked + .slider {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
         }
-
+        
         input:checked + .slider:before {
             transform: translateX(26px);
         }
-
+        
         .payment-method {
-            border: 2px solid var(--border-color);
+            border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
             padding: 1.5rem;
             margin-bottom: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-
+        
         .payment-method:hover {
-            border-color: var(--primary-color);
+            border-color: var(--primary);
         }
-
+        
         .payment-method.selected {
-            border-color: var(--primary-color);
-            background-color: rgba(59, 130, 246, 0.05);
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.05);
         }
-
+        
         .method-icon {
             width: 60px;
             height: 60px;
@@ -290,127 +298,151 @@
             font-weight: 700;
             color: white;
         }
-
+        
         .easypaisa-icon {
             background: linear-gradient(135deg, #0e9c4e, #0a7a3d);
         }
-
+        
         .jazzcash-icon {
             background: linear-gradient(135deg, #f59e0b, #d97706);
         }
-
+        
         .bank-icon {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         }
-
+        
         .danger-zone {
-            border-left: 4px solid #ef4444;
+            border-left: 4px solid var(--danger);
             background-color: rgba(239, 68, 68, 0.05);
         }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--card-color);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
+        
         .notification {
             position: fixed;
-            top: 20px;
-            right: 90px;
-            background: var(--card-color);
-            border: 1px solid var(--border-color);
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
             border-radius: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            transform: translateY(-100px);
-            opacity: 0;
-            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
         }
-
+        
         .notification.show {
-            transform: translateY(0);
-            opacity: 1;
+            transform: translateX(0);
         }
-
+        
         .notification.success {
-            border-left: 4px solid #10b981;
+            background-color: var(--secondary);
         }
-
+        
         .notification.error {
-            border-left: 4px solid #ef4444;
+            background-color: var(--danger);
         }
-
-        .notification.warning {
-            border-left: 4px solid #f59e0b;
-        }
-
+        
         .password-strength {
             height: 4px;
             border-radius: 2px;
             margin-top: 0.5rem;
             transition: all 0.3s ease;
         }
-
+        
         .password-strength.weak {
             background-color: #ef4444;
             width: 25%;
         }
-
+        
         .password-strength.medium {
             background-color: #f59e0b;
             width: 50%;
         }
-
+        
         .password-strength.strong {
             background-color: #10b981;
             width: 100%;
         }
-
+        
         .password-requirements {
             font-size: 0.75rem;
-            color: var(--text-secondary);
+            color: #6b7280;
             margin-top: 0.5rem;
         }
-
+        
         .requirement {
             display: flex;
             align-items: center;
             margin-bottom: 0.25rem;
         }
-
+        
         .requirement.met {
             color: #10b981;
         }
-
+        
         .requirement.unmet {
             color: #ef4444;
         }
-
+        
         .requirement i {
             margin-right: 0.5rem;
             font-size: 0.875rem;
         }
-
-        /* Mobile responsiveness */
-        @media (max-width: 1024px) {
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 auto 1rem;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .setting-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
             .sidebar {
+                width: 100%;
+                position: fixed;
+                height: 100%;
                 transform: translateX(-100%);
             }
             
-            .sidebar.open {
+            .sidebar.active {
                 transform: translateX(0);
             }
             
@@ -419,7 +451,7 @@
             }
             
             .mobile-menu-btn {
-                display: block;
+                display: flex;
             }
             
             .content-header {
@@ -428,281 +460,420 @@
                 gap: 1rem;
             }
         }
-
-        @media (max-width: 640px) {
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .card {
-                padding: 1rem;
-            }
-        }
     </style>
 </head>
-<body class="antialiased">
-    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle menu">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <div id="app-container" class="w-full flex-grow">
-        <aside class="sidebar" id="sidebar">
+<body class="antialiased flex flex-col min-h-screen bg-gray-100">
+    <div id="app-container" class="w-full flex-grow flex">
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar flex flex-col">
             <div class="sidebar-header">
-                <a href="dashboard.html" class="text-2xl font-bold text-blue-600">Coin Pop</a>
+                <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-coins mr-2"></i>
+                    Coin Pop
+                </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.html" class="nav-link">
-                    <i class="fas fa-home w-6 h-6"></i>
+                    <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
                 <a href="play.html" class="nav-link">
-                    <i class="fas fa-gamepad w-6 h-6"></i>
+                    <i class="fas fa-play-circle"></i>
                     <span>Play</span>
                 </a>
                 <a href="leaderboard.html" class="nav-link">
-                    <i class="fas fa-trophy w-6 h-6"></i>
+                    <i class="fas fa-trophy"></i>
                     <span>Leaderboard</span>
                 </a>
                 <a href="rewards.html" class="nav-link">
-                    <i class="fas fa-gift w-6 h-6"></i>
+                    <i class="fas fa-gift"></i>
                     <span>Daily Rewards</span>
                 </a>
-                <a href="withdraw.html" class="nav-link">
-                    <i class="fas fa-money-bill-wave w-6 h-6"></i>
+                <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
                     <span>Withdraw</span>
                 </a>
                 <a href="settings.html" class="nav-link active">
-                    <i class="fas fa-cog w-6 h-6"></i>
+                    <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
                 <a href="contact.html" class="nav-link">
-                    <i class="fas fa-envelope w-6 h-6"></i>
+                    <i class="fas fa-envelope"></i>
                     <span>Contact Us</span>
                 </a>
                 <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
-                    <i class="fas fa-user-shield w-6 h-6"></i>
+                    <i class="fas fa-user-shield"></i>
                     <span>Admin</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <div id="user-email-display" class="text-sm truncate">user@example.com</div>
-                <button id="logout-btn" class="logout-btn">Sign Out</button>
+                <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
+                <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
+                    Sign Out
+                </button>
             </div>
         </aside>
 
-        <div class="main-content">
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
             <header class="content-header">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Settings</h2>
-                <div id="coin-balance-display" class="coin-balance-display">
-                    <span id="coins-value">Coins: 0</span>
-                    <button id="refresh-btn" class="refresh-btn" title="Refresh balance">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Settings</h2>
+                    <p class="text-gray-600">Manage your account preferences and security</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
+                        <i class="fas fa-coins mr-2"></i>
+                        Coins: 0
+                    </div>
                 </div>
             </header>
 
-            <main>
-                <!-- Profile Settings -->
-                <div class="card">
-                    <h3 class="card-header">Profile Settings</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" id="user-name" class="form-input" placeholder="Enter your full name">
+            <main class="flex-1 overflow-auto p-6">
+                <!-- Hero Section -->
+                <div class="settings-hero relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h1 class="text-3xl font-bold mb-2">Account Settings</h1>
+                            <p class="text-blue-100">Customize your experience and manage your account security</p>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" id="user-email" class="form-input" placeholder="Enter your email" readonly>
-                        </div>
-                    </div>
-                    <button id="save-profile" class="btn btn-primary">Save Profile Changes</button>
-                </div>
-
-                <!-- Payment Methods -->
-                <div class="card">
-                    <h3 class="card-header">Payment Methods</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">Select and configure your preferred withdrawal methods</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="payment-method" data-method="easypaisa">
-                            <div class="method-icon easypaisa-icon">EP</div>
-                            <div class="text-center">
-                                <div class="font-semibold">EasyPaisa</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">Instant Transfer</div>
+                        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                            <p class="text-sm">Account Status</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-2xl font-bold mr-2">Verified</span>
+                                <i class="fas fa-check-circle text-green-300"></i>
                             </div>
-                        </div>
-                        <div class="payment-method" data-method="jazzcash">
-                            <div class="method-icon jazzcash-icon">JC</div>
-                            <div class="text-center">
-                                <div class="font-semibold">JazzCash</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">Fast & Secure</div>
-                            </div>
-                        </div>
-                        <div class="payment-method" data-method="bank">
-                            <div class="method-icon bank-icon">B</div>
-                            <div class="text-center">
-                                <div class="font-semibold">Bank Transfer</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">1-2 Business Days</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="payment-details" style="display: none;">
-                        <div class="form-group">
-                            <label class="form-label" id="account-label">Account Number</label>
-                            <input type="text" id="account-number" class="form-input" placeholder="Enter account number">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Account Holder Name</label>
-                            <input type="text" id="account-name" class="form-input" placeholder="Enter account holder name">
-                        </div>
-                        <button id="save-payment" class="btn btn-primary">Save Payment Details</button>
-                    </div>
-                </div>
-
-                <!-- Appearance Settings -->
-                <div class="card">
-                    <h3 class="card-header">Appearance</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="font-semibold">Dark Mode</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">Switch between light and dark themes</div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="dark-mode-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="font-semibold">Notifications</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">Receive push notifications</div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="notifications-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="font-semibold">Sound Effects</div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">Enable game sound effects</div>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="sound-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
                         </div>
                     </div>
                 </div>
 
-                <!-- Security Settings -->
-                <div class="card">
-                    <h3 class="card-header">Security</h3>
-                    <div class="space-y-4">
-                        <div class="form-group">
-                            <label class="form-label">Change Password</label>
-                            <input type="password" id="new-password" class="form-input mb-2" placeholder="New password">
-                            <div id="password-strength" class="password-strength"></div>
-                            <div id="password-requirements" class="password-requirements">
-                                <div class="requirement" id="req-length">
-                                    <i class="fas fa-circle"></i>
-                                    <span>At least 8 characters</span>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Profile Settings -->
+                        <div class="card p-6">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-user"></i>
                                 </div>
-                                <div class="requirement" id="req-uppercase">
-                                    <i class="fas fa-circle"></i>
-                                    <span>One uppercase letter</span>
+                                <h3>Profile Settings</h3>
+                            </div>
+                            
+                            <div class="text-center mb-6">
+                                <div class="profile-avatar" id="profile-avatar">
+                                    <!-- Avatar will be populated by JavaScript -->
                                 </div>
-                                <div class="requirement" id="req-lowercase">
-                                    <i class="fas fa-circle"></i>
-                                    <span>One lowercase letter</span>
+                                <button class="text-sm text-primary font-medium hover:underline">Change Avatar</button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" id="user-name" class="form-input" placeholder="Enter your full name">
                                 </div>
-                                <div class="requirement" id="req-number">
-                                    <i class="fas fa-circle"></i>
-                                    <span>One number</span>
-                                </div>
-                                <div class="requirement" id="req-special">
-                                    <i class="fas fa-circle"></i>
-                                    <span>One special character</span>
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" id="user-email" class="form-input" placeholder="Enter your email" readonly>
                                 </div>
                             </div>
-                            <input type="password" id="confirm-password" class="form-input mt-3" placeholder="Confirm new password">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Bio</label>
+                                <textarea id="user-bio" class="form-input" rows="3" placeholder="Tell us about yourself"></textarea>
+                            </div>
+                            
+                            <button id="save-profile" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>
+                                Save Profile Changes
+                            </button>
                         </div>
-                        <button id="change-password" class="btn btn-primary">Update Password</button>
-                    </div>
-                </div>
 
-                <!-- Danger Zone -->
-                <div class="card danger-zone">
-                    <h3 class="card-header text-red-600">Danger Zone</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="font-semibold text-red-600">Delete Account</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400">Permanently delete your account and all data</div>
+                        <!-- Payment Methods -->
+                        <div class="card p-6">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <h3>Payment Methods</h3>
+                            </div>
+                            
+                            <p class="text-gray-600 mb-4">Select and configure your preferred withdrawal methods</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="payment-method" data-method="easypaisa">
+                                    <div class="method-icon easypaisa-icon">EP</div>
+                                    <div class="text-center">
+                                        <div class="font-semibold">EasyPaisa</div>
+                                        <div class="text-sm text-gray-600">Instant Transfer</div>
+                                    </div>
+                                </div>
+                                <div class="payment-method" data-method="jazzcash">
+                                    <div class="method-icon jazzcash-icon">JC</div>
+                                    <div class="text-center">
+                                        <div class="font-semibold">JazzCash</div>
+                                        <div class="text-sm text-gray-600">Fast & Secure</div>
+                                    </div>
+                                </div>
+                                <div class="payment-method" data-method="bank">
+                                    <div class="method-icon bank-icon">B</div>
+                                    <div class="text-center">
+                                        <div class="font-semibold">Bank Transfer</div>
+                                        <div class="text-sm text-gray-600">1-2 Business Days</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="payment-details" style="display: none;">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="form-group">
+                                        <label class="form-label" id="account-label">Account Number</label>
+                                        <input type="text" id="account-number" class="form-input" placeholder="Enter account number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Account Holder Name</label>
+                                        <input type="text" id="account-name" class="form-input" placeholder="Enter account holder name">
+                                    </div>
+                                </div>
+                                <button id="save-payment" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Save Payment Details
+                                </button>
+                            </div>
                         </div>
-                        <button id="delete-account" class="btn bg-red-600 text-white hover:bg-red-700">Delete My Account</button>
+
+                        <!-- Security Settings -->
+                        <div class="card p-6">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h3>Security</h3>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Change Password</label>
+                                <input type="password" id="new-password" class="form-input mb-2" placeholder="New password">
+                                <div id="password-strength" class="password-strength"></div>
+                                <div id="password-requirements" class="password-requirements">
+                                    <div class="requirement" id="req-length">
+                                        <i class="fas fa-circle"></i>
+                                        <span>At least 8 characters</span>
+                                    </div>
+                                    <div class="requirement" id="req-uppercase">
+                                        <i class="fas fa-circle"></i>
+                                        <span>One uppercase letter</span>
+                                    </div>
+                                    <div class="requirement" id="req-lowercase">
+                                        <i class="fas fa-circle"></i>
+                                        <span>One lowercase letter</span>
+                                    </div>
+                                    <div class="requirement" id="req-number">
+                                        <i class="fas fa-circle"></i>
+                                        <span>One number</span>
+                                    </div>
+                                    <div class="requirement" id="req-special">
+                                        <i class="fas fa-circle"></i>
+                                        <span>One special character</span>
+                                    </div>
+                                </div>
+                                <input type="password" id="confirm-password" class="form-input mt-3" placeholder="Confirm new password">
+                            </div>
+                            <button id="change-password" class="btn btn-primary">
+                                <i class="fas fa-key mr-2"></i>
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6">
+                        <!-- Appearance Settings -->
+                        <div class="card p-6">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <h3>Appearance</h3>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Dark Mode</div>
+                                        <div class="setting-description">Switch between light and dark themes</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="dark-mode-toggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Notifications</div>
+                                        <div class="setting-description">Receive push notifications</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notifications-toggle" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Sound Effects</div>
+                                        <div class="setting-description">Enable game sound effects</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="sound-toggle" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Vibration</div>
+                                        <div class="setting-description">Enable haptic feedback</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="vibration-toggle" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="card p-6 danger-zone">
+                            <div class="section-header">
+                                <div class="section-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h3 class="text-red-600">Danger Zone</h3>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="font-semibold text-red-600">Delete Account</div>
+                                    <div class="text-sm text-gray-600 mt-1">Permanently delete your account and all data</div>
+                                </div>
+                                <button id="delete-account" class="btn btn-danger w-full">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Delete My Account
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Account Info -->
+                        <div class="card p-6">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <h3>Account Information</h3>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Member Since</span>
+                                    <span class="font-medium" id="member-since">Jan 2023</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Total Games Played</span>
+                                    <span class="font-medium" id="total-games">142</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Total Coins Earned</span>
+                                    <span class="font-medium" id="total-coins-earned">5,240</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Account Status</span>
+                                    <span class="font-medium text-green-600">Verified</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Theme Toggle -->
-    <div class="theme-toggle" id="theme-toggle">
-        <i class="fas fa-moon"></i>
-    </div>
-
     <!-- Notification -->
     <div id="notification" class="notification">
-        <span id="notification-message"></span>
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Operation completed successfully</span>
     </div>
 
     <script>
-        // Check authentication
         document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+
+            // Load user data
             const currentUserEmail = localStorage.getItem('currentUser');
             if (!currentUserEmail) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            // Load user data
             const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
             if (!userData) {
                 window.location.href = 'index.html';
                 return;
             }
 
-            // DOM Elements
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const sidebar = document.getElementById('sidebar');
-            const notification = document.getElementById('notification');
-            const notificationMessage = document.getElementById('notification-message');
-            const refreshBtn = document.getElementById('refresh-btn');
+            // Initialize settings state
+            let settingsState = JSON.parse(localStorage.getItem(`settingsState_${currentUserEmail}`)) || {
+                darkMode: false,
+                notifications: true,
+                soundEffects: true,
+                vibration: true,
+                memberSince: new Date().toISOString(),
+                totalGames: 142,
+                totalCoinsEarned: 5240
+            };
+
+            // Update UI with user data
+            document.getElementById('user-email-display').textContent = currentUserEmail;
+            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+            document.getElementById('user-email').value = currentUserEmail;
+            document.getElementById('user-name').value = userData.name || currentUserEmail.split('@')[0];
+            document.getElementById('user-bio').value = userData.bio || '';
+            
+            // Update profile avatar
+            const profileAvatar = document.getElementById('profile-avatar');
+            const userName = userData.name || currentUserEmail.split('@')[0];
+            profileAvatar.textContent = userName.charAt(0).toUpperCase();
+            
+            // Update account info
+            document.getElementById('member-since').textContent = new Date(settingsState.memberSince).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            document.getElementById('total-games').textContent = settingsState.totalGames.toLocaleString();
+            document.getElementById('total-coins-earned').textContent = settingsState.totalCoinsEarned.toLocaleString();
+
+            // Show admin link if user is admin
+            if (userData.isAdmin) {
+                document.getElementById('admin-nav-link').style.display = 'flex';
+            }
 
             // Show notification
             function showNotification(message, type = 'success') {
-                notificationMessage.textContent = message;
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
                 notification.className = `notification ${type} show`;
                 
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 3000);
             }
-
-            // Update UI
-            function updateUI() {
-                document.getElementById('user-email-display').textContent = currentUserEmail;
-                document.getElementById('coins-value').textContent = `Coins: ${userData.coins || 0}`;
-                document.getElementById('user-email').value = currentUserEmail;
-                document.getElementById('user-name').value = userData.name || currentUserEmail.split('@')[0];
-            }
-
-            // Initialize UI
-            updateUI();
 
             // Load payment methods
             if (userData.paymentMethods) {
@@ -717,43 +888,6 @@
                     document.querySelector('[data-method="bank"]').classList.add('selected');
                 }
             }
-
-            // Show admin link if user is admin
-            if (userData.isAdmin) {
-                document.getElementById('admin-nav-link').style.display = 'flex';
-            }
-
-            // Mobile menu toggle
-            mobileMenuBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-            });
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(event) {
-                if (window.innerWidth <= 1024 && 
-                    !sidebar.contains(event.target) && 
-                    !mobileMenuBtn.contains(event.target) &&
-                    sidebar.classList.contains('open')) {
-                    sidebar.classList.remove('open');
-                }
-            });
-
-            // Refresh button
-            refreshBtn.addEventListener('click', function() {
-                // Add rotation animation
-                this.style.transform = 'rotate(360deg)';
-                setTimeout(() => {
-                    this.style.transform = 'rotate(0deg)';
-                }, 500);
-                
-                // Reload user data
-                const updatedUserData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
-                if (updatedUserData) {
-                    Object.assign(userData, updatedUserData);
-                    updateUI();
-                    showNotification('Balance updated successfully!');
-                }
-            });
 
             // Payment method selection
             document.querySelectorAll('.payment-method').forEach(method => {
@@ -794,8 +928,15 @@
             // Save profile
             document.getElementById('save-profile').addEventListener('click', function() {
                 const userName = document.getElementById('user-name').value;
+                const userBio = document.getElementById('user-bio').value;
+                
                 userData.name = userName;
+                userData.bio = userBio;
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                
+                // Update avatar
+                profileAvatar.textContent = userName.charAt(0).toUpperCase();
+                
                 showNotification('Profile updated successfully!');
             });
 
@@ -803,7 +944,7 @@
             document.getElementById('save-payment').addEventListener('click', function() {
                 const selectedMethod = document.querySelector('.payment-method.selected');
                 if (!selectedMethod) {
-                    showNotification('Please select a payment method first', 'warning');
+                    showNotification('Please select a payment method first', 'error');
                     return;
                 }
 
@@ -812,7 +953,7 @@
                 const accountName = document.getElementById('account-name').value;
 
                 if (!accountNumber || !accountName) {
-                    showNotification('Please fill in all payment details', 'warning');
+                    showNotification('Please fill in all payment details', 'error');
                     return;
                 }
 
@@ -881,7 +1022,7 @@
                 const confirmPassword = document.getElementById('confirm-password').value;
 
                 if (!newPassword || !confirmPassword) {
-                    showNotification('Please fill in both password fields', 'warning');
+                    showNotification('Please fill in both password fields', 'error');
                     return;
                 }
 
@@ -891,7 +1032,7 @@
                 }
 
                 if (!validatePassword(newPassword)) {
-                    showNotification('Password does not meet all requirements', 'warning');
+                    showNotification('Password does not meet all requirements', 'error');
                     return;
                 }
 
@@ -914,64 +1055,37 @@
             document.getElementById('delete-account').addEventListener('click', function() {
                 if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
                     localStorage.removeItem(`user_${currentUserEmail}`);
+                    localStorage.removeItem(`settingsState_${currentUserEmail}`);
                     localStorage.removeItem('currentUser');
-                    showNotification('Account deleted successfully', 'warning');
+                    showNotification('Account deleted successfully', 'error');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 1500);
                 }
             });
 
-            // Theme toggle
-            const themeToggle = document.getElementById('theme-toggle');
-            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            // Toggle switches
+            document.getElementById('dark-mode-toggle').checked = settingsState.darkMode;
+            document.getElementById('notifications-toggle').checked = settingsState.notifications;
+            document.getElementById('sound-toggle').checked = settingsState.soundEffects;
+            document.getElementById('vibration-toggle').checked = settingsState.vibration;
 
-            // Initialize theme
-            function initTheme() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                if (savedTheme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                    darkModeToggle.checked = true;
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                    darkModeToggle.checked = false;
-                }
-            }
-
-            themeToggle.addEventListener('click', function() {
-                if (document.body.classList.contains('dark-theme')) {
-                    document.body.classList.remove('dark-theme');
-                    localStorage.setItem('theme', 'light');
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                    darkModeToggle.checked = false;
-                } else {
-                    document.body.classList.add('dark-theme');
-                    localStorage.setItem('theme', 'dark');
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                    darkModeToggle.checked = true;
-                }
+            // Update toggle states
+            document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const settingId = this.id;
+                    settingsState[settingId.replace('-toggle', '')] = this.checked;
+                    localStorage.setItem(`settingsState_${currentUserEmail}`, JSON.stringify(settingsState));
+                    showNotification('Settings updated successfully!');
+                });
             });
 
-            darkModeToggle.addEventListener('change', function() {
-                if (this.checked) {
-                    document.body.classList.add('dark-theme');
-                    localStorage.setItem('theme', 'dark');
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    localStorage.setItem('theme', 'light');
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                }
-            });
-
-            initTheme();
-
-            // Sign out
+            // Logout functionality
             document.getElementById('logout-btn').addEventListener('click', function() {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
+                if (confirm('Are you sure you want to sign out?')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
+                }
             });
         });
     </script>

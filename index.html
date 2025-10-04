@@ -6,53 +6,568 @@
     <title>Login - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .login-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .login-hero {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-hero::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .login-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .login-form {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider-text {
+            padding: 0 1rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .social-btn:hover {
+            background: #f9fafb;
+        }
+        
+        .social-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.75rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--secondary);
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 0.5rem;
+        }
+        
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .signup-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+            
+            .login-hero {
+                padding: 2rem;
+            }
+            
+            .login-form {
+                padding: 2rem;
+            }
+        }
     </style>
 </head>
-<body class="antialiased bg-gray-100 flex items-center justify-center min-h-screen">
-
-    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
-        <div>
-            <h1 class="text-3xl font-bold text-center text-blue-600">Coin Pop</h1>
-            <h2 class="mt-2 text-xl font-semibold text-center text-gray-800">Welcome Back!</h2>
-            <p class="mt-2 text-center text-sm text-gray-600">Sign in to continue to your dashboard.</p>
+<body>
+    <div class="login-container">
+        <!-- Hero Section -->
+        <div class="login-hero">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h1 class="text-2xl font-bold">Coin Pop</h1>
+            </div>
+            
+            <h2 class="text-3xl font-bold mb-4">Earn While You Play</h2>
+            <p class="text-blue-100 mb-6">Join thousands of players earning coins through fun games and challenges.</p>
+            
+            <ul class="feature-list">
+                <li>
+                    <div class="feature-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span>Play exciting games to earn coins</span>
+                </li>
+                <li>
+                    <div class="feature-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span>Claim daily rewards and bonuses</span>
+                </li>
+                <li>
+                    <div class="feature-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span>Compete on the leaderboard</span>
+                </li>
+                <li>
+                    <div class="feature-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span>Withdraw your earnings easily</span>
+                </li>
+            </ul>
         </div>
-
-        <form id="login-form" class="mt-8 space-y-6">
-            <div class="space-y-4 rounded-md shadow-sm">
-                <div>
-                    <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="Email address" value="test@example.com">
-                </div>
-                <div>
-                    <label for="password" class="sr-only">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required
-                        class="relative block w-full px-3 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="Password" value="password123">
-                </div>
-            </div>
-
+        
+        <!-- Login Form -->
+        <div class="login-form">
             <div>
-                <button type="submit"
-                    class="group relative flex justify-center w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Sign in
-                </button>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+                <p class="text-gray-600 mb-6">Sign in to your account to continue playing and earning.</p>
             </div>
-            <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
-        </form>
-         <div class="text-center">
-            <p class="text-sm text-gray-600">
-                Don't have an account?
-                <a href="#" id="signup-link" class="font-medium text-blue-600 hover:text-blue-500">
-                    Sign up
-                </a>
-            </p>
+            
+            <form id="login-form" class="space-y-4">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required
+                        class="form-input" placeholder="Enter your email" value="test@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="password-container">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required
+                            class="form-input pr-10" placeholder="Enter your password" value="password123">
+                        <button type="button" class="password-toggle" id="password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember-me" name="remember-me">
+                        <label for="remember-me" class="text-sm text-gray-700">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Sign In
+                </button>
+                
+                <div class="divider">
+                    <span class="divider-text">Or continue with</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn">
+                        <i class="fab fa-google text-red-500 social-icon"></i>
+                    </button>
+                    <button type="button" class="social-btn">
+                        <i class="fab fa-facebook text-blue-600 social-icon"></i>
+                    </button>
+                    <button type="button" class="social-btn">
+                        <i class="fab fa-apple text-gray-800 social-icon"></i>
+                    </button>
+                </div>
+                
+                <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
+            </form>
+            
+            <div class="signup-link">
+                <p>Don't have an account?
+                    <a href="#" id="signup-link">Sign up now</a>
+                </p>
+            </div>
         </div>
     </div>
 
-    <script src="main.js"></script>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Operation completed successfully</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordInput = document.getElementById('password');
+            
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle eye icon
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+            
+            // Form submission
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorElement = document.getElementById('login-error');
+                
+                // Reset error message
+                errorElement.textContent = '';
+                
+                // Basic validation
+                if (!email || !password) {
+                    errorElement.textContent = 'Please fill in all fields.';
+                    return;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    errorElement.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+                
+                // Simulate login process
+                simulateLogin(email, password);
+            });
+            
+            // Sign up link
+            document.getElementById('signup-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showNotification('Sign up functionality coming soon!', 'info');
+            });
+            
+            // Forgot password link
+            document.querySelector('.forgot-password').addEventListener('click', function(e) {
+                e.preventDefault();
+                showNotification('Password reset functionality coming soon!', 'info');
+            });
+            
+            // Social login buttons
+            document.querySelectorAll('.social-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    showNotification('Social login functionality coming soon!', 'info');
+                });
+            });
+            
+            // Simulate login process
+            function simulateLogin(email, password) {
+                // Show loading state
+                const submitButton = document.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Signing In...';
+                submitButton.disabled = true;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Check if user exists in localStorage
+                    const userData = JSON.parse(localStorage.getItem(`user_${email}`));
+                    
+                    if (userData && userData.password === password) {
+                        // Successful login
+                        localStorage.setItem('currentUser', email);
+                        showNotification('Login successful! Redirecting...', 'success');
+                        
+                        // Redirect to dashboard after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    } else {
+                        // Failed login
+                        document.getElementById('login-error').textContent = 'Invalid email or password.';
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                        
+                        // Create demo account if it doesn't exist
+                        if (!userData) {
+                            const demoUser = {
+                                email: email,
+                                password: password,
+                                name: email.split('@')[0],
+                                coins: 1000,
+                                isAdmin: email === 'admin@coinpop.com'
+                            };
+                            localStorage.setItem(`user_${email}`, JSON.stringify(demoUser));
+                            showNotification('Demo account created! Please try logging in again.', 'info');
+                        }
+                    }
+                }, 1500);
+            }
+            
+            // Show notification
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Check if user is already logged in
+            if (localStorage.getItem('currentUser')) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -6,94 +6,857 @@
     <title>Dashboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .content-header {
+            background-color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-card.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        }
+        
+        .stat-card.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--secondary);
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+        }
+        
+        .withdraw-request {
+            border-left: 4px solid var(--primary);
+            background-color: #f9fafb;
+        }
+        
+        .withdraw-request.pending {
+            border-left-color: var(--warning);
+        }
+        
+        .withdraw-request.approved {
+            border-left-color: var(--secondary);
+        }
+        
+        .withdraw-request.rejected {
+            border-left-color: var(--danger);
+        }
+        
+        .dashboard-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .dashboard-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-30%, 30%);
+        }
+        
+        .feature-card {
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        .feature-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+        
+        .feature-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .feature-icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+        
+        .activity-icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        .activity-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+        
+        .activity-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+        }
+    </style>
 </head>
 <body class="antialiased flex flex-col min-h-screen bg-gray-100">
-    <div id="app-container" class="w-full flex-grow">
-        <aside class="sidebar">
+    <div id="app-container" class="w-full flex-grow flex">
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <aside class="sidebar flex flex-col">
             <div class="sidebar-header">
-                <a href="dashboard.html" class="text-2xl font-bold text-blue-600">Coin Pop</a>
+                <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-coins mr-2"></i>
+                    Coin Pop
+                </a>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
                 <a href="play.html" class="nav-link">
-                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <i class="fas fa-play-circle"></i>
                     <span>Play</span>
                 </a>
                 <a href="leaderboard.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <i class="fas fa-trophy"></i>
                     <span>Leaderboard</span>
                 </a>
                 <a href="rewards.html" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    <i class="fas fa-gift"></i>
                     <span>Daily Rewards</span>
                 </a>
                 <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <i class="fas fa-money-bill-wave"></i>
                     <span>Withdraw</span>
                 </a>
-                 <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="contact.html" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
+                <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                    <i class="fas fa-user-shield"></i>
                     <span>Admin</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <div id="user-email-display" class="text-sm truncate">user@example.com</div>
-                <button id="logout-btn" class="logout-btn">Sign Out</button>
+                <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
+                <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
+                    Sign Out
+                </button>
             </div>
         </aside>
 
-        <div class="main-content">
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
             <header class="content-header">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
                     <p id="welcome-message" class="text-gray-600">Welcome back!</p>
                 </div>
-                <div id="coin-balance-display" class="coin-balance-display">Coins: 0</div>
+                <div class="flex items-center space-x-4">
+                    <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
+                        <i class="fas fa-coins mr-2"></i>
+                        Coins: 0
+                    </div>
+                    <div class="relative">
+                        <button id="notification-btn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">3</span>
+                        </button>
+                    </div>
+                </div>
             </header>
 
-            <main>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Current Balance</h4>
-                        <p id="dashboard-coins" class="text-4xl font-bold text-blue-600 mt-2">0</p>
-                    </div>
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Leaderboard Rank</h4>
-                        <p id="dashboard-rank" class="text-4xl font-bold text-gray-800 mt-2">--</p>
-                    </div>
-                    <div class="card text-center">
-                        <h4 class="text-gray-500 font-medium">Next Daily Reward</h4>
-                        <p id="dashboard-reward-timer" class="text-2xl font-bold text-green-600 mt-3">Ready to Claim!</p>
+            <main class="flex-1 overflow-auto p-6">
+                <!-- Hero Section -->
+                <div class="dashboard-hero relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h1 class="text-3xl font-bold mb-2">Welcome to Coin Pop!</h1>
+                            <p class="text-blue-100">Play games, earn coins, and withdraw your earnings</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                            <p class="text-sm">Daily Login Streak</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-2xl font-bold mr-2">7</span>
+                                <span class="text-sm">days</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <a href="play.html" class="card flex items-center p-6 hover:bg-gray-50 transition">
-                        <div class="p-4 bg-purple-100 rounded-lg">
-                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Current Balance</p>
+                                <h3 id="dashboard-coins" class="text-2xl font-bold mt-1">0</h3>
+                            </div>
+                            <i class="fas fa-coins text-xl opacity-80"></i>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-bold text-gray-800">Play Game</h4>
-                            <p class="text-gray-600">Earn coins by playing.</p>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-green-300">+150</span> earned today</p>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Leaderboard Rank</p>
+                                <h3 id="dashboard-rank" class="text-2xl font-bold mt-1">#24</h3>
+                            </div>
+                            <i class="fas fa-trophy text-xl opacity-80"></i>
                         </div>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-yellow-300">+2</span> positions this week</p>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Daily Reward</p>
+                                <h3 id="dashboard-reward-timer" class="text-2xl font-bold mt-1">Ready!</h3>
+                            </div>
+                            <i class="fas fa-gift text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80">Claim your free coins</p>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Games Played</p>
+                                <h3 class="text-2xl font-bold mt-1">42</h3>
+                            </div>
+                            <i class="fas fa-gamepad text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-green-300">5</span> today</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <a href="play.html" class="feature-card">
+                        <div class="feature-icon primary">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Play Game</h3>
+                        <p class="text-gray-600 text-sm">Earn coins by playing fun games</p>
                     </a>
-                     <a href="rewards.html" class="card flex items-center p-6 hover:bg-gray-50 transition">
-                        <div class="p-4 bg-yellow-100 rounded-lg">
-                           <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    <a href="rewards.html" class="feature-card">
+                        <div class="feature-icon success">
+                            <i class="fas fa-gift"></i>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-lg font-bold text-gray-800">Claim Reward</h4>
-                            <p class="text-gray-600">Get your free daily bonus.</p>
-                        </div>
+                        <h3 class="font-bold text-lg mb-2">Daily Reward</h3>
+                        <p class="text-gray-600 text-sm">Claim your free daily bonus</p>
                     </a>
+                    <a href="leaderboard.html" class="feature-card">
+                        <div class="feature-icon warning">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Leaderboard</h3>
+                        <p class="text-gray-600 text-sm">See how you rank against others</p>
+                    </a>
+                    <a href="withdraw.html" class="feature-card">
+                        <div class="feature-icon danger">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Withdraw</h3>
+                        <p class="text-gray-600 text-sm">Cash out your earnings</p>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="p-4 border-b">
+                            <h3 class="font-semibold text-gray-700">Recent Activity</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-medium">Game Completed</p>
+                                        <span class="text-green-600 font-semibold">+50 coins</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon primary">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-medium">Daily Reward Claimed</p>
+                                        <span class="text-green-600 font-semibold">+100 coins</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">Yesterday</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon warning">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-medium">Rank Improved</p>
+                                        <span class="text-blue-600 font-semibold">#24 → #22</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">2 days ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon danger">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-medium">Withdrawal Request</p>
+                                        <span class="text-red-600 font-semibold">-500 coins</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">3 days ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress & Goals -->
+                    <div class="card">
+                        <div class="p-4 border-b">
+                            <h3 class="font-semibold text-gray-700">Your Progress</h3>
+                        </div>
+                        <div class="p-4 space-y-6">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Daily Goal</span>
+                                    <span class="text-gray-600">150/200 coins</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Complete 3 more games to reach your goal</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Weekly Challenge</span>
+                                    <span class="text-gray-600">850/1000 coins</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Earn 150 more coins to complete the challenge</p>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Withdrawal Level</span>
+                                    <span class="text-gray-600">Level 2</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 40%"></div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Play 12 more games to reach Level 3</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
-    <script src="main.js"></script>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Operation completed successfully</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+
+            // Load user data
+            const currentUserEmail = localStorage.getItem('currentUser');
+            if (!currentUserEmail) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Update UI with user data
+            document.getElementById('user-email-display').textContent = currentUserEmail;
+            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+            document.getElementById('dashboard-coins').textContent = userData.coins;
+            document.getElementById('welcome-message').textContent = `Welcome back, ${userData.name || currentUserEmail.split('@')[0]}!`;
+
+            // Show admin link if user is admin
+            if (userData.isAdmin) {
+                document.getElementById('admin-nav-link').style.display = 'flex';
+            }
+
+            // Update leaderboard rank (mock data)
+            const rank = Math.floor(Math.random() * 50) + 1;
+            document.getElementById('dashboard-rank').textContent = `#${rank}`;
+
+            // Update notification badge
+            const pendingCount = Math.floor(Math.random() * 5);
+            if (pendingCount > 0) {
+                document.getElementById('notification-badge').textContent = pendingCount;
+                document.getElementById('notification-badge').classList.remove('hidden');
+            }
+
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to sign out?')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Show notification
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            // Simulate daily reward timer
+            function updateRewardTimer() {
+                const now = new Date();
+                const nextReward = new Date();
+                nextReward.setHours(24, 0, 0, 0); // Next day at midnight
+                
+                const diff = nextReward - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                if (hours <= 0 && minutes <= 0) {
+                    document.getElementById('dashboard-reward-timer').textContent = 'Ready!';
+                } else {
+                    document.getElementById('dashboard-reward-timer').textContent = `${hours}h ${minutes}m`;
+                }
+            }
+
+            // Update reward timer every minute
+            updateRewardTimer();
+            setInterval(updateRewardTimer, 60000);
+        });
+    </script>
 </body>
 </html>

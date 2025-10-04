@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handleLoginPage(form) {
-    // ... (This function remains unchanged from the previous step)
     if (localStorage.getItem('currentUser')) {
         window.location.href = 'dashboard.html';
         return;
@@ -56,11 +55,16 @@ function handleLoginPage(form) {
 function handleAuthenticatedPages() {
     const currentUserEmail = localStorage.getItem('currentUser');
     if (!currentUserEmail) {
-        window.location.href = 'index.html';
+        // In case the user tries to access a page directly without a login page, like signin.html,
+        // we should try to redirect to the login page, assuming it's named index.html or signin.html
+        // A check prevents a redirect loop if the login page itself is missing.
+        if (!window.location.pathname.endsWith('signin.html') && !window.location.pathname.endsWith('index.html')) {
+            window.location.href = 'signin.html';
+        }
         return;
     }
 
-    // --- REFACTORED: Centralized User Data Management ---
+    // Centralized User Data Management
     let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
 
     const userEmailDisplay = document.getElementById('user-email-display');
@@ -82,7 +86,8 @@ function handleAuthenticatedPages() {
     }
 
     function setActiveNavLink() {
-        const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        const path = window.location.pathname.split('/').pop();
+        const currentPage = path === '' ? 'dashboard.html' : path; // Default to dashboard
         document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
             if (link.getAttribute('href') === currentPage) {
                 link.classList.add('active');
@@ -92,7 +97,7 @@ function handleAuthenticatedPages() {
 
     document.getElementById('logout-btn').addEventListener('click', () => {
         localStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        window.location.href = 'signin.html';
     });
     
     // Initial setup
@@ -101,26 +106,25 @@ function handleAuthenticatedPages() {
     setActiveNavLink();
 
     // --- PAGE-SPECIFIC LOGIC ---
-    // Now we pass the shared data and functions to each page handler
     handleDashboardPage(userData);
     handleRewardsPage(userData, updateUserData);
-    handlePlayPage(userData, updateUserData); // <-- New page logic
+    handlePlayPage(userData, updateUserData);
+    handleLeaderboardPage(userData);
+    handleWithdrawPage(userData, updateUserData);
+    handleAdminPage(userData, updateUserData);
 }
 
 function initializeDummyUser() {
-    // ... (This function remains unchanged)
     if (!localStorage.getItem('user_test@example.com')) {
         const dummyUser = { email: 'test@example.com', password: 'password123', coins: 100, isAdmin: true, lastClaimTime: null };
         localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
     }
 }
 
-// Pass userData and updateUserData as arguments
 function handleRewardsPage(userData, updateUserData) {
     const claimButton = document.getElementById('claim-reward-btn');
     if (!claimButton) return;
     
-    // ... (The rest of the rewards logic is the same, but it now uses the passed-in arguments)
     const rewardMessage = document.getElementById('reward-message');
     const timerMessage = document.getElementById('timer-message');
     const REWARD_AMOUNT = 50;
@@ -137,21 +141,21 @@ function handleRewardsPage(userData, updateUserData) {
         }
     }
 
-    function enableClaimButton() { /* ... unchanged ... */
+    function enableClaimButton() {
         claimButton.disabled = false;
         claimButton.textContent = `Claim ${REWARD_AMOUNT} Coins`;
         rewardMessage.textContent = 'Your daily reward is ready. Claim it now!';
         timerMessage.style.display = 'none';
         if (countdownInterval) clearInterval(countdownInterval);
     }
-    function disableClaimButton(duration) { /* ... unchanged ... */
+    function disableClaimButton(duration) {
         claimButton.disabled = true;
         claimButton.textContent = 'Reward Claimed';
         rewardMessage.textContent = 'You have already claimed your reward for today.';
         timerMessage.style.display = 'block';
         startCountdown(duration);
     }
-    function startCountdown(duration) { /* ... unchanged ... */
+    function startCountdown(duration) {
         let timer = duration;
         if (countdownInterval) clearInterval(countdownInterval);
         countdownInterval = setInterval(() => {
@@ -160,8 +164,8 @@ function handleRewardsPage(userData, updateUserData) {
                 clearInterval(countdownInterval);
                 checkRewardStatus();
             } else {
-                const h = Math.floor((timer / (3600000)) % 24);
-                const m = Math.floor((timer / (60000)) % 60);
+                const h = Math.floor((timer / 3600000) % 24);
+                const m = Math.floor((timer / 60000) % 60);
                 const s = Math.floor((timer / 1000) % 60);
                 timerMessage.textContent = `Next claim in: ${h}h ${m}m ${s}s`;
             }
@@ -178,12 +182,10 @@ function handleRewardsPage(userData, updateUserData) {
     checkRewardStatus();
 }
 
-// Pass userData as an argument
 function handleDashboardPage(userData) {
     const welcomeMessage = document.getElementById('welcome-message');
     if (!welcomeMessage) return;
 
-    // ... (The rest of the dashboard logic is the same, but it now uses the passed-in userData)
     document.getElementById('dashboard-coins').textContent = userData.coins;
     welcomeMessage.textContent = `Welcome back, ${userData.email.split('@')[0]}!`;
 
@@ -203,7 +205,7 @@ function handleDashboardPage(userData) {
 
     const dashboardRewardTimer = document.getElementById('dashboard-reward-timer');
     let rewardCountdownInterval;
-    function checkRewardStatus() { /* ... unchanged ... */
+    function checkRewardStatus() {
         const COOLDOWN_PERIOD = 86400000;
         const lastClaim = userData.lastClaimTime;
         if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
@@ -218,7 +220,7 @@ function handleDashboardPage(userData) {
             startRewardCountdown(remainingTime);
         }
     }
-    function startRewardCountdown(duration) { /* ... unchanged ... */
+    function startRewardCountdown(duration) {
         let timer = duration;
         if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
         rewardCountdownInterval = setInterval(() => {
@@ -237,49 +239,29 @@ function handleDashboardPage(userData) {
     checkRewardStatus();
 }
 
-// --- NEW FUNCTION for the Play Page ---
 function handlePlayPage(userData, updateUserData) {
     const popButton = document.getElementById('pop-coin-btn');
-    if (!popButton) return; // Only run on the Play page
+    if (!popButton) return;
 
     const resultMessage = document.getElementById('pop-result-message');
 
     popButton.addEventListener('click', () => {
-        // Generate a random number of coins between 1 and 5
         const coinsWon = Math.floor(Math.random() * 5) + 1;
-
-        // Update user data
         updateUserData({
             coins: userData.coins + coinsWon
         });
-
-        // Display the result
         resultMessage.textContent = `You won ${coinsWon} coins!`;
-
-        // Trigger the animation
         popButton.classList.add('pop-animation');
-        
-        // Remove the animation class after it finishes to allow it to be re-triggered
         setTimeout(() => {
             popButton.classList.remove('pop-animation');
-        }, 300); // Animation duration is 0.3s
+        }, 300);
     });
 }
-// --- PAGE-SPECIFIC LOGIC ---
-// Now we pass the shared data and functions to each page handler
-handleDashboardPage(userData);
-handleRewardsPage(userData, updateUserData);
-handlePlayPage(userData, updateUserData);
-handleLeaderboardPage(userData); // <-- ADD THIS LINE
-handleWithdrawPage(userData, updateUserData);
-handleAdminPage(userData, updateUserData);
 
-// --- NEW FUNCTION for the Leaderboard Page ---
 function handleLeaderboardPage(currentUserData) {
     const leaderboardBody = document.getElementById('leaderboard-body');
-    if (!leaderboardBody) return; // Only run on the Leaderboard page
+    if (!leaderboardBody) return;
 
-    // 1. Fetch and sort all users
     const allUsers = [];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -287,14 +269,9 @@ function handleLeaderboardPage(currentUserData) {
             allUsers.push(JSON.parse(localStorage.getItem(key)));
         }
     }
-
-    // Sort users by coins in descending order
     allUsers.sort((a, b) => b.coins - a.coins);
-
-    // 2. Clear the loading message
     leaderboardBody.innerHTML = '';
 
-    // 3. Populate the table
     if (allUsers.length === 0) {
         leaderboardBody.innerHTML = `<tr><td colspan="3" class="px-6 py-12 text-center text-gray-500">No players found.</td></tr>`;
         return;
@@ -303,109 +280,73 @@ function handleLeaderboardPage(currentUserData) {
     allUsers.forEach((user, index) => {
         const rank = index + 1;
         const isCurrentUser = user.email === currentUserData.email;
-
-        // Create table row element
         const row = document.createElement('tr');
-        
-        // Add a highlight class if the row is for the current user
         if (isCurrentUser) {
             row.className = 'bg-blue-50 font-semibold';
         }
-
-        // Create cells for rank, player name, and coins
-        const rankCell = document.createElement('td');
-        rankCell.className = 'px-6 py-4 whitespace-nowrap';
-        rankCell.textContent = `#${rank}`;
-
-        const playerCell = document.createElement('td');
-        playerCell.className = 'px-6 py-4 whitespace-nowrap';
-        // Displaying only the part before '@' for privacy/cleanliness
-        playerCell.textContent = user.email.split('@')[0]; 
-        if(isCurrentUser) playerCell.textContent += ' (You)';
-
-
-        const coinsCell = document.createElement('td');
-        coinsCell.className = 'px-6 py-4 whitespace-nowrap text-blue-600 font-bold';
-        coinsCell.textContent = user.coins;
-
-        // Append cells to the row
-        row.appendChild(rankCell);
-        row.appendChild(playerCell);
-        row.appendChild(coinsCell);
-
-        // Append the row to the table body
+        row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">#${rank}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${user.email.split('@')[0]}${isCurrentUser ? ' (You)' : ''}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-blue-600 font-bold">${user.coins}</td>
+        `;
         leaderboardBody.appendChild(row);
     });
 }
-// --- NEW FUNCTION for the Withdraw Page ---
+
 function handleWithdrawPage(userData, updateUserData) {
     const withdrawForm = document.getElementById('withdraw-form');
-    if (!withdrawForm) return; // Only run on the Withdraw page
+    if (!withdrawForm) return;
 
     const amountInput = document.getElementById('withdraw-amount');
     const cashValueDisplay = document.getElementById('cash-value');
     const messageDisplay = document.getElementById('withdraw-message');
+    const CONVERSION_RATE = 1000;
 
-    const CONVERSION_RATE = 1000; // 1000 coins = $1
-
-    // Update cash value as the user types
     amountInput.addEventListener('input', () => {
         const amount = parseInt(amountInput.value, 10) || 0;
         const value = (amount / CONVERSION_RATE).toFixed(2);
         cashValueDisplay.textContent = `$${value}`;
     });
 
-    // Handle form submission
     withdrawForm.addEventListener('submit', (e) => {
         e.preventDefault();
         messageDisplay.textContent = '';
         messageDisplay.classList.remove('text-red-500', 'text-green-500');
-
         const amountToWithdraw = parseInt(amountInput.value, 10);
 
-        // --- Validation ---
         if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
             messageDisplay.textContent = 'Please enter a valid, positive number.';
             messageDisplay.classList.add('text-red-500');
             return;
         }
-
         if (amountToWithdraw > userData.coins) {
             messageDisplay.textContent = 'Insufficient coin balance for this withdrawal.';
             messageDisplay.classList.add('text-red-500');
             return;
         }
 
-        // --- Process Withdrawal ---
         updateUserData({
             coins: userData.coins - amountToWithdraw
         });
-
-        // Show success message
         const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked').value;
         messageDisplay.textContent = `Success! Your ${selectedMethod} reward is being processed.`;
         messageDisplay.classList.add('text-green-500');
-
-        // Reset form
         amountInput.value = '';
         cashValueDisplay.textContent = '$0.00';
     });
 }
-// --- NEW FUNCTION for the Admin Page ---
+
 function handleAdminPage(currentUserData, updateUserData) {
     const userListBody = document.getElementById('admin-user-list');
-    if (!userListBody) return; // Only run on the Admin page
+    if (!userListBody) return;
 
-    // --- SECURITY CHECK ---
-    // If the current user is not an admin, redirect them immediately.
     if (!currentUserData.isAdmin) {
         window.location.href = 'dashboard.html';
         return;
     }
 
     function renderUserTable() {
-        userListBody.innerHTML = ''; // Clear the table before re-rendering
-        
+        userListBody.innerHTML = '';
         const allUsers = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -413,7 +354,6 @@ function handleAdminPage(currentUserData, updateUserData) {
                 allUsers.push(JSON.parse(localStorage.getItem(key)));
             }
         }
-
         allUsers.forEach(user => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -435,44 +375,34 @@ function handleAdminPage(currentUserData, updateUserData) {
         });
     }
 
-    // Event Delegation for the entire table body
     userListBody.addEventListener('click', (e) => {
         const target = e.target;
         const userEmail = target.dataset.email;
-
         if (!userEmail) return;
 
-        // Handle toggling admin status
         if (target.classList.contains('toggle-admin-btn')) {
             const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
             userToUpdate.isAdmin = !userToUpdate.isAdmin;
             localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-            renderUserTable(); // Re-render the table to show the change
+            renderUserTable();
         }
 
-        // Handle updating coins
         if (target.classList.contains('update-coins-btn')) {
             const input = userListBody.querySelector(`.coin-input[data-email="${userEmail}"]`);
             const amount = parseInt(input.value, 10);
-
             if (isNaN(amount)) {
                 alert('Please enter a valid number.');
                 return;
             }
-
             const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
             userToUpdate.coins += amount;
             localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-            
-            // If the admin is updating their own coins, update their session data too
             if (userEmail === currentUserData.email) {
                 updateUserData({ coins: userToUpdate.coins });
             }
-
-            renderUserTable(); // Re-render the table with new coin values
+            renderUserTable();
         }
     });
     
-    // Initial render of the user table
     renderUserTable();
 }

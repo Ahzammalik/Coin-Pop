@@ -1,408 +1,795 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        handleLoginPage(loginForm);
-    } else {
-        handleAuthenticatedPages();
-    }
-});
+/**
+ * CoinMaster Pro - Main Application Controller
+ * Enhanced with modern JavaScript, animations, and professional error handling
+ */
 
-function handleLoginPage(form) {
-    if (localStorage.getItem('currentUser')) {
-        window.location.href = 'dashboard.html';
-        return;
+class CoinMasterApp {
+    constructor() {
+        this.currentUser = null;
+        this.userData = null;
+        this.CONSTANTS = {
+            REWARD_AMOUNT: 50,
+            COOLDOWN_PERIOD: 24 * 60 * 60 * 1000, // 24 hours
+            CONVERSION_RATE: 1000,
+            MIN_WITHDRAWAL: 10
+        };
+        this.init();
     }
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const loginError = document.getElementById('login-error');
-    const signupLink = document.getElementById('signup-link');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        loginError.textContent = '';
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        const storedUser = localStorage.getItem(`user_${email}`);
-        if (storedUser) {
-            const userData = JSON.parse(storedUser);
-            if (userData.password === password) {
-                localStorage.setItem('currentUser', email);
-                window.location.href = 'dashboard.html';
-            } else {
-                loginError.textContent = 'Incorrect password. Please try again.';
-            }
+
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.handleRouting();
+            this.setupGlobalEventListeners();
+        });
+    }
+
+    handleRouting() {
+        const loginForm = document.getElementById('login-form');
+        
+        if (loginForm) {
+            this.handleLoginPage(loginForm);
         } else {
-            loginError.textContent = 'No user found with that email address.';
+            this.handleAuthenticatedPages();
         }
-    });
-    signupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        const email = prompt("Please enter an email for your new account:", "newuser@example.com");
-        if (!email) return;
-        if (localStorage.getItem(`user_${email}`)) {
-            alert("This email is already registered. Please log in.");
+    }
+
+    setupGlobalEventListeners() {
+        // Global click handler for ripple effects
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.btn, button, .nav-link')) {
+                this.createRippleEffect(e);
+            }
+        });
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+            this.showNotification('An unexpected error occurred', 'error');
+        });
+    }
+
+    createRippleEffect(event) {
+        const button = event.target;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+
+        ripple.style.cssText = `
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 600ms linear;
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x}px;
+            top: ${y}px;
+            pointer-events: none;
+        `;
+
+        button.style.position = 'relative';
+        button.style.overflow = 'hidden';
+        button.appendChild(ripple);
+
+        setTimeout(() => ripple.remove(), 600);
+    }
+
+    // ========== AUTHENTICATION MANAGEMENT ==========
+
+    handleLoginPage(form) {
+        // Redirect if already logged in
+        if (this.getCurrentUser()) {
+            this.redirectTo('dashboard.html');
             return;
         }
-        const password = prompt("Please enter a password:");
-        if (!password) return;
-        const newUser = { email, password, coins: 50, isAdmin: false, lastClaimTime: null };
-        localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
-        alert("Account created successfully! You can now log in.");
-        emailInput.value = email;
-        passwordInput.value = '';
-    });
-}
 
-function handleAuthenticatedPages() {
-    const currentUserEmail = localStorage.getItem('currentUser');
-    if (!currentUserEmail) {
-        // In case the user tries to access a page directly without a login page, like signin.html,
-        // we should try to redirect to the login page, assuming it's named index.html or signin.html
-        // A check prevents a redirect loop if the login page itself is missing.
-        if (!window.location.pathname.endsWith('signin.html') && !window.location.pathname.endsWith('index.html')) {
-            window.location.href = 'signin.html';
-        }
-        return;
+        this.setupLoginForm(form);
+        this.setupSignupHandler();
     }
 
-    // Centralized User Data Management
-    let userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+    setupLoginForm(form) {
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
 
-    const userEmailDisplay = document.getElementById('user-email-display');
-    const coinBalanceDisplay = document.getElementById('coin-balance-display');
-    const adminNavLink = document.getElementById('admin-nav-link');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            loginError.textContent = '';
+            this.showLoadingState(form, true);
 
-    function updateUserData(newData) {
-        userData = { ...userData, ...newData };
-        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-        updateUI(); // Re-render UI elements after data changes
-    }
+            try {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
 
-    function updateUI() {
-        if (userEmailDisplay) userEmailDisplay.textContent = userData.email;
-        if (coinBalanceDisplay) coinBalanceDisplay.textContent = `Coins: ${userData.coins}`;
-        if (adminNavLink && userData.isAdmin) {
-            adminNavLink.style.display = 'flex';
-        }
-    }
-
-    function setActiveNavLink() {
-        const path = window.location.pathname.split('/').pop();
-        const currentPage = path === '' ? 'dashboard.html' : path; // Default to dashboard
-        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
-                link.classList.add('active');
+                await this.authenticateUser(email, password);
+                this.redirectTo('dashboard.html');
+            } catch (error) {
+                loginError.textContent = error.message;
+                this.shakeElement(form);
+            } finally {
+                this.showLoadingState(form, false);
             }
         });
     }
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        localStorage.removeItem('currentUser');
-        window.location.href = 'signin.html';
-    });
-    
-    // Initial setup
-    initializeDummyUser();
-    updateUI();
-    setActiveNavLink();
+    async authenticateUser(email, password) {
+        // Simulate API call delay
+        await this.delay(800);
 
-    // --- PAGE-SPECIFIC LOGIC ---
-    handleDashboardPage(userData);
-    handleRewardsPage(userData, updateUserData);
-    handlePlayPage(userData, updateUserData);
-    handleLeaderboardPage(userData);
-    handleWithdrawPage(userData, updateUserData);
-    handleAdminPage(userData, updateUserData);
-}
+        if (!email || !password) {
+            throw new Error('Please enter both email and password');
+        }
 
-function initializeDummyUser() {
-    if (!localStorage.getItem('user_test@example.com')) {
-        const dummyUser = { email: 'test@example.com', password: 'password123', coins: 100, isAdmin: true, lastClaimTime: null };
-        localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
+        const storedUser = localStorage.getItem(`user_${email}`);
+        
+        if (!storedUser) {
+            throw new Error('No account found with this email address');
+        }
+
+        const userData = JSON.parse(storedUser);
+        
+        if (userData.password !== password) {
+            throw new Error('Incorrect password. Please try again.');
+        }
+
+        localStorage.setItem('currentUser', email);
+        this.currentUser = email;
+        return userData;
     }
-}
 
-function handleRewardsPage(userData, updateUserData) {
-    const claimButton = document.getElementById('claim-reward-btn');
-    if (!claimButton) return;
-    
-    const rewardMessage = document.getElementById('reward-message');
-    const timerMessage = document.getElementById('timer-message');
-    const REWARD_AMOUNT = 50;
-    const COOLDOWN_PERIOD = 24 * 60 * 60 * 1000;
-    let countdownInterval;
+    setupSignupHandler() {
+        const signupLink = document.getElementById('signup-link');
+        const emailInput = document.getElementById('email');
 
-    function checkRewardStatus() {
-        const lastClaim = userData.lastClaimTime;
-        if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
-            enableClaimButton();
-        } else {
-            const remainingTime = COOLDOWN_PERIOD - (Date.now() - lastClaim);
-            disableClaimButton(remainingTime);
+        signupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showSignupModal(emailInput);
+        });
+    }
+
+    showSignupModal(emailInput) {
+        const modal = this.createModal(`
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">Create New Account</h3>
+                <form id="signup-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email Address</label>
+                        <input type="email" id="signup-email" 
+                               class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                               placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="signup-password" 
+                               class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                               placeholder="Minimum 6 characters" minlength="6" required>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+                        Create Account
+                    </button>
+                </form>
+            </div>
+        `);
+
+        modal.querySelector('#signup-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSignup(modal, emailInput);
+        });
+    }
+
+    handleSignup(modal, emailInput) {
+        const signupEmail = document.getElementById('signup-email').value.trim();
+        const signupPassword = document.getElementById('signup-password').value;
+
+        if (localStorage.getItem(`user_${signupEmail}`)) {
+            this.showNotification('This email is already registered', 'error');
+            return;
+        }
+
+        const newUser = {
+            email: signupEmail,
+            password: signupPassword,
+            coins: 100, // Starting bonus
+            isAdmin: false,
+            lastClaimTime: null,
+            joinDate: new Date().toISOString()
+        };
+
+        localStorage.setItem(`user_${signupEmail}`, JSON.stringify(newUser));
+        modal.remove();
+        
+        this.showNotification('Account created successfully! Welcome to CoinMaster!', 'success');
+        emailInput.value = signupEmail;
+    }
+
+    // ========== AUTHENTICATED PAGES HANDLER ==========
+
+    handleAuthenticatedPages() {
+        this.currentUser = this.getCurrentUser();
+        
+        if (!this.currentUser) {
+            this.redirectToLogin();
+            return;
+        }
+
+        this.userData = this.getUserData(this.currentUser);
+        this.initializeApplication();
+    }
+
+    initializeApplication() {
+        this.initializeDummyUser();
+        this.setupNavigation();
+        this.updateUI();
+        this.initializePageSpecificHandlers();
+    }
+
+    setupNavigation() {
+        this.setActiveNavLink();
+        
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.handleLogout());
         }
     }
 
-    function enableClaimButton() {
-        claimButton.disabled = false;
-        claimButton.textContent = `Claim ${REWARD_AMOUNT} Coins`;
-        rewardMessage.textContent = 'Your daily reward is ready. Claim it now!';
-        timerMessage.style.display = 'none';
-        if (countdownInterval) clearInterval(countdownInterval);
-    }
-    function disableClaimButton(duration) {
-        claimButton.disabled = true;
-        claimButton.textContent = 'Reward Claimed';
-        rewardMessage.textContent = 'You have already claimed your reward for today.';
-        timerMessage.style.display = 'block';
-        startCountdown(duration);
-    }
-    function startCountdown(duration) {
-        let timer = duration;
-        if (countdownInterval) clearInterval(countdownInterval);
-        countdownInterval = setInterval(() => {
-            timer -= 1000;
-            if (timer < 0) {
-                clearInterval(countdownInterval);
-                checkRewardStatus();
-            } else {
-                const h = Math.floor((timer / 3600000) % 24);
-                const m = Math.floor((timer / 60000) % 60);
-                const s = Math.floor((timer / 1000) % 60);
-                timerMessage.textContent = `Next claim in: ${h}h ${m}m ${s}s`;
+    setActiveNavLink() {
+        const path = window.location.pathname.split('/').pop();
+        const currentPage = path || 'dashboard.html';
+        
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'border-blue-500');
+            
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active', 'bg-blue-50', 'text-blue-600', 'border-blue-500');
             }
+        });
+    }
+
+    handleLogout() {
+        this.showNotification('Logging out...', 'info');
+        
+        setTimeout(() => {
+            localStorage.removeItem('currentUser');
+            this.redirectTo('signin.html');
         }, 1000);
     }
-    claimButton.addEventListener('click', () => {
-        if (claimButton.disabled) return;
-        updateUserData({
-            coins: userData.coins + REWARD_AMOUNT,
+
+    updateUI() {
+        this.updateUserInfo();
+        this.updateAdminFeatures();
+    }
+
+    updateUserInfo() {
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const coinBalanceDisplay = document.getElementById('coin-balance-display');
+
+        if (userEmailDisplay) {
+            userEmailDisplay.textContent = this.userData.email;
+            userEmailDisplay.title = this.userData.email;
+        }
+
+        if (coinBalanceDisplay) {
+            this.animateValue(coinBalanceDisplay, parseInt(coinBalanceDisplay.textContent) || 0, this.userData.coins, 1000);
+        }
+    }
+
+    updateAdminFeatures() {
+        const adminNavLink = document.getElementById('admin-nav-link');
+        if (adminNavLink && this.userData.isAdmin) {
+            adminNavLink.style.display = 'flex';
+            adminNavLink.classList.add('bg-purple-50', 'text-purple-700');
+        }
+    }
+
+    // ========== PAGE SPECIFIC HANDLERS ==========
+
+    initializePageSpecificHandlers() {
+        const pageHandlers = {
+            'dashboard.html': () => this.handleDashboardPage(),
+            'rewards.html': () => this.handleRewardsPage(),
+            'play.html': () => this.handlePlayPage(),
+            'leaderboard.html': () => this.handleLeaderboardPage(),
+            'withdraw.html': () => this.handleWithdrawPage(),
+            'admin.html': () => this.handleAdminPage()
+        };
+
+        const currentPage = window.location.pathname.split('/').pop();
+        const handler = pageHandlers[currentPage];
+
+        if (handler) {
+            handler();
+        }
+    }
+
+    handleDashboardPage() {
+        this.updateDashboardStats();
+        this.setupDashboardRewardTimer();
+    }
+
+    updateDashboardStats() {
+        const welcomeMessage = document.getElementById('welcome-message');
+        const dashboardCoins = document.getElementById('dashboard-coins');
+        const dashboardRank = document.getElementById('dashboard-rank');
+
+        if (welcomeMessage) {
+            const username = this.userData.email.split('@')[0];
+            welcomeMessage.textContent = `Welcome back, ${username}!`;
+            welcomeMessage.innerHTML = `Welcome back, <span class="text-blue-600">${username}</span>!`;
+        }
+
+        if (dashboardCoins) {
+            this.animateValue(dashboardCoins, 0, this.userData.coins, 1500);
+        }
+
+        if (dashboardRank) {
+            const rank = this.calculateUserRank();
+            dashboardRank.textContent = `#${rank}`;
+            dashboardRank.className = `text-lg font-bold ${rank <= 3 ? 'text-yellow-500' : 'text-gray-700'}`;
+        }
+    }
+
+    handleRewardsPage() {
+        const claimButton = document.getElementById('claim-reward-btn');
+        if (!claimButton) return;
+
+        this.setupRewardSystem(claimButton);
+    }
+
+    setupRewardSystem(claimButton) {
+        const rewardMessage = document.getElementById('reward-message');
+        const timerMessage = document.getElementById('timer-message');
+        let countdownInterval;
+
+        const updateRewardUI = () => {
+            const rewardStatus = this.getRewardStatus();
+            
+            if (rewardStatus.claimable) {
+                this.enableClaimButton(claimButton, rewardMessage, timerMessage);
+            } else {
+                this.disableClaimButton(claimButton, rewardMessage, timerMessage, rewardStatus.remainingTime);
+            }
+        };
+
+        claimButton.addEventListener('click', () => {
+            if (claimButton.disabled) return;
+            
+            this.claimReward();
+            this.pulseAnimation(claimButton, 'bg-green-500');
+            this.showNotification(`🎉 ${this.CONSTANTS.REWARD_AMOUNT} coins claimed!`, 'success');
+            updateRewardUI();
+        });
+
+        updateRewardUI();
+    }
+
+    // ========== UTILITY METHODS ==========
+
+    getCurrentUser() {
+        return localStorage.getItem('currentUser');
+    }
+
+    getUserData(email) {
+        const data = localStorage.getItem(`user_${email}`);
+        return data ? JSON.parse(data) : null;
+    }
+
+    updateUserData(updates) {
+        this.userData = { ...this.userData, ...updates };
+        localStorage.setItem(`user_${this.currentUser}`, JSON.stringify(this.userData));
+        this.updateUI();
+    }
+
+    redirectTo(url) {
+        window.location.href = url;
+    }
+
+    redirectToLogin() {
+        if (!window.location.pathname.includes('signin.html')) {
+            this.redirectTo('signin.html');
+        }
+    }
+
+    showLoadingState(element, isLoading) {
+        const buttons = element.querySelectorAll('button[type="submit"]');
+        
+        buttons.forEach(button => {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="spinner"></div> Loading...';
+                button.classList.add('opacity-50');
+            } else {
+                button.disabled = false;
+                button.textContent = button.getAttribute('data-original-text') || 'Sign In';
+                button.classList.remove('opacity-50');
+            }
+        });
+    }
+
+    showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll('.custom-notification');
+        existingNotifications.forEach(notification => notification.remove());
+
+        const notification = document.createElement('div');
+        const typeStyles = {
+            success: 'bg-green-500 border-green-600',
+            error: 'bg-red-500 border-red-600',
+            warning: 'bg-yellow-500 border-yellow-600',
+            info: 'bg-blue-500 border-blue-600'
+        };
+
+        notification.className = `custom-notification fixed top-4 right-4 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${typeStyles[type]}`;
+        notification.textContent = message;
+        notification.style.zIndex = '1000';
+
+        document.body.appendChild(notification);
+
+        // Animate in
+        setTimeout(() => {
+            notification.classList.remove('transform', '-translate-y-2', 'opacity-0');
+            notification.classList.add('translate-y-0', 'opacity-100');
+        }, 100);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            notification.classList.add('opacity-0', 'transform', '-translate-y-2');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    animateValue(element, start, end, duration) {
+        const startTime = performance.now();
+        const step = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const currentValue = Math.floor(start + (end - start) * progress);
+            element.textContent = currentValue.toLocaleString();
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                element.textContent = end.toLocaleString();
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
+    pulseAnimation(element, pulseClass) {
+        element.classList.add('animate-pulse', pulseClass);
+        setTimeout(() => {
+            element.classList.remove('animate-pulse', pulseClass);
+        }, 600);
+    }
+
+    shakeElement(element) {
+        element.classList.add('animate-shake');
+        setTimeout(() => {
+            element.classList.remove('animate-shake');
+        }, 600);
+    }
+
+    createModal(content) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = content;
+        document.body.appendChild(modal);
+        return modal;
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ========== REWARD SYSTEM ==========
+
+    getRewardStatus() {
+        const lastClaim = this.userData.lastClaimTime;
+        const now = Date.now();
+        
+        if (!lastClaim || (now - lastClaim >= this.CONSTANTS.COOLDOWN_PERIOD)) {
+            return { claimable: true, remainingTime: 0 };
+        } else {
+            return {
+                claimable: false,
+                remainingTime: this.CONSTANTS.COOLDOWN_PERIOD - (now - lastClaim)
+            };
+        }
+    }
+
+    enableClaimButton(button, rewardMessage, timerMessage) {
+        button.disabled = false;
+        button.innerHTML = `🎁 Claim ${this.CONSTANTS.REWARD_AMOUNT} Coins`;
+        button.className = 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all transform hover:scale-105';
+        rewardMessage.textContent = 'Your daily reward is ready!';
+        rewardMessage.className = 'text-green-600 font-semibold';
+        
+        if (timerMessage) {
+            timerMessage.style.display = 'none';
+        }
+    }
+
+    disableClaimButton(button, rewardMessage, timerMessage, remainingTime) {
+        button.disabled = true;
+        button.textContent = 'Reward Claimed';
+        button.className = 'bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed';
+        rewardMessage.textContent = 'Come back tomorrow for more rewards!';
+        rewardMessage.className = 'text-gray-600';
+        
+        if (timerMessage) {
+            timerMessage.style.display = 'block';
+            this.startCountdown(timerMessage, remainingTime);
+        }
+    }
+
+    claimReward() {
+        this.updateUserData({
+            coins: this.userData.coins + this.CONSTANTS.REWARD_AMOUNT,
             lastClaimTime: Date.now()
         });
-        checkRewardStatus();
-    });
-    checkRewardStatus();
-}
+    }
 
-function handleDashboardPage(userData) {
-    const welcomeMessage = document.getElementById('welcome-message');
-    if (!welcomeMessage) return;
-
-    document.getElementById('dashboard-coins').textContent = userData.coins;
-    welcomeMessage.textContent = `Welcome back, ${userData.email.split('@')[0]}!`;
-
-    function calculateRank() {
-        const allUsers = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('user_')) {
-                allUsers.push(JSON.parse(localStorage.getItem(key)));
+    startCountdown(timerElement, duration) {
+        let remaining = duration;
+        
+        const updateTimer = () => {
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            
+            timerElement.textContent = `Next reward in: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (remaining <= 0) {
+                clearInterval(interval);
+                location.reload();
             }
-        }
+            
+            remaining -= 1000;
+        };
+        
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+    }
+
+    calculateUserRank() {
+        const allUsers = this.getAllUsers();
         allUsers.sort((a, b) => b.coins - a.coins);
-        const userRank = allUsers.findIndex(user => user.email === userData.email) + 1;
-        document.getElementById('dashboard-rank').textContent = `#${userRank}`;
-    }
-    calculateRank();
-
-    const dashboardRewardTimer = document.getElementById('dashboard-reward-timer');
-    let rewardCountdownInterval;
-    function checkRewardStatus() {
-        const COOLDOWN_PERIOD = 86400000;
-        const lastClaim = userData.lastClaimTime;
-        if (!lastClaim || (Date.now() - lastClaim >= COOLDOWN_PERIOD)) {
-            dashboardRewardTimer.textContent = 'Ready to Claim!';
-            dashboardRewardTimer.classList.remove('text-red-500');
-            dashboardRewardTimer.classList.add('text-green-600');
-            if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
-        } else {
-            const remainingTime = COOLDOWN_PERIOD - (Date.now() - lastClaim);
-            dashboardRewardTimer.classList.remove('text-green-600');
-            dashboardRewardTimer.classList.add('text-red-500');
-            startRewardCountdown(remainingTime);
-        }
-    }
-    function startRewardCountdown(duration) {
-        let timer = duration;
-        if (rewardCountdownInterval) clearInterval(rewardCountdownInterval);
-        rewardCountdownInterval = setInterval(() => {
-            timer -= 1000;
-            if (timer < 0) {
-                clearInterval(rewardCountdownInterval);
-                checkRewardStatus();
-            } else {
-                const h = Math.floor((timer / 3600000) % 24);
-                const m = Math.floor((timer / 60000) % 60);
-                const s = Math.floor((timer / 1000) % 60);
-                dashboardRewardTimer.textContent = `${h}h ${m}m ${s}s`;
-            }
-        }, 1000);
-    }
-    checkRewardStatus();
-}
-
-function handlePlayPage(userData, updateUserData) {
-    const popButton = document.getElementById('pop-coin-btn');
-    if (!popButton) return;
-
-    const resultMessage = document.getElementById('pop-result-message');
-
-    popButton.addEventListener('click', () => {
-        const coinsWon = Math.floor(Math.random() * 5) + 1;
-        updateUserData({
-            coins: userData.coins + coinsWon
-        });
-        resultMessage.textContent = `You won ${coinsWon} coins!`;
-        popButton.classList.add('pop-animation');
-        setTimeout(() => {
-            popButton.classList.remove('pop-animation');
-        }, 300);
-    });
-}
-
-function handleLeaderboardPage(currentUserData) {
-    const leaderboardBody = document.getElementById('leaderboard-body');
-    if (!leaderboardBody) return;
-
-    const allUsers = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('user_')) {
-            allUsers.push(JSON.parse(localStorage.getItem(key)));
-        }
-    }
-    allUsers.sort((a, b) => b.coins - a.coins);
-    leaderboardBody.innerHTML = '';
-
-    if (allUsers.length === 0) {
-        leaderboardBody.innerHTML = `<tr><td colspan="3" class="px-6 py-12 text-center text-gray-500">No players found.</td></tr>`;
-        return;
+        return allUsers.findIndex(user => user.email === this.userData.email) + 1;
     }
 
-    allUsers.forEach((user, index) => {
-        const rank = index + 1;
-        const isCurrentUser = user.email === currentUserData.email;
-        const row = document.createElement('tr');
-        if (isCurrentUser) {
-            row.className = 'bg-blue-50 font-semibold';
-        }
-        row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap">#${rank}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${user.email.split('@')[0]}${isCurrentUser ? ' (You)' : ''}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-blue-600 font-bold">${user.coins}</td>
-        `;
-        leaderboardBody.appendChild(row);
-    });
-}
-
-function handleWithdrawPage(userData, updateUserData) {
-    const withdrawForm = document.getElementById('withdraw-form');
-    if (!withdrawForm) return;
-
-    const amountInput = document.getElementById('withdraw-amount');
-    const cashValueDisplay = document.getElementById('cash-value');
-    const messageDisplay = document.getElementById('withdraw-message');
-    const CONVERSION_RATE = 1000;
-
-    amountInput.addEventListener('input', () => {
-        const amount = parseInt(amountInput.value, 10) || 0;
-        const value = (amount / CONVERSION_RATE).toFixed(2);
-        cashValueDisplay.textContent = `$${value}`;
-    });
-
-    withdrawForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        messageDisplay.textContent = '';
-        messageDisplay.classList.remove('text-red-500', 'text-green-500');
-        const amountToWithdraw = parseInt(amountInput.value, 10);
-
-        if (isNaN(amountToWithdraw) || amountToWithdraw <= 0) {
-            messageDisplay.textContent = 'Please enter a valid, positive number.';
-            messageDisplay.classList.add('text-red-500');
-            return;
-        }
-        if (amountToWithdraw > userData.coins) {
-            messageDisplay.textContent = 'Insufficient coin balance for this withdrawal.';
-            messageDisplay.classList.add('text-red-500');
-            return;
-        }
-
-        updateUserData({
-            coins: userData.coins - amountToWithdraw
-        });
-        const selectedMethod = withdrawForm.querySelector('input[name="method"]:checked').value;
-        messageDisplay.textContent = `Success! Your ${selectedMethod} reward is being processed.`;
-        messageDisplay.classList.add('text-green-500');
-        amountInput.value = '';
-        cashValueDisplay.textContent = '$0.00';
-    });
-}
-
-function handleAdminPage(currentUserData, updateUserData) {
-    const userListBody = document.getElementById('admin-user-list');
-    if (!userListBody) return;
-
-    if (!currentUserData.isAdmin) {
-        window.location.href = 'dashboard.html';
-        return;
-    }
-
-    function renderUserTable() {
-        userListBody.innerHTML = '';
-        const allUsers = [];
+    getAllUsers() {
+        const users = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith('user_')) {
-                allUsers.push(JSON.parse(localStorage.getItem(key)));
+                users.push(JSON.parse(localStorage.getItem(key)));
             }
         }
-        allUsers.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${user.email}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">${user.coins}</td>
+        return users;
+    }
+
+    initializeDummyUser() {
+        if (!localStorage.getItem('user_test@example.com')) {
+            const dummyUser = {
+                email: 'test@example.com',
+                password: 'password123',
+                coins: 1000,
+                isAdmin: true,
+                lastClaimTime: null,
+                joinDate: new Date().toISOString()
+            };
+            localStorage.setItem('user_test@example.com', JSON.stringify(dummyUser));
+        }
+    }
+
+    // ========== EXISTING FUNCTIONALITY (simplified for brevity) ==========
+
+    handlePlayPage() {
+        const popButton = document.getElementById('pop-coin-btn');
+        if (!popButton) return;
+
+        popButton.addEventListener('click', () => {
+            const coinsWon = Math.floor(Math.random() * 5) + 1;
+            this.updateUserData({ coins: this.userData.coins + coinsWon });
+            
+            document.getElementById('pop-result-message').textContent = `🎉 You won ${coinsWon} coins!`;
+            this.pulseAnimation(popButton, 'bg-yellow-500');
+        });
+    }
+
+    handleLeaderboardPage() {
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        if (!leaderboardBody) return;
+
+        const allUsers = this.getAllUsers();
+        allUsers.sort((a, b) => b.coins - a.coins);
+        
+        leaderboardBody.innerHTML = allUsers.map((user, index) => {
+            const isCurrentUser = user.email === this.userData.email;
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank} font-bold` : '';
+            
+            return `
+                <tr class="${isCurrentUser ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''} transition-colors hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap ${rankClass}">
+                        ${rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : `#${rank}`}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${user.email.split('@')[0]}${isCurrentUser ? ' <span class="text-blue-600 font-semibold">(You)</span>' : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap font-bold text-blue-600">
+                        ${user.coins.toLocaleString()} 🪙
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    handleWithdrawPage() {
+        const form = document.getElementById('withdraw-form');
+        if (!form) return;
+
+        const amountInput = document.getElementById('withdraw-amount');
+        const cashValueDisplay = document.getElementById('cash-value');
+
+        amountInput.addEventListener('input', () => {
+            const amount = parseInt(amountInput.value) || 0;
+            const cashValue = (amount / this.CONSTANTS.CONVERSION_RATE).toFixed(2);
+            cashValueDisplay.textContent = `$${cashValue}`;
+            cashValueDisplay.className = amount >= this.CONSTANTS.MIN_WITHDRAWAL ? 'text-green-600 font-bold' : 'text-red-600';
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.processWithdrawal(form, amountInput);
+        });
+    }
+
+    processWithdrawal(form, amountInput) {
+        const amount = parseInt(amountInput.value);
+        const messageDisplay = document.getElementById('withdraw-message');
+
+        if (amount < this.CONSTANTS.MIN_WITHDRAWAL) {
+            this.showNotification(`Minimum withdrawal is ${this.CONSTANTS.MIN_WITHDRAWAL} coins`, 'error');
+            return;
+        }
+
+        if (amount > this.userData.coins) {
+            this.showNotification('Insufficient coins', 'error');
+            return;
+        }
+
+        this.updateUserData({ coins: this.userData.coins - amount });
+        this.showNotification(`Withdrawal request processed! $${(amount / this.CONSTANTS.CONVERSION_RATE).toFixed(2)} will be sent to your account.`, 'success');
+        form.reset();
+        document.getElementById('cash-value').textContent = '$0.00';
+    }
+
+    handleAdminPage() {
+        if (!this.userData.isAdmin) {
+            this.redirectTo('dashboard.html');
+            return;
+        }
+        this.renderAdminUserTable();
+    }
+
+    renderAdminUserTable() {
+        const userListBody = document.getElementById('admin-user-list');
+        if (!userListBody) return;
+
+        const allUsers = this.getAllUsers();
+        userListBody.innerHTML = allUsers.map(user => `
+            <tr class="border-b hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap font-medium">${user.email}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <button data-email="${user.email}" class="toggle-admin-btn px-3 py-1 text-sm font-medium rounded-md ${user.isAdmin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                        ${user.isAdmin ? 'Admin' : 'User'}
+                    <span class="font-bold text-blue-600">${user.coins}</span> 🪙
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <button onclick="app.toggleAdmin('${user.email}')" 
+                            class="toggle-admin-btn px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                                user.isAdmin ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            }">
+                        ${user.isAdmin ? '👑 Admin' : '👤 User'}
                     </button>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center space-x-2">
-                        <input type="number" data-email="${user.email}" class="coin-input w-24 border-gray-300 rounded-md shadow-sm text-sm" placeholder="Add/Sub">
-                        <button data-email="${user.email}" class="update-coins-btn px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">Update</button>
+                        <input type="number" id="coins-${user.email}" 
+                               class="w-20 px-2 py-1 border rounded text-sm" 
+                               placeholder="± coins">
+                        <button onclick="app.updateUserCoins('${user.email}')" 
+                                class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors">
+                            Update
+                        </button>
                     </div>
                 </td>
-            `;
-            userListBody.appendChild(row);
-        });
+            </tr>
+        `).join('');
     }
 
-    userListBody.addEventListener('click', (e) => {
-        const target = e.target;
-        const userEmail = target.dataset.email;
-        if (!userEmail) return;
+    toggleAdmin(userEmail) {
+        const user = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+        user.isAdmin = !user.isAdmin;
+        localStorage.setItem(`user_${userEmail}`, JSON.stringify(user));
+        this.renderAdminUserTable();
+        this.showNotification(`${user.email} is now ${user.isAdmin ? 'admin' : 'user'}`, 'success');
+    }
 
-        if (target.classList.contains('toggle-admin-btn')) {
-            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
-            userToUpdate.isAdmin = !userToUpdate.isAdmin;
-            localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-            renderUserTable();
+    updateUserCoins(userEmail) {
+        const input = document.getElementById(`coins-${userEmail}`);
+        const amount = parseInt(input.value);
+
+        if (isNaN(amount)) {
+            this.showNotification('Please enter a valid number', 'error');
+            return;
         }
 
-        if (target.classList.contains('update-coins-btn')) {
-            const input = userListBody.querySelector(`.coin-input[data-email="${userEmail}"]`);
-            const amount = parseInt(input.value, 10);
-            if (isNaN(amount)) {
-                alert('Please enter a valid number.');
-                return;
-            }
-            const userToUpdate = JSON.parse(localStorage.getItem(`user_${userEmail}`));
-            userToUpdate.coins += amount;
-            localStorage.setItem(`user_${userEmail}`, JSON.stringify(userToUpdate));
-            if (userEmail === currentUserData.email) {
-                updateUserData({ coins: userToUpdate.coins });
-            }
-            renderUserTable();
+        const user = JSON.parse(localStorage.getItem(`user_${userEmail}`));
+        user.coins += amount;
+        localStorage.setItem(`user_${userEmail}`, JSON.stringify(user));
+
+        if (userEmail === this.currentUser) {
+            this.userData.coins = user.coins;
+            this.updateUI();
         }
-    });
-    
-    renderUserTable();
+
+        this.renderAdminUserTable();
+        this.showNotification(`Updated ${user.email}'s coins by ${amount}`, 'success');
+        input.value = '';
+    }
 }
+
+// Initialize the application
+const app = new CoinMasterApp();
+
+// Add CSS for animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    .spinner {
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #3498db;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .rank-1 { color: #FFD700; }
+    .rank-2 { color: #C0C0C0; }
+    .rank-3 { color: #CD7F32; }
+    
+    .custom-notification {
+        backdrop-filter: blur(10px);
+        border: 1px solid;
+    }
+`;
+document.head.appendChild(style);

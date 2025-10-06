@@ -79,7 +79,7 @@
             padding: 1.5rem 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: between;
+            justify-content: space-between; /* Fixed from 'between' */
             align-items: center;
         }
         
@@ -193,6 +193,7 @@
             display: flex;
             border-bottom: 1px solid #e5e7eb;
             margin-bottom: 1.5rem;
+            overflow-x: auto;
         }
         
         .tab {
@@ -201,6 +202,7 @@
             border-bottom: 2px solid transparent;
             font-weight: 500;
             color: #6b7280;
+            white-space: nowrap;
         }
         
         .tab.active {
@@ -228,13 +230,15 @@
             max-width: 500px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal-header {
             padding: 1.5rem;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
-            justify-content: between;
+            justify-content: space-between; /* Fixed from 'between' */
             align-items: center;
         }
         
@@ -273,6 +277,16 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: #ef4444;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
         
         .notification {
@@ -320,6 +334,26 @@
             border-left-color: #ef4444;
         }
         
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex-grow: 1;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -338,6 +372,18 @@
             
             .mobile-menu-btn {
                 display: block;
+            }
+            
+            .content-header {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
             }
         }
     </style>
@@ -463,10 +509,18 @@
 
                 <!-- User Management Tab -->
                 <div id="users-tab" class="tab-content">
+                    <div class="search-box">
+                        <input type="text" id="user-search" class="search-input" placeholder="Search users by email...">
+                        <select id="user-filter" class="filter-select">
+                            <option value="all">All Users</option>
+                            <option value="admin">Admins Only</option>
+                            <option value="user">Regular Users</option>
+                        </select>
+                    </div>
                     <div class="card overflow-hidden mb-6">
                         <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                             <h3 class="font-semibold text-gray-700">All Users</h3>
-                            <button class="btn btn-primary btn-sm">
+                            <button id="add-user-btn" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus mr-2"></i>
                                 Add User
                             </button>
@@ -491,6 +545,15 @@
 
                 <!-- Withdrawal Requests Tab -->
                 <div id="withdrawals-tab" class="tab-content hidden">
+                    <div class="search-box">
+                        <input type="text" id="withdrawal-search" class="search-input" placeholder="Search withdrawals by user email...">
+                        <select id="withdrawal-filter" class="filter-select">
+                            <option value="all">All Statuses</option>
+                            <option value="pending">Pending Only</option>
+                            <option value="approved">Approved Only</option>
+                            <option value="rejected">Rejected Only</option>
+                        </select>
+                    </div>
                     <div class="card overflow-hidden mb-6">
                         <div class="p-4 bg-gray-50 border-b">
                             <h3 class="font-semibold text-gray-700">Pending Withdrawal Requests</h3>
@@ -519,30 +582,36 @@
                 <div id="settings-tab" class="tab-content hidden">
                     <div class="card p-6">
                         <h3 class="font-semibold text-gray-700 mb-4">System Configuration</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="form-group">
-                                <label class="form-label">Minimum Withdrawal Amount</label>
-                                <input type="number" class="form-input" value="100">
+                        <form id="settings-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Minimum Withdrawal Amount</label>
+                                    <input type="number" class="form-input" id="min-withdrawal" value="100" min="1" required>
+                                    <div class="error-message hidden" id="min-withdrawal-error"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Maximum Withdrawal Amount</label>
+                                    <input type="number" class="form-input" id="max-withdrawal" value="5000" min="1" required>
+                                    <div class="error-message hidden" id="max-withdrawal-error"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Daily Coin Limit</label>
+                                    <input type="number" class="form-input" id="daily-coin-limit" value="1000" min="1" required>
+                                    <div class="error-message hidden" id="daily-coin-limit-error"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Withdrawal Processing Fee (%)</label>
+                                    <input type="number" class="form-input" id="withdrawal-fee" value="2.5" min="0" max="100" step="0.1" required>
+                                    <div class="error-message hidden" id="withdrawal-fee-error"></div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Maximum Withdrawal Amount</label>
-                                <input type="number" class="form-input" value="5000">
+                            <div class="mt-6">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Save Settings
+                                </button>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Daily Coin Limit</label>
-                                <input type="number" class="form-input" value="1000">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Withdrawal Processing Fee (%)</label>
-                                <input type="number" class="form-input" value="2.5">
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-save mr-2"></i>
-                                Save Settings
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </main>
@@ -553,6 +622,48 @@
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notification-text">Operation completed successfully</span>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Add New User</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="new-user-email" required>
+                        <div class="error-message hidden" id="new-user-email-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="new-user-password" required minlength="6">
+                        <div class="error-message hidden" id="new-user-password-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Coins</label>
+                        <input type="number" class="form-input" id="new-user-coins" value="0" min="0" required>
+                        <div class="error-message hidden" id="new-user-coins-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Admin Status</label>
+                        <select class="form-input" id="new-user-admin">
+                            <option value="false">User</option>
+                            <option value="true">Admin</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger close-modal">Cancel</button>
+                <button class="btn btn-success" id="save-new-user">Add User</button>
+            </div>
+        </div>
     </div>
 
     <!-- Edit User Modal -->
@@ -567,11 +678,13 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="edit-user-email" value="user@example.com">
+                    <input type="email" class="form-input" id="edit-user-email" value="user@example.com" required>
+                    <div class="error-message hidden" id="edit-user-email-error"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Coins</label>
-                    <input type="number" class="form-input" id="edit-user-coins" value="1500">
+                    <input type="number" class="form-input" id="edit-user-coins" value="1500" min="0" required>
+                    <div class="error-message hidden" id="edit-user-coins-error"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Admin Status</label>
@@ -641,7 +754,7 @@
 
     <script>
         // Sample data for demonstration
-        const users = [
+        let users = [
             { id: 1, email: 'john.doe@example.com', coins: 1250, isAdmin: false },
             { id: 2, email: 'jane.smith@example.com', coins: 3200, isAdmin: false },
             { id: 3, email: 'mike.johnson@example.com', coins: 800, isAdmin: false },
@@ -649,7 +762,7 @@
             { id: 5, email: 'alex.brown@example.com', coins: 2100, isAdmin: false }
         ];
 
-        const withdrawalRequests = [
+        let withdrawalRequests = [
             { id: 1, userId: 1, userEmail: 'john.doe@example.com', amount: 50, method: 'PayPal', status: 'pending', date: '2023-05-15', details: 'PayPal: john.doe@example.com' },
             { id: 2, userId: 2, userEmail: 'jane.smith@example.com', amount: 100, method: 'Bank Transfer', status: 'pending', date: '2023-05-14', details: 'Account: ****1234' },
             { id: 3, userId: 5, userEmail: 'alex.brown@example.com', amount: 75, method: 'PayPal', status: 'pending', date: '2023-05-13', details: 'PayPal: alex.brown@example.com' },
@@ -661,13 +774,19 @@
         const withdrawalRequestsList = document.getElementById('withdrawal-requests-list');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
-        const modal = document.querySelectorAll('.modal');
+        const modals = document.querySelectorAll('.modal');
         const closeModalButtons = document.querySelectorAll('.close-modal');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
         const notificationBadge = document.getElementById('notification-badge');
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
+        const userSearch = document.getElementById('user-search');
+        const userFilter = document.getElementById('user-filter');
+        const withdrawalSearch = document.getElementById('withdrawal-search');
+        const withdrawalFilter = document.getElementById('withdrawal-filter');
+        const settingsForm = document.getElementById('settings-form');
+        const addUserForm = document.getElementById('add-user-form');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
@@ -683,7 +802,30 @@
         function renderUserList() {
             adminUserList.innerHTML = '';
             
-            users.forEach(user => {
+            const searchTerm = userSearch.value.toLowerCase();
+            const filterValue = userFilter.value;
+            
+            const filteredUsers = users.filter(user => {
+                const matchesSearch = user.email.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterValue === 'all' || 
+                                    (filterValue === 'admin' && user.isAdmin) ||
+                                    (filterValue === 'user' && !user.isAdmin);
+                
+                return matchesSearch && matchesFilter;
+            });
+            
+            if (filteredUsers.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        No users found matching your criteria
+                    </td>
+                `;
+                adminUserList.appendChild(row);
+                return;
+            }
+            
+            filteredUsers.forEach(user => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -737,7 +879,28 @@
         function renderWithdrawalRequests() {
             withdrawalRequestsList.innerHTML = '';
             
-            withdrawalRequests.forEach(request => {
+            const searchTerm = withdrawalSearch.value.toLowerCase();
+            const filterValue = withdrawalFilter.value;
+            
+            const filteredRequests = withdrawalRequests.filter(request => {
+                const matchesSearch = request.userEmail.toLowerCase().includes(searchTerm);
+                const matchesFilter = filterValue === 'all' || request.status === filterValue;
+                
+                return matchesSearch && matchesFilter;
+            });
+            
+            if (filteredRequests.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        No withdrawal requests found matching your criteria
+                    </td>
+                `;
+                withdrawalRequestsList.appendChild(row);
+                return;
+            }
+            
+            filteredRequests.forEach(request => {
                 const statusClass = request.status === 'pending' ? 'badge-warning' : 
                                   request.status === 'approved' ? 'badge-success' : 'badge-danger';
                 
@@ -836,34 +999,61 @@
         // Close modal when clicking close button or outside modal
         closeModalButtons.forEach(button => {
             button.addEventListener('click', function() {
-                modal.forEach(m => m.style.display = 'none');
+                modals.forEach(m => m.style.display = 'none');
+                clearFormErrors();
             });
         });
 
         window.addEventListener('click', function(event) {
-            modal.forEach(m => {
+            modals.forEach(m => {
                 if (event.target === m) {
                     m.style.display = 'none';
+                    clearFormErrors();
                 }
             });
         });
 
         // Save user changes
         document.getElementById('save-user-changes').addEventListener('click', function() {
-            // In a real app, you would send this data to the server
-            showNotification('User updated successfully', 'success');
-            document.getElementById('edit-user-modal').style.display = 'none';
+            const email = document.getElementById('edit-user-email').value;
+            const coins = parseInt(document.getElementById('edit-user-coins').value);
+            const isAdmin = document.getElementById('edit-user-admin').value === 'true';
+            
+            if (validateUserForm(email, coins, 'edit')) {
+                // In a real app, you would send this data to the server
+                showNotification('User updated successfully', 'success');
+                document.getElementById('edit-user-modal').style.display = 'none';
+                
+                // Update the user in our sample data
+                const userId = users.find(u => u.email === email)?.id;
+                if (userId) {
+                    const userIndex = users.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        users[userIndex].email = email;
+                        users[userIndex].coins = coins;
+                        users[userIndex].isAdmin = isAdmin;
+                        renderUserList();
+                    }
+                }
+            }
         });
 
         // Save withdrawal changes
         document.getElementById('save-withdrawal-changes').addEventListener('click', function() {
+            const status = document.getElementById('withdrawal-status').value;
             // In a real app, you would send this data to the server
             showNotification('Withdrawal request updated successfully', 'success');
             document.getElementById('withdrawal-details-modal').style.display = 'none';
             
             // Update the withdrawal request status in our sample data
-            const status = document.getElementById('withdrawal-status').value;
-            // In a real app, you would update the actual request in the database
+            const requestId = withdrawalRequests.find(r => r.status === status)?.id;
+            if (requestId) {
+                const requestIndex = withdrawalRequests.findIndex(r => r.id === requestId);
+                if (requestIndex !== -1) {
+                    withdrawalRequests[requestIndex].status = status;
+                    renderWithdrawalRequests();
+                }
+            }
             
             // Refresh the UI
             updateNotificationBadge();
@@ -904,6 +1094,154 @@
                 window.location.href = 'login.html';
             }
         });
+
+        // Search and filter functionality
+        userSearch.addEventListener('input', renderUserList);
+        userFilter.addEventListener('change', renderUserList);
+        withdrawalSearch.addEventListener('input', renderWithdrawalRequests);
+        withdrawalFilter.addEventListener('change', renderWithdrawalRequests);
+
+        // Add user functionality
+        document.getElementById('add-user-btn').addEventListener('click', function() {
+            document.getElementById('add-user-modal').style.display = 'flex';
+        });
+
+        document.getElementById('save-new-user').addEventListener('click', function() {
+            const email = document.getElementById('new-user-email').value;
+            const password = document.getElementById('new-user-password').value;
+            const coins = parseInt(document.getElementById('new-user-coins').value);
+            const isAdmin = document.getElementById('new-user-admin').value === 'true';
+            
+            if (validateUserForm(email, coins, 'add', password)) {
+                // In a real app, you would send this data to the server
+                const newUser = {
+                    id: Math.max(...users.map(u => u.id)) + 1,
+                    email: email,
+                    coins: coins,
+                    isAdmin: isAdmin
+                };
+                
+                users.push(newUser);
+                renderUserList();
+                showNotification('User added successfully', 'success');
+                document.getElementById('add-user-modal').style.display = 'none';
+                document.getElementById('add-user-form').reset();
+            }
+        });
+
+        // Settings form validation and submission
+        settingsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const minWithdrawal = parseFloat(document.getElementById('min-withdrawal').value);
+            const maxWithdrawal = parseFloat(document.getElementById('max-withdrawal').value);
+            const dailyCoinLimit = parseInt(document.getElementById('daily-coin-limit').value);
+            const withdrawalFee = parseFloat(document.getElementById('withdrawal-fee').value);
+            
+            let isValid = true;
+            
+            // Validate min withdrawal
+            if (minWithdrawal <= 0) {
+                showFieldError('min-withdrawal', 'Minimum withdrawal must be greater than 0');
+                isValid = false;
+            } else {
+                hideFieldError('min-withdrawal');
+            }
+            
+            // Validate max withdrawal
+            if (maxWithdrawal <= 0) {
+                showFieldError('max-withdrawal', 'Maximum withdrawal must be greater than 0');
+                isValid = false;
+            } else if (maxWithdrawal < minWithdrawal) {
+                showFieldError('max-withdrawal', 'Maximum withdrawal must be greater than or equal to minimum withdrawal');
+                isValid = false;
+            } else {
+                hideFieldError('max-withdrawal');
+            }
+            
+            // Validate daily coin limit
+            if (dailyCoinLimit <= 0) {
+                showFieldError('daily-coin-limit', 'Daily coin limit must be greater than 0');
+                isValid = false;
+            } else {
+                hideFieldError('daily-coin-limit');
+            }
+            
+            // Validate withdrawal fee
+            if (withdrawalFee < 0 || withdrawalFee > 100) {
+                showFieldError('withdrawal-fee', 'Withdrawal fee must be between 0 and 100');
+                isValid = false;
+            } else {
+                hideFieldError('withdrawal-fee');
+            }
+            
+            if (isValid) {
+                // In a real app, you would send this data to the server
+                showNotification('Settings saved successfully', 'success');
+            }
+        });
+
+        // Form validation helper functions
+        function validateUserForm(email, coins, formType, password = '') {
+            let isValid = true;
+            
+            // Validate email
+            if (!email || !isValidEmail(email)) {
+                showFieldError(`${formType}-user-email`, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideFieldError(`${formType}-user-email`);
+            }
+            
+            // Validate coins
+            if (isNaN(coins) || coins < 0) {
+                showFieldError(`${formType}-user-coins`, 'Coins must be a positive number');
+                isValid = false;
+            } else {
+                hideFieldError(`${formType}-user-coins`);
+            }
+            
+            // Validate password for new users
+            if (formType === 'add' && (!password || password.length < 6)) {
+                showFieldError('new-user-password', 'Password must be at least 6 characters long');
+                isValid = false;
+            } else if (formType === 'add') {
+                hideFieldError('new-user-password');
+            }
+            
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function hideFieldError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            
+            field.classList.remove('error');
+            errorElement.classList.add('hidden');
+        }
+
+        function clearFormErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.querySelectorAll('.form-input.error').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
     </script>
 </body>
 </html>

@@ -146,6 +146,7 @@
             overflow: hidden;
             transition: all 0.3s ease;
             border: 1px solid #e5e7eb;
+            position: relative;
         }
         
         .reward-card:hover {
@@ -160,6 +161,10 @@
         .reward-card.active {
             border: 2px solid var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .reward-card.upcoming {
+            border: 2px dashed #d1d5db;
         }
         
         .reward-icon {
@@ -250,6 +255,7 @@
             justify-content: center;
             gap: 0.5rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .streak-day {
@@ -262,6 +268,7 @@
             font-weight: 600;
             background: #e5e7eb;
             color: #6b7280;
+            position: relative;
         }
         
         .streak-day.active {
@@ -273,6 +280,11 @@
             background: var(--secondary);
             color: white;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        
+        .streak-day.missed {
+            background: #fca5a5;
+            color: #991b1b;
         }
         
         .progress-container {
@@ -344,6 +356,88 @@
             margin-top: 1.5rem;
         }
         
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .reward-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-claimed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-available {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-locked {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .status-upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .special-reward {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .special-reward .reward-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .reward-details {
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .reward-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .milestone-reward {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background: white;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .milestone-reward.claimed {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -373,6 +467,10 @@
             .streak-day {
                 width: 35px;
                 height: 35px;
+            }
+            
+            .reward-card {
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -470,20 +568,17 @@
                 <!-- Streak Counter -->
                 <div class="card p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Your Login Streak</h3>
-                    <div class="streak-counter">
-                        <div class="streak-day active">1</div>
-                        <div class="streak-day active">2</div>
-                        <div class="streak-day active">3</div>
-                        <div class="streak-day active">4</div>
-                        <div class="streak-day active">5</div>
-                        <div class="streak-day current">6</div>
-                        <div class="streak-day">7</div>
+                    <div class="streak-counter" id="streak-container">
+                        <!-- Streak days will be populated by JavaScript -->
                     </div>
-                    <p class="text-center text-gray-600 mt-2">Complete 7 days for a 100 coin bonus!</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="streak-progress" style="width: 0%"></div>
+                    </div>
+                    <p class="text-center text-gray-600 mt-2" id="streak-message">Complete 7 days for a 100 coin bonus!</p>
                 </div>
 
                 <!-- Daily Reward Card -->
-                <div class="card max-w-lg mx-auto p-8 relative">
+                <div class="card max-w-lg mx-auto p-8 relative mb-8">
                     <div class="reward-badge">
                         <i class="fas fa-gift"></i>
                     </div>
@@ -492,7 +587,7 @@
                     <p class="text-gray-600 text-center mb-6">Claim your daily bonus and keep your streak going!</p>
                     
                     <div class="my-6">
-                        <div class="reward-icon success reward-animation">
+                        <div class="reward-icon success" id="reward-icon">
                             <i class="fas fa-gift"></i>
                         </div>
                     </div>
@@ -515,89 +610,21 @@
                 <!-- Weekly Rewards -->
                 <div class="mt-8">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Weekly Rewards</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
-                        <!-- Day 1 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon primary">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 1</h4>
-                            <p class="text-gray-600 text-sm mt-1">25 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Claimed</span>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="weekly-rewards-container">
+                        <!-- Weekly rewards will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Milestone Rewards -->
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Milestone Rewards</h3>
+                    <div class="reward-details">
+                        <div class="reward-progress">
+                            <span>Login Milestones</span>
+                            <span id="milestone-progress">0/5 claimed</span>
                         </div>
-                        
-                        <!-- Day 2 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon primary">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 2</h4>
-                            <p class="text-gray-600 text-sm mt-1">30 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Claimed</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Day 3 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon primary">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 3</h4>
-                            <p class="text-gray-600 text-sm mt-1">35 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Claimed</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Day 4 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon primary">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 4</h4>
-                            <p class="text-gray-600 text-sm mt-1">40 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Claimed</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Day 5 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon primary">
-                                <i class="fas fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 5</h4>
-                            <p class="text-gray-600 text-sm mt-1">45 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Claimed</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Day 6 (Today) -->
-                        <div class="reward-card p-4 text-center active">
-                            <div class="reward-icon success">
-                                <i class="fas fa-gift"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 6</h4>
-                            <p class="text-gray-600 text-sm mt-1">50 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Available</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Day 7 -->
-                        <div class="reward-card p-4 text-center">
-                            <div class="reward-icon warning">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <h4 class="font-bold text-gray-800">Day 7</h4>
-                            <p class="text-gray-600 text-sm mt-1">100 Coins</p>
-                            <div class="mt-2">
-                                <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Locked</span>
-                            </div>
+                        <div id="milestone-rewards-container">
+                            <!-- Milestone rewards will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -639,6 +666,23 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Special Rewards -->
+                <div class="card mt-8 special-reward">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">Special Weekend Bonus</h3>
+                        <p class="text-white opacity-90 mb-4">Get double coins on weekends! Claim your reward on Saturday or Sunday for twice the coins.</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-2xl font-bold">2x Coins</div>
+                                <div class="text-sm opacity-90">Saturday & Sunday only</div>
+                            </div>
+                            <div class="reward-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -647,6 +691,33 @@
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notification-text">Operation completed successfully</span>
+    </div>
+
+    <!-- Reward Claimed Modal -->
+    <div id="reward-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Reward Claimed!</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-6xl text-green-500 mb-4">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h4 class="text-xl font-bold mb-2">Congratulations!</h4>
+                <p class="text-gray-600 mb-4">You've successfully claimed your daily reward</p>
+                <div class="bg-green-50 p-4 rounded-lg mb-4">
+                    <p class="text-2xl font-bold text-green-700" id="modal-reward-amount">+50 Coins</p>
+                    <p class="text-sm text-green-600" id="modal-streak-bonus">+10 coins streak bonus</p>
+                </div>
+                <p class="text-sm text-gray-500">Your streak is now <span id="modal-streak-count">6</span> days!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary w-full close-modal">Continue</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -674,7 +745,14 @@
                 lastClaimed: null,
                 streak: 0,
                 totalClaims: 0,
-                weeklyClaims: [false, false, false, false, false, false, false]
+                weeklyClaims: [false, false, false, false, false, false, false],
+                milestoneClaims: {
+                    3: false,
+                    7: false,
+                    14: false,
+                    30: false,
+                    90: false
+                }
             };
 
             // Update UI with user data
@@ -685,6 +763,172 @@
             // Show admin link if user is admin
             if (userData.isAdmin) {
                 document.getElementById('admin-nav-link').style.display = 'flex';
+            }
+
+            // Render streak counter
+            function renderStreakCounter() {
+                const streakContainer = document.getElementById('streak-container');
+                const streakProgress = document.getElementById('streak-progress');
+                const streakMessage = document.getElementById('streak-message');
+                
+                streakContainer.innerHTML = '';
+                
+                for (let i = 1; i <= 7; i++) {
+                    const dayElement = document.createElement('div');
+                    
+                    if (i <= rewardsState.streak) {
+                        dayElement.className = 'streak-day active';
+                        dayElement.innerHTML = `<i class="fas fa-check"></i>`;
+                    } else if (i === rewardsState.streak + 1) {
+                        dayElement.className = 'streak-day current';
+                        dayElement.textContent = i;
+                    } else {
+                        dayElement.className = 'streak-day';
+                        dayElement.textContent = i;
+                    }
+                    
+                    streakContainer.appendChild(dayElement);
+                }
+                
+                // Update progress bar
+                const progress = Math.min((rewardsState.streak / 7) * 100, 100);
+                streakProgress.style.width = `${progress}%`;
+                
+                // Update message
+                if (rewardsState.streak >= 7) {
+                    streakMessage.textContent = 'Amazing! You completed the weekly streak!';
+                } else {
+                    const daysLeft = 7 - rewardsState.streak;
+                    streakMessage.textContent = `Complete ${daysLeft} more ${daysLeft === 1 ? 'day' : 'days'} for a 100 coin bonus!`;
+                }
+            }
+
+            // Render weekly rewards
+            function renderWeeklyRewards() {
+                const weeklyContainer = document.getElementById('weekly-rewards-container');
+                weeklyContainer.innerHTML = '';
+                
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const rewards = [25, 30, 35, 40, 45, 50, 100];
+                const today = new Date().getDay();
+                const adjustedToday = today === 0 ? 6 : today - 1; // Adjust for Sunday being 0
+                
+                for (let i = 0; i < 7; i++) {
+                    const rewardCard = document.createElement('div');
+                    rewardCard.className = 'reward-card';
+                    
+                    let status = 'locked';
+                    let statusClass = 'status-locked';
+                    let iconClass = 'primary';
+                    
+                    if (rewardsState.weeklyClaims[i]) {
+                        status = 'claimed';
+                        statusClass = 'status-claimed';
+                    } else if (i === adjustedToday) {
+                        status = 'available';
+                        statusClass = 'status-available';
+                        rewardCard.classList.add('active');
+                        iconClass = 'success';
+                    } else if (i < adjustedToday) {
+                        status = 'missed';
+                        statusClass = 'status-locked';
+                    } else if (i > adjustedToday) {
+                        status = 'upcoming';
+                        statusClass = 'status-upcoming';
+                        rewardCard.classList.add('upcoming');
+                    }
+                    
+                    // Special styling for day 7
+                    if (i === 6) {
+                        iconClass = 'warning';
+                    }
+                    
+                    rewardCard.innerHTML = `
+                        <div class="reward-icon ${iconClass}">
+                            <i class="fas fa-${i === 6 ? 'star' : 'coins'}"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800">${days[i]}</h4>
+                        <p class="text-gray-600 text-sm mt-1">${rewards[i]} Coins</p>
+                        <div class="mt-2">
+                            <span class="reward-status ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                        </div>
+                    `;
+                    
+                    weeklyContainer.appendChild(rewardCard);
+                }
+            }
+
+            // Render milestone rewards
+            function renderMilestoneRewards() {
+                const milestoneContainer = document.getElementById('milestone-rewards-container');
+                const milestoneProgress = document.getElementById('milestone-progress');
+                
+                milestoneContainer.innerHTML = '';
+                
+                const milestones = [
+                    { days: 3, reward: 25 },
+                    { days: 7, reward: 100 },
+                    { days: 14, reward: 250 },
+                    { days: 30, reward: 500 },
+                    { days: 90, reward: 2000 }
+                ];
+                
+                let claimedCount = 0;
+                
+                milestones.forEach(milestone => {
+                    const isClaimed = rewardsState.milestoneClaims[milestone.days] || rewardsState.streak >= milestone.days;
+                    if (isClaimed) claimedCount++;
+                    
+                    const milestoneElement = document.createElement('div');
+                    milestoneElement.className = `milestone-reward ${isClaimed ? 'claimed' : ''}`;
+                    
+                    milestoneElement.innerHTML = `
+                        <div>
+                            <div class="font-semibold">${milestone.days} Day Streak</div>
+                            <div class="text-sm text-gray-500">${milestone.reward} coins</div>
+                        </div>
+                        <div>
+                            ${isClaimed ? 
+                                '<span class="reward-status status-claimed">Claimed</span>' : 
+                                `<button class="btn btn-primary btn-sm claim-milestone" data-days="${milestone.days}" data-reward="${milestone.reward}">
+                                    Claim
+                                </button>`
+                            }
+                        </div>
+                    `;
+                    
+                    milestoneContainer.appendChild(milestoneElement);
+                });
+                
+                milestoneProgress.textContent = `${claimedCount}/${milestones.length} claimed`;
+                
+                // Add event listeners to claim buttons
+                document.querySelectorAll('.claim-milestone').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const days = parseInt(this.getAttribute('data-days'));
+                        const reward = parseInt(this.getAttribute('data-reward'));
+                        claimMilestoneReward(days, reward);
+                    });
+                });
+            }
+
+            // Claim milestone reward
+            function claimMilestoneReward(days, reward) {
+                if (rewardsState.streak >= days && !rewardsState.milestoneClaims[days]) {
+                    // Update user coins
+                    userData.coins += reward;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    
+                    // Update milestone claims
+                    rewardsState.milestoneClaims[days] = true;
+                    localStorage.setItem(`rewardsState_${currentUserEmail}`, JSON.stringify(rewardsState));
+                    
+                    // Update UI
+                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                    renderMilestoneRewards();
+                    
+                    showNotification(`Congratulations! You claimed ${reward} coins for your ${days}-day streak!`, 'success');
+                }
             }
 
             // Check if reward is available
@@ -699,15 +943,23 @@
                     document.getElementById('claim-reward-btn').className = 'btn btn-success w-full text-lg py-3';
                     document.getElementById('timer-message').style.display = 'none';
                     
-                    // Calculate streak bonus
+                    // Calculate reward amount
                     const baseReward = 50;
                     const streakBonus = Math.min(rewardsState.streak * 5, 50); // Max 50 coin bonus
-                    const totalReward = baseReward + streakBonus;
+                    
+                    // Weekend bonus (double coins on weekends)
+                    const isWeekend = now.getDay() === 0 || now.getDay() === 6; // 0 = Sunday, 6 = Saturday
+                    const weekendMultiplier = isWeekend ? 2 : 1;
+                    
+                    const totalReward = (baseReward + streakBonus) * weekendMultiplier;
                     
                     document.getElementById('reward-amount').textContent = `${totalReward} Coins`;
                     
                     if (streakBonus > 0) {
-                        document.getElementById('streak-bonus').textContent = `+${streakBonus} coins streak bonus`;
+                        document.getElementById('streak-bonus').textContent = `+${streakBonus} coins streak bonus${isWeekend ? ' + weekend 2x bonus' : ''}`;
+                        document.getElementById('streak-bonus').style.display = 'block';
+                    } else if (isWeekend) {
+                        document.getElementById('streak-bonus').textContent = 'Weekend 2x bonus!';
                         document.getElementById('streak-bonus').style.display = 'block';
                     } else {
                         document.getElementById('streak-bonus').style.display = 'none';
@@ -752,42 +1004,72 @@
 
             // Claim reward functionality
             document.getElementById('claim-reward-btn').addEventListener('click', function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                // Show loading state
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading-spinner"></span> Claiming...';
+                
                 // Calculate reward amount
                 const baseReward = 50;
                 const streakBonus = Math.min(rewardsState.streak * 5, 50);
-                const totalReward = baseReward + streakBonus;
                 
-                // Update user coins
-                userData.coins += totalReward;
-                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                // Weekend bonus
+                const now = new Date();
+                const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+                const weekendMultiplier = isWeekend ? 2 : 1;
                 
-                // Update rewards state
-                rewardsState.lastClaimed = new Date().toISOString();
-                rewardsState.streak += 1;
-                rewardsState.totalClaims += 1;
+                const totalReward = (baseReward + streakBonus) * weekendMultiplier;
                 
-                // Update weekly claims (simplified for demo)
-                const today = new Date().getDay();
-                rewardsState.weeklyClaims[today] = true;
-                
-                localStorage.setItem(`rewardsState_${currentUserEmail}`, JSON.stringify(rewardsState));
-                
-                // Update UI
-                document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                document.getElementById('streak-count').textContent = rewardsState.streak;
-                
-                // Show success message
-                showNotification(`Success! You claimed ${totalReward} coins!`, 'success');
-                
-                // Update button state
-                checkRewardAvailability();
-                
-                // Add animation to reward icon
-                const rewardIcon = document.querySelector('.reward-icon');
-                rewardIcon.classList.add('reward-animation');
                 setTimeout(() => {
-                    rewardIcon.classList.remove('reward-animation');
-                }, 500);
+                    // Update user coins
+                    userData.coins += totalReward;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    
+                    // Update rewards state
+                    rewardsState.lastClaimed = new Date().toISOString();
+                    rewardsState.streak += 1;
+                    rewardsState.totalClaims += 1;
+                    
+                    // Update weekly claims
+                    const today = new Date().getDay();
+                    const adjustedToday = today === 0 ? 6 : today - 1;
+                    rewardsState.weeklyClaims[adjustedToday] = true;
+                    
+                    localStorage.setItem(`rewardsState_${currentUserEmail}`, JSON.stringify(rewardsState));
+                    
+                    // Update UI
+                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                    document.getElementById('streak-count').textContent = rewardsState.streak;
+                    
+                    // Render updated components
+                    renderStreakCounter();
+                    renderWeeklyRewards();
+                    renderMilestoneRewards();
+                    
+                    // Show success modal
+                    document.getElementById('modal-reward-amount').textContent = `+${totalReward} Coins`;
+                    document.getElementById('modal-streak-bonus').textContent = streakBonus > 0 ? 
+                        `+${streakBonus} coins streak bonus${isWeekend ? ' + weekend 2x bonus' : ''}` : 
+                        (isWeekend ? 'Weekend 2x bonus!' : '');
+                    document.getElementById('modal-streak-count').textContent = rewardsState.streak;
+                    document.getElementById('reward-modal').style.display = 'flex';
+                    
+                    // Reset button
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    
+                    // Update reward availability
+                    checkRewardAvailability();
+                    
+                    // Add animation to reward icon
+                    const rewardIcon = document.getElementById('reward-icon');
+                    rewardIcon.classList.add('reward-animation');
+                    setTimeout(() => {
+                        rewardIcon.classList.remove('reward-animation');
+                    }, 500);
+                }, 1500);
             });
 
             // Show notification
@@ -803,6 +1085,23 @@
                 }, 3000);
             }
 
+            // Modal functionality
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
             // Logout functionality
             document.getElementById('logout-btn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to sign out?')) {
@@ -811,7 +1110,10 @@
                 }
             });
 
-            // Initialize reward availability check
+            // Initialize all components
+            renderStreakCounter();
+            renderWeeklyRewards();
+            renderMilestoneRewards();
             checkRewardAvailability();
         });
     </script>

@@ -364,6 +364,9 @@
             transition: all 0.3s ease;
             cursor: pointer;
             border: 1px solid #e5e7eb;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
         
         .feature-card:hover {
@@ -454,6 +457,11 @@
             color: var(--warning);
         }
         
+        .activity-icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
         .mobile-menu-btn {
             display: none;
             position: fixed;
@@ -470,6 +478,81 @@
             cursor: pointer;
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .streak-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .streak-day {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .streak-day.active {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .streak-day.inactive {
+            background-color: #e5e7eb;
+            color: #9ca3af;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
         @media (max-width: 768px) {
@@ -490,6 +573,16 @@
             
             .mobile-menu-btn {
                 display: flex;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
         }
     </style>
@@ -582,9 +675,12 @@
                         </div>
                         <div class="bg-white bg-opacity-20 p-4 rounded-lg">
                             <p class="text-sm">Daily Login Streak</p>
-                            <div class="flex items-center mt-2">
-                                <span class="text-2xl font-bold mr-2">7</span>
-                                <span class="text-sm">days</span>
+                            <div class="streak-container mt-2">
+                                <div class="streak-day active">7</div>
+                                <span class="text-white font-semibold">days</span>
+                                <button id="claim-streak-btn" class="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs py-1 px-2 rounded">
+                                    Claim Reward
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -666,61 +762,37 @@
                     </a>
                 </div>
 
+                <!-- Quick Action Buttons -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <button class="quick-action-btn" id="quick-play-btn">
+                        <i class="fas fa-play text-primary text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Quick Play</span>
+                    </button>
+                    <button class="quick-action-btn" id="daily-reward-btn">
+                        <i class="fas fa-gift text-green-500 text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Daily Reward</span>
+                    </button>
+                    <button class="quick-action-btn" id="invite-friend-btn">
+                        <i class="fas fa-user-plus text-blue-500 text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Invite Friend</span>
+                    </button>
+                    <button class="quick-action-btn" id="watch-ad-btn">
+                        <i class="fas fa-tv text-purple-500 text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Watch Ad</span>
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Recent Activity -->
                     <div class="card">
-                        <div class="p-4 border-b">
+                        <div class="p-4 border-b flex justify-between items-center">
                             <h3 class="font-semibold text-gray-700">Recent Activity</h3>
+                            <button id="refresh-activity-btn" class="text-primary hover:text-primary-dark">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </div>
-                        <div class="p-4">
-                            <div class="activity-item">
-                                <div class="activity-icon success">
-                                    <i class="fas fa-coins"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between">
-                                        <p class="font-medium">Game Completed</p>
-                                        <span class="text-green-600 font-semibold">+50 coins</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">2 hours ago</p>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon primary">
-                                    <i class="fas fa-gift"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between">
-                                        <p class="font-medium">Daily Reward Claimed</p>
-                                        <span class="text-green-600 font-semibold">+100 coins</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">Yesterday</p>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon warning">
-                                    <i class="fas fa-trophy"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between">
-                                        <p class="font-medium">Rank Improved</p>
-                                        <span class="text-blue-600 font-semibold">#24 → #22</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">2 days ago</p>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon danger">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between">
-                                        <p class="font-medium">Withdrawal Request</p>
-                                        <span class="text-red-600 font-semibold">-500 coins</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">3 days ago</p>
-                                </div>
-                            </div>
+                        <div class="p-4 max-h-80 overflow-y-auto" id="activity-list">
+                            <!-- Activity items will be populated by JavaScript -->
                         </div>
                     </div>
 
@@ -763,6 +835,53 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Achievements Section -->
+                <div class="card mt-8">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">Your Achievements</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="achievement-badge mr-3">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">First Win</p>
+                                    <p class="text-sm text-gray-500">Win your first game</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="achievement-badge mr-3">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Top Player</p>
+                                    <p class="text-sm text-gray-500">Reach top 10 in leaderboard</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="achievement-badge mr-3">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Streak Master</p>
+                                    <p class="text-sm text-gray-500">7-day login streak</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="achievement-badge mr-3">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Coin Collector</p>
+                                    <p class="text-sm text-gray-500">Earn 10,000 coins</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -771,6 +890,32 @@
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
         <span id="notification-text">Operation completed successfully</span>
+    </div>
+
+    <!-- Daily Reward Modal -->
+    <div id="daily-reward-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Daily Reward</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-6xl text-yellow-500 mb-4">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h4 class="text-xl font-bold mb-2">Congratulations!</h4>
+                <p class="text-gray-600 mb-4">You've earned your daily reward</p>
+                <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                    <p class="text-2xl font-bold text-yellow-700">+100 Coins</p>
+                </div>
+                <p class="text-sm text-gray-500">Come back tomorrow for another reward!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary w-full close-modal">Claim Reward</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -791,6 +936,19 @@
             if (!userData) {
                 window.location.href = 'index.html';
                 return;
+            }
+
+            // Initialize user stats
+            if (!userData.stats) {
+                userData.stats = {
+                    gamesPlayed: 42,
+                    dailyGoal: 150,
+                    weeklyChallenge: 850,
+                    withdrawalLevel: 2,
+                    loginStreak: 7,
+                    lastLogin: new Date().toISOString().split('T')[0]
+                };
+                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
             }
 
             // Update UI with user data
@@ -814,6 +972,137 @@
                 document.getElementById('notification-badge').textContent = pendingCount;
                 document.getElementById('notification-badge').classList.remove('hidden');
             }
+
+            // Load activity data
+            function loadActivityData() {
+                const activityList = document.getElementById('activity-list');
+                const activities = [
+                    { type: 'game', icon: 'coins', color: 'success', title: 'Game Completed', amount: '+50 coins', time: '2 hours ago' },
+                    { type: 'reward', icon: 'gift', color: 'primary', title: 'Daily Reward Claimed', amount: '+100 coins', time: 'Yesterday' },
+                    { type: 'rank', icon: 'trophy', color: 'warning', title: 'Rank Improved', amount: '#24 → #22', time: '2 days ago' },
+                    { type: 'withdrawal', icon: 'money-bill-wave', color: 'danger', title: 'Withdrawal Request', amount: '-500 coins', time: '3 days ago' },
+                    { type: 'friend', icon: 'user-plus', color: 'primary', title: 'Friend Invited', amount: '+25 coins', time: '4 days ago' }
+                ];
+
+                activityList.innerHTML = '';
+                
+                activities.forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <div class="activity-icon ${activity.color}">
+                            <i class="fas fa-${activity.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <p class="font-medium">${activity.title}</p>
+                                <span class="${activity.type === 'withdrawal' ? 'text-red-600' : 'text-green-600'} font-semibold">${activity.amount}</span>
+                            </div>
+                            <p class="text-sm text-gray-500">${activity.time}</p>
+                        </div>
+                    `;
+                    activityList.appendChild(activityItem);
+                });
+            }
+
+            loadActivityData();
+
+            // Refresh activity button
+            document.getElementById('refresh-activity-btn').addEventListener('click', function() {
+                const btn = this;
+                const originalIcon = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span>';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    loadActivityData();
+                    btn.innerHTML = originalIcon;
+                    btn.disabled = false;
+                    showNotification('Activity refreshed', 'success');
+                }, 1000);
+            });
+
+            // Quick action buttons
+            document.getElementById('quick-play-btn').addEventListener('click', function() {
+                window.location.href = 'play.html';
+            });
+
+            document.getElementById('daily-reward-btn').addEventListener('click', function() {
+                document.getElementById('daily-reward-modal').style.display = 'flex';
+            });
+
+            document.getElementById('invite-friend-btn').addEventListener('click', function() {
+                showNotification('Invite link copied to clipboard!', 'success');
+                // In a real app, this would copy an invite link to clipboard
+            });
+
+            document.getElementById('watch-ad-btn').addEventListener('click', function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    // Simulate watching an ad and earning coins
+                    userData.coins += 25;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    
+                    // Update UI
+                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                    document.getElementById('dashboard-coins').textContent = userData.coins;
+                    
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    showNotification('+25 coins earned from watching ad!', 'success');
+                    loadActivityData();
+                }, 3000);
+            });
+
+            // Claim streak reward
+            document.getElementById('claim-streak-btn').addEventListener('click', function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span> Claiming...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    // Calculate streak bonus (more coins for longer streaks)
+                    const streakBonus = userData.stats.loginStreak * 10;
+                    userData.coins += streakBonus;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    
+                    // Update UI
+                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                    document.getElementById('dashboard-coins').textContent = userData.coins;
+                    
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    showNotification(`+${streakBonus} coins for ${userData.stats.loginStreak} day streak!`, 'success');
+                    loadActivityData();
+                }, 1500);
+            });
+
+            // Modal functionality
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
 
             // Logout functionality
             document.getElementById('logout-btn').addEventListener('click', function() {

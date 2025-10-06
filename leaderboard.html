@@ -168,6 +168,7 @@
             display: flex;
             border-bottom: 1px solid #e5e7eb;
             margin-bottom: 1.5rem;
+            overflow-x: auto;
         }
         
         .tab {
@@ -176,6 +177,7 @@
             border-bottom: 2px solid transparent;
             font-weight: 500;
             color: #6b7280;
+            white-space: nowrap;
         }
         
         .tab.active {
@@ -356,6 +358,7 @@
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .time-filter-btn {
@@ -372,6 +375,145 @@
             background-color: var(--primary);
             color: white;
             border-color: var(--primary);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--secondary);
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .podium-1 {
+            order: 2;
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: white;
+        }
+        
+        .podium-2 {
+            order: 1;
+            background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+            color: white;
+        }
+        
+        .podium-3 {
+            order: 3;
+            background: linear-gradient(135deg, #CD7F32 0%, #A66D29 100%);
+            color: white;
+        }
+        
+        .podium-rank {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .podium-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .podium-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .podium-coins {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+        
+        .refresh-btn.loading {
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
         
         @media (max-width: 768px) {
@@ -406,6 +548,16 @@
             
             .player-email {
                 display: none;
+            }
+            
+            .podium {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .podium-item {
+                transform: none !important;
+                order: unset !important;
             }
         }
     </style>
@@ -534,6 +686,19 @@
                     </div>
                 </div>
 
+                <!-- Tabs for different leaderboards -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="global">Global</div>
+                    <div class="tab" data-tab="friends">Friends</div>
+                    <div class="tab" data-tab="weekly">Weekly</div>
+                    <div class="tab" data-tab="monthly">Monthly</div>
+                </div>
+
+                <!-- Podium for top 3 players -->
+                <div class="podium" id="podium-container">
+                    <!-- Podium items will be populated by JavaScript -->
+                </div>
+
                 <!-- Filters -->
                 <div class="card p-4 mb-6">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -541,20 +706,28 @@
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" id="search-input" class="search-input" placeholder="Search players...">
                         </div>
-                        <div class="time-filter">
-                            <button class="time-filter-btn active" data-period="all">All Time</button>
-                            <button class="time-filter-btn" data-period="weekly">This Week</button>
-                            <button class="time-filter-btn" data-period="daily">Today</button>
+                        <div class="flex items-center gap-4">
+                            <div class="time-filter">
+                                <button class="time-filter-btn active" data-period="all">All Time</button>
+                                <button class="time-filter-btn" data-period="weekly">This Week</button>
+                                <button class="time-filter-btn" data-period="daily">Today</button>
+                            </div>
+                            <button id="refresh-leaderboard" class="refresh-btn" title="Refresh leaderboard">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Leaderboard -->
                 <div class="card overflow-hidden">
-                    <div class="p-4 bg-gray-50 border-b">
+                    <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                         <h3 class="font-semibold text-gray-700">Top Players</h3>
+                        <div class="text-sm text-gray-500">
+                            Showing <span id="showing-count">0</span> of <span id="total-count">0</span> players
+                        </div>
                     </div>
-                    <div id="leaderboard-body" class="divide-y divide-gray-200">
+                    <div id="leaderboard-body" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
                         <!-- Leaderboard items will be populated by JavaScript -->
                         <div class="px-6 py-12 text-center text-gray-500">
                             <i class="fas fa-trophy text-4xl mb-4 text-gray-300"></i>
@@ -577,6 +750,12 @@
                 </div>
             </main>
         </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Operation completed successfully</span>
     </div>
 
     <script>
@@ -646,6 +825,50 @@
                 return leaderboard.sort((a, b) => b.coins - a.coins);
             }
 
+            // Show notification
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                
+                notificationText.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            // Render podium for top 3 players
+            function renderPodium(leaderboardData) {
+                const podiumContainer = document.getElementById('podium-container');
+                const topThree = leaderboardData.slice(0, 3);
+                
+                if (topThree.length === 0) {
+                    podiumContainer.innerHTML = '';
+                    return;
+                }
+                
+                let podiumHTML = '';
+                
+                topThree.forEach((player, index) => {
+                    const rank = index + 1;
+                    const podiumClass = `podium-${rank}`;
+                    
+                    podiumHTML += `
+                        <div class="podium-item ${podiumClass}">
+                            <div class="podium-rank">#${rank}</div>
+                            <div class="podium-avatar">
+                                ${player.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="podium-name">${player.name}</div>
+                            <div class="podium-coins">${player.coins.toLocaleString()} coins</div>
+                        </div>
+                    `;
+                });
+                
+                podiumContainer.innerHTML = podiumHTML;
+            }
+
             // Render leaderboard
             function renderLeaderboard(leaderboardData, searchTerm = '', page = 1, itemsPerPage = 10) {
                 const leaderboardBody = document.getElementById('leaderboard-body');
@@ -656,6 +879,8 @@
                 const topPlayerNameElement = document.getElementById('top-player-name');
                 const topPlayerCoinsElement = document.getElementById('top-player-coins');
                 const onlinePlayersElement = document.getElementById('online-players');
+                const showingCountElement = document.getElementById('showing-count');
+                const totalCountElement = document.getElementById('total-count');
                 
                 // Filter by search term
                 let filteredData = leaderboardData;
@@ -668,6 +893,7 @@
                 
                 // Update stats
                 totalPlayersElement.textContent = filteredData.length;
+                totalCountElement.textContent = filteredData.length;
                 onlinePlayersElement.textContent = Math.floor(Math.random() * 50) + 10;
                 
                 // Find current user rank
@@ -684,6 +910,9 @@
                     topPlayerCoinsElement.textContent = `${filteredData[0].coins} coins`;
                 }
                 
+                // Render podium for top 3
+                renderPodium(filteredData);
+                
                 // Pagination
                 const totalPages = Math.ceil(filteredData.length / itemsPerPage);
                 const startIndex = (page - 1) * itemsPerPage;
@@ -694,6 +923,7 @@
                 document.getElementById('page-info').textContent = `Page ${page} of ${totalPages}`;
                 document.getElementById('prev-page').disabled = page <= 1;
                 document.getElementById('next-page').disabled = page >= totalPages;
+                showingCountElement.textContent = pageData.length;
                 
                 // Clear leaderboard
                 leaderboardBody.innerHTML = '';
@@ -701,9 +931,12 @@
                 // Render leaderboard items
                 if (pageData.length === 0) {
                     leaderboardBody.innerHTML = `
-                        <div class="px-6 py-12 text-center text-gray-500">
-                            <i class="fas fa-search text-4xl mb-4 text-gray-300"></i>
-                            <p>No players found matching your search.</p>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">No players found</h3>
+                            <p class="text-gray-600">Try adjusting your search or filter</p>
                         </div>
                     `;
                     return;
@@ -745,7 +978,7 @@
             }
 
             // Initialize leaderboard
-            const leaderboardData = generateLeaderboardData();
+            let leaderboardData = generateLeaderboardData();
             renderLeaderboard(leaderboardData);
             
             // Search functionality
@@ -767,8 +1000,48 @@
                     // In a real app, you would filter data by time period
                     // For now, we'll just show a notification
                     const period = this.getAttribute('data-period');
-                    alert(`Filtering by ${period} data. In a real app, this would update the leaderboard.`);
+                    showNotification(`Showing ${period} leaderboard`, 'success');
                 });
+            });
+            
+            // Tab functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    const tabName = this.getAttribute('data-tab');
+                    showNotification(`Showing ${tabName} leaderboard`, 'success');
+                    
+                    // In a real app, you would load different leaderboard data
+                    // For now, we'll just use the same data
+                    currentPage = 1;
+                    renderLeaderboard(leaderboardData, searchInput.value, currentPage);
+                });
+            });
+            
+            // Refresh leaderboard functionality
+            document.getElementById('refresh-leaderboard').addEventListener('click', function() {
+                const btn = this;
+                const originalIcon = btn.innerHTML;
+                
+                btn.classList.add('loading');
+                btn.disabled = true;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // Generate new data with some randomness
+                    leaderboardData = generateLeaderboardData();
+                    renderLeaderboard(leaderboardData, searchInput.value, currentPage);
+                    
+                    btn.classList.remove('loading');
+                    btn.innerHTML = originalIcon;
+                    btn.disabled = false;
+                    
+                    showNotification('Leaderboard updated', 'success');
+                }, 1500);
             });
             
             // Pagination functionality
@@ -776,6 +1049,9 @@
                 if (currentPage > 1) {
                     currentPage--;
                     renderLeaderboard(leaderboardData, searchInput.value, currentPage);
+                    
+                    // Scroll to top of leaderboard
+                    document.getElementById('leaderboard-body').scrollTop = 0;
                 }
             });
             
@@ -784,6 +1060,9 @@
                 if (currentPage < totalPages) {
                     currentPage++;
                     renderLeaderboard(leaderboardData, searchInput.value, currentPage);
+                    
+                    // Scroll to top of leaderboard
+                    document.getElementById('leaderboard-body').scrollTop = 0;
                 }
             });
             

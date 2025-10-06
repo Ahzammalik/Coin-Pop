@@ -3,99 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Pop Game</title>
+    <title>Play Game - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
         }
-
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f3f4f6;
+            color: #1f2937;
             overflow-x: hidden;
         }
-
-        .coin-balance-header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin: 20px auto;
-            max-width: 800px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 215, 0, 0.3);
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            position: fixed;
+            left: 0;
+            top: 0;
         }
-
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .game-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
         }
-
-        .game-header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
         }
-
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .content-header {
+            background-color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
-
+        
         .stat-card {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
             color: white;
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
         }
-
+        
+        .stat-card.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Game-specific styles */
+        .game-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .game-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-30%, 30%);
+        }
+        
+        /* Coin animation */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes coinFloat {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .pop-animation {
+            animation: pop 0.3s ease-in-out;
+        }
+        
+        .shake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .coin-float {
+            position: absolute;
+            animation: coinFloat 1.5s ease-out forwards;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f59e0b;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .coin-btn {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8B6914;
+            cursor: pointer;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                inset 0 -8px 15px rgba(0, 0, 0, 0.2),
+                inset 0 8px 15px rgba(255, 255, 255, 0.4);
+            transition: all 0.2s ease;
+            border: 8px solid #DAA520;
+            user-select: none;
+        }
+        
+        .coin-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 15px 25px rgba(0, 0, 0, 0.25),
+                inset 0 -8px 15px rgba(0, 0, 0, 0.2),
+                inset 0 8px 15px rgba(255, 255, 255, 0.4);
+        }
+        
+        .coin-btn:active {
+            transform: scale(0.95);
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.2),
+                inset 0 -8px 15px rgba(0, 0, 0, 0.2),
+                inset 0 8px 15px rgba(255, 255, 255, 0.4);
+        }
+        
+        .coin-btn::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 30%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+        
         .stat-value {
             font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: var(--primary);
         }
-
+        
         .stat-label {
             font-size: 0.875rem;
-            opacity: 0.9;
+            color: #6b7280;
+            margin-top: 0.25rem;
         }
-
-        .game-area {
+        
+        .result-message {
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .result-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .result-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            overflow: hidden;
+            height: 10px;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 1rem;
+            transition: width 0.5s ease;
+        }
+        
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        /* Coin Pop Game Styles */
+        .game-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .game-tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .game-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .game-content {
+            display: none;
+        }
+        
+        .game-content.active {
+            display: block;
+        }
+        
+        .coin-pop-game {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .coin {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.2),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.2),
+                inset 0 5px 10px rgba(255, 255, 255, 0.4);
+            border: 3px solid #DAA520;
+            transition: transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8B6914;
+            user-select: none;
+        }
+        
+        .coin:hover {
+            transform: scale(1.05);
+        }
+        
+        .coin-pop {
+            animation: pop 0.3s ease-in-out;
+        }
+        
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .level-progress {
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            overflow: hidden;
+            height: 10px;
+            margin: 1rem 0;
+        }
+        
+        .level-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary) 0%, #059669 100%);
+            border-radius: 1rem;
+            transition: width 0.5s ease;
+        }
+        
+        .level-rewards {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reward-icon {
+            color: #f59e0b;
+        }
+        
+        /* Enhanced Floating Coin Game Styles */
+        .enhanced-game-area {
             position: relative;
             height: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
             overflow: hidden;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            border: 3px solid rgba(255, 255, 255, 0.2);
         }
-
-        .coin {
+        
+        .enhanced-coin {
             position: absolute;
             width: 50px;
             height: 50px;
@@ -114,88 +503,55 @@
             user-select: none;
             animation: float 1s ease-in-out infinite;
         }
-
-        /* Different coin colors */
+        
         .coin-gold {
             background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
             border-color: #DAA520;
             color: #8B6914;
         }
-
+        
         .coin-silver {
             background: radial-gradient(circle at 30% 30%, #C0C0C0, #A0A0A0);
             border-color: #808080;
             color: #505050;
         }
-
+        
         .coin-bronze {
             background: radial-gradient(circle at 30% 30%, #CD7F32, #8B4513);
             border-color: #654321;
             color: #4A2C1D;
         }
-
+        
         .coin-ruby {
             background: radial-gradient(circle at 30% 30%, #FF6B6B, #EE5A24);
             border-color: #C44569;
             color: #8B0000;
         }
-
+        
         .coin-sapphire {
             background: radial-gradient(circle at 30% 30%, #4FC3F7, #0288D1);
             border-color: #01579B;
             color: #003B6F;
         }
-
+        
         .coin-emerald {
             background: radial-gradient(circle at 30% 30%, #66BB6A, #2E7D32);
             border-color: #1B5E20;
             color: #0A3D0A;
         }
-
-        .coin-amethyst {
-            background: radial-gradient(circle at 30% 30%, #BA68C8, #7B1FA2);
-            border-color: #4A148C;
-            color: #2D004D;
-        }
-
+        
         .coin-diamond {
             background: radial-gradient(circle at 30% 30%, #E0F7FA, #80DEEA);
             border-color: #00ACC1;
             color: #006978;
             animation: diamondGlow 2s ease-in-out infinite;
         }
-
-        .coin::before {
-            content: '';
-            position: absolute;
-            top: 10%;
-            left: 20%;
-            width: 20%;
-            height: 20%;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            filter: blur(2px);
-        }
-
-        .coin:hover {
-            transform: scale(1.15);
-        }
-
-        .coin-pop {
-            animation: pop 0.2s ease-out;
-        }
-
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.4); }
-            100% { transform: scale(0); }
-        }
-
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(5deg); }
         }
-
+        
         @keyframes diamondGlow {
             0%, 100% { 
                 box-shadow: 
@@ -212,88 +568,8 @@
                     0 0 40px rgba(224, 247, 250, 0.8);
             }
         }
-
-        .level-info {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
-            border-radius: 10px;
-            transition: width 0.2s ease;
-            position: relative;
-        }
-
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 1s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .floating-text {
+        
+        .enhanced-floating-text {
             position: absolute;
             font-weight: bold;
             font-size: 1.2rem;
@@ -303,7 +579,7 @@
             animation: floatUp 1s ease-out forwards;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-
+        
         @keyframes floatUp {
             0% {
                 transform: translateY(0) scale(1);
@@ -314,45 +590,7 @@
                 opacity: 0;
             }
         }
-
-        .level-up {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-        }
-
-        .level-up.active {
-            animation: levelUpPopup 1.5s ease-out;
-        }
-
-        @keyframes levelUpPopup {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        .reward-coin {
-            font-size: 3rem;
-            color: #f59e0b;
-            margin: 10px 0;
-        }
-
-        .game-title {
-            text-align: center;
-            color: white;
-            margin-bottom: 10px;
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
+        
         .combo-display {
             position: absolute;
             top: 20px;
@@ -364,7 +602,7 @@
             color: #7c3aed;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-
+        
         .speed-indicator {
             position: absolute;
             top: 20px;
@@ -377,104 +615,330 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             font-size: 0.9rem;
         }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .coin-btn {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .coin-pop-game, .enhanced-game-area {
+                height: 300px;
+            }
+        }
     </style>
 </head>
-<body>
-    <!-- Coin Balance Header -->
-    <div class="coin-balance-header">
-        <div class="text-sm text-gray-600 mb-1">TOTAL COINS EARNED</div>
-        <div class="balance-amount" id="totalCoinsBalance">0.00</div>
-        <div class="text-xs text-gray-500 mt-1">Keep popping coins to earn more!</div>
-    </div>
+<body class="antialiased flex flex-col min-h-screen bg-gray-100">
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    <div class="game-container">
-        <h1 class="game-title">🎯 Floating Coin Pop Game</h1>
-        
-        <div class="game-header">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="current-level">1</div>
-                    <div class="stat-label">Current Level</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="coins-collected">0</div>
-                    <div class="stat-label">Coins Collected</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="coins-per-level">0.25</div>
-                    <div class="stat-label">Coins/Level</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="coins-per-minute">0</div>
-                    <div class="stat-label">Coins/Min</div>
-                </div>
-            </div>
-
-            <div class="level-info">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-semibold">Level Progress</span>
-                    <span id="progress-text">0/10 coins</span>
-                </div>
-                <div class="progress-container">
-                    <div id="level-progress" class="progress-bar" style="width: 0%"></div>
-                </div>
-                <div class="text-sm text-gray-600 mt-2">
-                    Complete each level to earn <span class="font-bold text-green-600">0.25 coins</span>
-                </div>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-coins mr-2"></i>
+                Coin Pop
+            </a>
         </div>
-
-        <div class="game-area" id="gameArea">
-            <div class="speed-indicator">
-                ⚡ 3x SPEED
-            </div>
-            <div class="combo-display" id="comboDisplay" style="display: none;">
-                Combo: <span id="comboCount">0</span>x
-            </div>
-            <!-- Coins will be generated here -->
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-primary" onclick="startGame()">
-                <i class="fas fa-play"></i> Start Game
-            </button>
-            <button class="btn btn-success" onclick="addCoins(8)">
-                <i class="fas fa-plus"></i> Add 8 Coins
-            </button>
-            <button class="btn btn-primary" onclick="resetGame()">
-                <i class="fas fa-redo"></i> Reset Game
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="play.html" class="nav-link active">
+                <i class="fas fa-play-circle"></i>
+                <span>Play</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link">
+                <i class="fas fa-trophy"></i>
+                <span>Leaderboard</span>
+            </a>
+            <a href="rewards.html" class="nav-link">
+                <i class="fas fa-gift"></i>
+                <span>Daily Rewards</span>
+            </a>
+            <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Withdraw</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="contact.html" class="nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Contact Us</span>
+            </a>
+            <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
+            <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
+                Sign Out
             </button>
         </div>
-    </div>
+    </aside>
 
-    <div class="level-up" id="levelUpPopup">
-        <div class="reward-coin">🪙</div>
-        <h3 class="text-xl font-bold text-gray-800">Level Complete!</h3>
-        <p class="text-green-600 font-semibold">+0.25 coins earned!</p>
-        <p class="text-gray-600 mt-2">Great job! Keep popping coins!</p>
+    <!-- Main Content -->
+    <div class="main-content flex-1 flex flex-col overflow-hidden">
+        <header class="content-header">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Play Game</h2>
+                <p class="text-gray-600">Pop coins and earn rewards!</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
+                    <i class="fas fa-coins mr-2"></i>
+                    Coins: 0
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-auto p-6">
+            <!-- Game Hero Section -->
+            <div class="game-hero relative z-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="mb-4 md:mb-0">
+                        <h1 class="text-3xl font-bold mb-2">Coin Pop Games</h1>
+                        <p class="text-blue-100">Play different games to earn coins and rewards!</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                        <p class="text-sm">Daily Goal</p>
+                        <div class="flex items-center mt-2">
+                            <span id="daily-goal-progress" class="text-2xl font-bold mr-2">0/10</span>
+                            <span class="text-sm">games</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Tabs -->
+            <div class="game-tabs">
+                <div class="game-tab active" data-game="pop-coin">Pop Coin</div>
+                <div class="game-tab" data-game="coin-pop-game">Coin Pop Game</div>
+                <div class="game-tab" data-game="enhanced-coin-pop">Enhanced Coin Pop</div>
+            </div>
+
+            <!-- Pop Coin Game -->
+            <div id="pop-coin-game" class="game-content active">
+                <!-- Game Stats -->
+                <div class="game-stats mb-6">
+                    <div class="stat-item">
+                        <div class="stat-value" id="games-played">0</div>
+                        <div class="stat-label">Games Played</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-earned">0</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="average-reward">0</div>
+                        <div class="stat-label">Avg. Reward</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="session-coins">0</div>
+                        <div class="stat-label">Session Coins</div>
+                    </div>
+                </div>
+
+                <!-- Game Container -->
+                <div class="card max-w-2xl mx-auto p-8">
+                    <div class="game-container">
+                        <h3 class="text-2xl font-bold text-gray-800 text-center">Pop The Coin!</h3>
+                        <p class="text-gray-600 text-center mb-6">Click the giant coin to earn a random reward between 1 and 10 coins.</p>
+                        
+                        <div id="pop-coin-btn" class="coin-btn">
+                            POP!
+                        </div>
+
+                        <div class="progress-container">
+                            <div id="energy-bar" class="progress-bar" style="width: 100%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500">Energy: <span id="energy-count">100</span>/100</p>
+
+                        <div id="pop-result-message" class="result-message">
+                            <!-- Result message will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coin Pop Game -->
+            <div id="coin-pop-game" class="game-content">
+                <div class="card p-6">
+                    <div class="level-info">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Coin Pop Game</h3>
+                            <p class="text-gray-600">Pop 100 coins to complete a level and earn 0.25 coins!</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-primary" id="current-level">Level 1</div>
+                            <div class="text-sm text-gray-500" id="level-progress-text">0/100 coins</div>
+                        </div>
+                    </div>
+
+                    <div class="level-progress">
+                        <div id="level-progress-bar" class="level-progress-bar" style="width: 0%"></div>
+                    </div>
+
+                    <div class="coin-pop-game" id="coin-pop-container">
+                        <!-- Coins will be generated here -->
+                    </div>
+
+                    <div class="level-rewards">
+                        <div class="reward-item">
+                            <i class="fas fa-coins reward-icon"></i>
+                            <div>
+                                <div class="font-semibold">0.25 coins</div>
+                                <div class="text-xs text-gray-500">Per level completion</div>
+                            </div>
+                        </div>
+                        <div class="reward-item">
+                            <i class="fas fa-trophy reward-icon"></i>
+                            <div>
+                                <div class="font-semibold" id="levels-completed">0 levels</div>
+                                <div class="text-xs text-gray-500">Completed today</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="coin-pop-result" class="result-message mt-4">
+                        <!-- Result message will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Coin Pop Game -->
+            <div id="enhanced-coin-pop" class="game-content">
+                <div class="card p-6">
+                    <div class="level-info">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Enhanced Coin Pop</h3>
+                            <p class="text-gray-600">Fast-paced coin popping with colorful coins and 3x speed!</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-primary" id="enhanced-current-level">Level 1</div>
+                            <div class="text-sm text-gray-500" id="enhanced-progress-text">0/50 coins</div>
+                        </div>
+                    </div>
+
+                    <div class="level-progress">
+                        <div id="enhanced-progress-bar" class="level-progress-bar" style="width: 0%"></div>
+                    </div>
+
+                    <div class="enhanced-game-area" id="enhanced-game-area">
+                        <div class="speed-indicator">
+                            ⚡ 3x SPEED
+                        </div>
+                        <div class="combo-display" id="enhanced-combo-display" style="display: none;">
+                            Combo: <span id="enhanced-combo-count">0</span>x
+                        </div>
+                        <!-- Enhanced coins will be generated here -->
+                    </div>
+
+                    <div class="level-rewards">
+                        <div class="reward-item">
+                            <i class="fas fa-coins reward-icon"></i>
+                            <div>
+                                <div class="font-semibold">0.25 coins</div>
+                                <div class="text-xs text-gray-500">Per level completion</div>
+                            </div>
+                        </div>
+                        <div class="reward-item">
+                            <i class="fas fa-bolt reward-icon"></i>
+                            <div>
+                                <div class="font-semibold" id="enhanced-levels-completed">0 levels</div>
+                                <div class="text-xs text-gray-500">Completed</div>
+                            </div>
+                        </div>
+                        <div class="reward-item">
+                            <i class="fas fa-palette reward-icon"></i>
+                            <div>
+                                <div class="font-semibold">6 Colors</div>
+                                <div class="text-xs text-gray-500">Different coins</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls mt-4">
+                        <button class="btn btn-primary" onclick="startEnhancedGame()">
+                            <i class="fas fa-play"></i> Start Enhanced Game
+                        </button>
+                        <button class="btn btn-success" onclick="addEnhancedCoins(5)">
+                            <i class="fas fa-plus"></i> Add 5 Coins
+                        </button>
+                    </div>
+
+                    <div id="enhanced-result" class="result-message mt-4">
+                        <!-- Result message will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Information -->
+            <div class="game-info">
+                <div class="info-card">
+                    <h3>How to Play</h3>
+                    <p>Choose between three games: Pop Coin for quick rewards, Coin Pop Game for level-based challenges, or Enhanced Coin Pop for fast-paced action with colorful coins!</p>
+                </div>
+                <div class="info-card">
+                    <h3>Daily Goals</h3>
+                    <p>Play 10 games daily to complete your goal and earn a bonus. Your progress resets every 24 hours.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Energy System</h3>
+                    <p>You have 100 energy points. Each game uses 10 energy. Energy regenerates 1 point every 5 minutes.</p>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        class CoinPopGame {
+        // Enhanced Coin Pop Game
+        class EnhancedCoinPopGame {
             constructor() {
                 this.currentLevel = 1;
                 this.coinsCollected = 0;
                 this.totalCoins = 0;
                 this.coinsPerLevel = 0.25;
-                this.coinsToNextLevel = 10;
+                this.coinsToNextLevel = 50;
                 this.gameActive = false;
                 this.coinInterval = null;
                 this.comboCount = 0;
                 this.lastCoinTime = 0;
                 this.comboTimeout = null;
-                this.coinsPerMinute = 0;
-                this.startTime = null;
-                this.coinsGenerated = 0;
+                this.levelsCompleted = 0;
                 
                 this.coinTypes = [
                     'coin-gold', 'coin-silver', 'coin-bronze',
-                    'coin-ruby', 'coin-sapphire', 'coin-emerald',
-                    'coin-amethyst', 'coin-diamond'
+                    'coin-ruby', 'coin-sapphire', 'coin-emerald', 'coin-diamond'
                 ];
                 
                 this.initializeGame();
@@ -482,57 +946,40 @@
 
             initializeGame() {
                 this.updateUI();
-                this.loadGameState();
             }
 
             startGame() {
                 if (this.gameActive) return;
                 
                 this.gameActive = true;
-                this.startTime = Date.now();
-                this.coinsGenerated = 0;
                 this.clearAllCoins();
                 this.generateInitialCoins();
                 this.startCoinGeneration();
                 
-                // Hide combo display initially
-                document.getElementById('comboDisplay').style.display = 'none';
+                document.getElementById('enhanced-combo-display').style.display = 'none';
             }
 
             generateInitialCoins() {
-                for (let i = 0; i < 8; i++) { // More initial coins for faster gameplay
+                for (let i = 0; i < 8; i++) {
                     this.createCoin();
                 }
             }
 
             startCoinGeneration() {
-                // 3x faster coin generation (every 0.7 seconds instead of 2 seconds)
                 this.coinInterval = setInterval(() => {
                     if (this.gameActive) {
                         this.createCoin();
-                        this.coinsGenerated++;
-                        this.updateCoinsPerMinute();
                     }
-                }, 700);
-            }
-
-            updateCoinsPerMinute() {
-                if (this.startTime) {
-                    const minutesElapsed = (Date.now() - this.startTime) / (1000 * 60);
-                    this.coinsPerMinute = minutesElapsed > 0 ? (this.coinsGenerated / minutesElapsed) : 0;
-                    this.updateUI();
-                }
+                }, 700); // 3x faster generation
             }
 
             createCoin() {
-                const gameArea = document.getElementById('gameArea');
+                const gameArea = document.getElementById('enhanced-game-area');
                 const coin = document.createElement('div');
                 
-                // Random coin type
                 const coinType = this.coinTypes[Math.floor(Math.random() * this.coinTypes.length)];
-                coin.className = `coin ${coinType}`;
+                coin.className = `enhanced-coin ${coinType}`;
                 
-                // Random position within game area
                 const maxX = gameArea.clientWidth - 50;
                 const maxY = gameArea.clientHeight - 50;
                 const x = Math.floor(Math.random() * maxX);
@@ -540,16 +987,12 @@
                 
                 coin.style.left = `${x}px`;
                 coin.style.top = `${y}px`;
-                
-                // Faster floating animation
                 coin.style.animationDuration = '0.8s';
                 
-                // Add click event
                 coin.addEventListener('click', () => this.popCoin(coin));
                 
                 gameArea.appendChild(coin);
 
-                // Auto-remove coins after 4 seconds (faster cleanup)
                 setTimeout(() => {
                     if (coin.parentNode) {
                         coin.remove();
@@ -560,35 +1003,27 @@
             popCoin(coin) {
                 if (!this.gameActive) return;
 
-                // Add pop animation
-                coin.classList.add('coin-pop');
+                coin.style.animation = 'pop 0.2s ease-out';
                 
-                // Update combo
                 this.updateCombo();
-                
-                // Update coins collected
                 this.coinsCollected++;
                 
-                // Create floating text
                 this.createFloatingText(coin, '+1');
                 
-                // Check for level completion
                 if (this.coinsCollected >= this.coinsToNextLevel) {
                     this.completeLevel();
                 }
                 
-                // Remove coin after animation (faster)
                 setTimeout(() => {
                     coin.remove();
                 }, 200);
                 
                 this.updateUI();
-                this.saveGameState();
             }
 
             updateCombo() {
                 const now = Date.now();
-                if (now - this.lastCoinTime < 1500) { // Faster combo window (1.5 seconds)
+                if (now - this.lastCoinTime < 1500) {
                     this.comboCount++;
                 } else {
                     this.comboCount = 1;
@@ -596,13 +1031,11 @@
                 
                 this.lastCoinTime = now;
                 
-                // Show combo display
-                const comboDisplay = document.getElementById('comboDisplay');
-                const comboCount = document.getElementById('comboCount');
+                const comboDisplay = document.getElementById('enhanced-combo-display');
+                const comboCount = document.getElementById('enhanced-combo-count');
                 comboDisplay.style.display = 'block';
                 comboCount.textContent = this.comboCount;
                 
-                // Reset combo timeout (faster)
                 clearTimeout(this.comboTimeout);
                 this.comboTimeout = setTimeout(() => {
                     comboDisplay.style.display = 'none';
@@ -611,53 +1044,50 @@
             }
 
             completeLevel() {
-                // Award coins
                 this.totalCoins += this.coinsPerLevel;
-                
-                // Level up
                 this.currentLevel++;
                 this.coinsCollected = 0;
-                this.coinsToNextLevel = Math.floor(10 + (this.currentLevel * 1.5)); // Slightly less difficulty increase
+                this.coinsToNextLevel = Math.floor(50 + (this.currentLevel * 1.5));
+                this.levelsCompleted++;
                 
-                // Show level up popup
                 this.showLevelUpPopup();
-                
-                // Clear all existing coins
                 this.clearAllCoins();
-                
-                // Generate new coins
                 this.generateInitialCoins();
+                
+                // Update main coin balance
+                updateMainCoinBalance(this.coinsPerLevel);
             }
 
             showLevelUpPopup() {
-                const popup = document.getElementById('levelUpPopup');
-                popup.classList.add('active');
+                const resultElement = document.getElementById('enhanced-result');
+                resultElement.textContent = `Level ${this.currentLevel - 1} completed! +${this.coinsPerLevel} coins!`;
+                resultElement.className = 'result-message result-success mt-4';
                 
                 setTimeout(() => {
-                    popup.classList.remove('active');
-                }, 1500); // Faster popup
+                    resultElement.textContent = '';
+                    resultElement.className = 'result-message mt-4';
+                }, 2000);
             }
 
             createFloatingText(element, text) {
                 const rect = element.getBoundingClientRect();
                 const floatingText = document.createElement('div');
                 
-                floatingText.className = 'floating-text';
+                floatingText.className = 'enhanced-floating-text';
                 floatingText.textContent = text;
                 floatingText.style.left = `${rect.left + rect.width/2}px`;
                 floatingText.style.top = `${rect.top}px`;
                 
                 document.body.appendChild(floatingText);
                 
-                // Remove after animation (faster)
                 setTimeout(() => {
                     floatingText.remove();
                 }, 1000);
             }
 
             clearAllCoins() {
-                const gameArea = document.getElementById('gameArea');
-                const coins = gameArea.querySelectorAll('.coin');
+                const gameArea = document.getElementById('enhanced-game-area');
+                const coins = gameArea.querySelectorAll('.enhanced-coin');
                 coins.forEach(coin => coin.remove());
             }
 
@@ -674,78 +1104,114 @@
                 this.currentLevel = 1;
                 this.coinsCollected = 0;
                 this.totalCoins = 0;
-                this.coinsToNextLevel = 10;
+                this.coinsToNextLevel = 50;
                 this.comboCount = 0;
-                this.coinsPerMinute = 0;
+                this.levelsCompleted = 0;
                 
                 this.clearAllCoins();
                 this.updateUI();
-                this.saveGameState();
                 
-                document.getElementById('comboDisplay').style.display = 'none';
+                document.getElementById('enhanced-combo-display').style.display = 'none';
             }
 
             updateUI() {
-                document.getElementById('current-level').textContent = this.currentLevel;
-                document.getElementById('coins-collected').textContent = this.coinsCollected;
-                document.getElementById('totalCoinsBalance').textContent = this.totalCoins.toFixed(2);
-                document.getElementById('coins-per-level').textContent = this.coinsPerLevel.toFixed(2);
-                document.getElementById('coins-per-minute').textContent = Math.round(this.coinsPerMinute);
+                document.getElementById('enhanced-current-level').textContent = `Level ${this.currentLevel}`;
+                document.getElementById('enhanced-progress-text').textContent = `${this.coinsCollected}/${this.coinsToNextLevel} coins`;
+                document.getElementById('enhanced-levels-completed').textContent = `${this.levelsCompleted} levels`;
                 
                 const progressPercent = (this.coinsCollected / this.coinsToNextLevel) * 100;
-                document.getElementById('level-progress').style.width = `${progressPercent}%`;
-                document.getElementById('progress-text').textContent = 
-                    `${this.coinsCollected}/${this.coinsToNextLevel} coins`;
+                document.getElementById('enhanced-progress-bar').style.width = `${progressPercent}%`;
+            }
+        }
+
+        // Global enhanced game instance
+        let enhancedGame;
+
+        // Global functions
+        function startEnhancedGame() {
+            if (!enhancedGame) {
+                enhancedGame = new EnhancedCoinPopGame();
+            }
+            enhancedGame.startGame();
+        }
+
+        function addEnhancedCoins(count) {
+            if (enhancedGame) {
+                enhancedGame.addCoins(count);
+            }
+        }
+
+        function updateMainCoinBalance(amount) {
+            const balanceDisplay = document.getElementById('coin-balance-display');
+            const currentBalance = parseInt(balanceDisplay.textContent.replace('Coins: ', '')) || 0;
+            const newBalance = currentBalance + amount;
+            balanceDisplay.textContent = `Coins: ${newBalance}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize enhanced game
+            enhancedGame = new EnhancedCoinPopGame();
+
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+
+            // Load user data
+            const currentUserEmail = localStorage.getItem('currentUser');
+            if (!currentUserEmail) {
+                window.location.href = 'index.html';
+                return;
             }
 
-            saveGameState() {
-                const gameState = {
-                    currentLevel: this.currentLevel,
-                    coinsCollected: this.coinsCollected,
-                    totalCoins: this.totalCoins,
-                    coinsToNextLevel: this.coinsToNextLevel
-                };
-                localStorage.setItem('coinPopGameState', JSON.stringify(gameState));
+            const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
             }
 
-            loadGameState() {
-                const savedState = localStorage.getItem('coinPopGameState');
-                if (savedState) {
-                    const state = JSON.parse(savedState);
-                    this.currentLevel = state.currentLevel || 1;
-                    this.coinsCollected = state.coinsCollected || 0;
-                    this.totalCoins = state.totalCoins || 0;
-                    this.coinsToNextLevel = state.coinsToNextLevel || 10;
-                    this.updateUI();
+            // Initialize game state
+            let gameState = JSON.parse(localStorage.getItem(`gameState_${currentUserEmail}`)) || {
+                gamesPlayed: 0,
+                totalEarned: 0,
+                sessionCoins: 0,
+                dailyGoal: 0,
+                lastPlayed: null,
+                energy: 100,
+                lastEnergyUpdate: Date.now(),
+                coinPopLevel: 1,
+                coinPopProgress: 0,
+                levelsCompleted: 0
+            };
+
+            // Update UI with user data
+            document.getElementById('user-email-display').textContent = currentUserEmail;
+            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+
+            // Show admin link if user is admin
+            if (userData.isAdmin) {
+                document.getElementById('admin-nav-link').style.display = 'flex';
+            }
+
+            // Game tab switching
+            document.querySelectorAll('.game-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.game-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const gameId = this.getAttribute('data-game');
+                    document.getElementById(`${gameId}-game`).classList.add('active');
+                });
+            });
+
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to sign out?')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
                 }
-            }
-        }
-
-        // Initialize game
-        let game;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            game = new CoinPopGame();
-        });
-
-        // Global functions for buttons
-        function startGame() {
-            game.startGame();
-        }
-
-        function addCoins(count) {
-            game.addCoins(count);
-        }
-
-        function resetGame() {
-            game.resetGame();
-        }
-
-        // Auto-save when leaving page
-        window.addEventListener('beforeunload', () => {
-            if (game) {
-                game.saveGameState();
-            }
+            });
         });
     </script>
 </body>

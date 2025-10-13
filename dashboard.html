@@ -555,6 +555,41 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
+        .referral-code {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border: 2px dashed #9ca3af;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .referral-code:hover {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        }
+        
+        .referral-code.copied {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #10b981;
+        }
+        
+        .ad-progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .ad-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -918,6 +953,92 @@
         </div>
     </div>
 
+    <!-- Invite Friends Modal -->
+    <div id="invite-friends-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Invite Friends</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="text-5xl text-blue-500 mb-2">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Earn Together</h4>
+                    <p class="text-gray-600">Invite friends and earn 50 coins for each friend who signs up!</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Your Referral Code</label>
+                    <div id="referral-code" class="referral-code">
+                        <p class="text-lg font-mono font-bold">COINPOP-<span id="referral-code-value">A1B2C3</span></p>
+                        <p class="text-sm text-gray-500 mt-1">Click to copy</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Or share this link</label>
+                    <div class="flex">
+                        <input type="text" id="referral-link" class="form-input rounded-r-none" value="https://coinpop.com/signup?ref=A1B2C3" readonly>
+                        <button id="copy-link-btn" class="btn btn-primary rounded-l-none">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mt-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        <p class="text-sm text-blue-700">You've invited <span id="friends-invited-count">3</span> friends so far</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary w-full close-modal">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watch Ad Modal -->
+    <div id="watch-ad-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Watch Ad to Earn Coins</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-5xl text-purple-500 mb-4">
+                    <i class="fas fa-tv"></i>
+                </div>
+                <h4 class="text-xl font-bold mb-2">Watch & Earn</h4>
+                <p class="text-gray-600 mb-4">Watch a short video ad to earn 25 coins</p>
+                
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div class="ad-progress-container">
+                        <div id="ad-progress-bar" class="ad-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p id="ad-timer" class="text-sm text-gray-600 mt-2">0s / 30s</p>
+                </div>
+                
+                <div class="bg-purple-50 p-3 rounded-lg">
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-coins text-yellow-500 mr-2"></i>
+                        <p class="text-sm text-purple-700">You'll earn <span class="font-bold">25 coins</span> after watching the ad</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="start-ad-btn" class="btn btn-primary w-full">Start Ad</button>
+                <button id="cancel-ad-btn" class="btn btn-danger w-full" style="display: none;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle
@@ -946,7 +1067,9 @@
                     weeklyChallenge: 850,
                     withdrawalLevel: 2,
                     loginStreak: 7,
-                    lastLogin: new Date().toISOString().split('T')[0]
+                    lastLogin: new Date().toISOString().split('T')[0],
+                    friendsInvited: 3,
+                    adsWatched: 12
                 };
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
             }
@@ -956,6 +1079,7 @@
             document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
             document.getElementById('dashboard-coins').textContent = userData.coins;
             document.getElementById('welcome-message').textContent = `Welcome back, ${userData.name || currentUserEmail.split('@')[0]}!`;
+            document.getElementById('friends-invited-count').textContent = userData.stats.friendsInvited || 0;
 
             // Show admin link if user is admin
             if (userData.isAdmin) {
@@ -1033,32 +1157,11 @@
             });
 
             document.getElementById('invite-friend-btn').addEventListener('click', function() {
-                showNotification('Invite link copied to clipboard!', 'success');
-                // In a real app, this would copy an invite link to clipboard
+                document.getElementById('invite-friends-modal').style.display = 'flex';
             });
 
             document.getElementById('watch-ad-btn').addEventListener('click', function() {
-                const btn = this;
-                const originalText = btn.innerHTML;
-                
-                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
-                btn.disabled = true;
-                
-                setTimeout(() => {
-                    // Simulate watching an ad and earning coins
-                    userData.coins += 25;
-                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                    
-                    // Update UI
-                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                    document.getElementById('dashboard-coins').textContent = userData.coins;
-                    
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    
-                    showNotification('+25 coins earned from watching ad!', 'success');
-                    loadActivityData();
-                }, 3000);
+                document.getElementById('watch-ad-modal').style.display = 'flex';
             });
 
             // Claim streak reward
@@ -1145,6 +1248,121 @@
             // Update reward timer every minute
             updateRewardTimer();
             setInterval(updateRewardTimer, 60000);
+
+            // Enhanced Invite Friends functionality
+            const referralCodeElement = document.getElementById('referral-code');
+            const referralLinkElement = document.getElementById('referral-link');
+            const copyLinkButton = document.getElementById('copy-link-btn');
+            
+            // Generate a referral code based on user email
+            function generateReferralCode(email) {
+                // Simple hash function to create a consistent code from email
+                let hash = 0;
+                for (let i = 0; i < email.length; i++) {
+                    hash = ((hash << 5) - hash) + email.charCodeAt(i);
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                return 'COINPOP-' + Math.abs(hash).toString(36).substring(0, 6).toUpperCase();
+            }
+            
+            const referralCode = generateReferralCode(currentUserEmail);
+            document.getElementById('referral-code-value').textContent = referralCode;
+            referralLinkElement.value = `https://coinpop.com/signup?ref=${referralCode}`;
+            
+            // Copy referral code to clipboard
+            referralCodeElement.addEventListener('click', function() {
+                navigator.clipboard.writeText(referralCode).then(() => {
+                    referralCodeElement.classList.add('copied');
+                    showNotification('Referral code copied to clipboard!', 'success');
+                    
+                    setTimeout(() => {
+                        referralCodeElement.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    showNotification('Failed to copy referral code', 'error');
+                });
+            });
+            
+            // Copy referral link to clipboard
+            copyLinkButton.addEventListener('click', function() {
+                navigator.clipboard.writeText(referralLinkElement.value).then(() => {
+                    showNotification('Referral link copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    showNotification('Failed to copy referral link', 'error');
+                });
+            });
+
+            // Enhanced Watch Ad functionality
+            const startAdButton = document.getElementById('start-ad-btn');
+            const cancelAdButton = document.getElementById('cancel-ad-btn');
+            const adProgressBar = document.getElementById('ad-progress-bar');
+            const adTimerElement = document.getElementById('ad-timer');
+            
+            let adInterval;
+            let adSeconds = 0;
+            const adTotalSeconds = 30; // 30-second ad
+            
+            startAdButton.addEventListener('click', function() {
+                // Disable start button and show cancel button
+                startAdButton.style.display = 'none';
+                cancelAdButton.style.display = 'block';
+                
+                // Reset progress
+                adSeconds = 0;
+                updateAdProgress();
+                
+                // Start the ad timer
+                adInterval = setInterval(function() {
+                    adSeconds++;
+                    updateAdProgress();
+                    
+                    // If ad is complete
+                    if (adSeconds >= adTotalSeconds) {
+                        clearInterval(adInterval);
+                        completeAd();
+                    }
+                }, 1000);
+            });
+            
+            cancelAdButton.addEventListener('click', function() {
+                clearInterval(adInterval);
+                resetAd();
+                showNotification('Ad cancelled', 'error');
+            });
+            
+            function updateAdProgress() {
+                const progressPercent = (adSeconds / adTotalSeconds) * 100;
+                adProgressBar.style.width = `${progressPercent}%`;
+                adTimerElement.textContent = `${adSeconds}s / ${adTotalSeconds}s`;
+            }
+            
+            function completeAd() {
+                // Award coins for watching the ad
+                userData.coins += 25;
+                userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
+                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                
+                // Update UI
+                document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                document.getElementById('dashboard-coins').textContent = userData.coins;
+                
+                // Show success message and close modal
+                showNotification('+25 coins earned from watching ad!', 'success');
+                document.getElementById('watch-ad-modal').style.display = 'none';
+                resetAd();
+                
+                // Add to activity log
+                loadActivityData();
+            }
+            
+            function resetAd() {
+                startAdButton.style.display = 'block';
+                cancelAdButton.style.display = 'none';
+                adProgressBar.style.width = '0%';
+                adTimerElement.textContent = '0s / 30s';
+            }
         });
     </script>
 </body>

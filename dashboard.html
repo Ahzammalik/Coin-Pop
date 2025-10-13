@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
     <style>
         :root {
             --primary: #4f46e5;
@@ -590,6 +595,54 @@
             transition: width 0.1s linear;
         }
         
+        /* AdMob specific styles */
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        .admob-interstitial {
+            width: 100%;
+            min-height: 400px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        .admob-app-open {
+            width: 100%;
+            height: 200px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -701,6 +754,21 @@
             </header>
 
             <main class="flex-1 overflow-auto p-6">
+                <!-- AdMob Banner Ad -->
+                <div class="admob-banner">
+                    <div class="ad-label">Ad</div>
+                    <!-- AdMob Banner Ad Unit -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-app-pub-4313544696010088"
+                         data-ad-slot="7463441754"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+
                 <!-- Hero Section -->
                 <div class="dashboard-hero relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -817,6 +885,25 @@
                     </button>
                 </div>
 
+                <!-- AdMob Interstitial Ad Trigger -->
+                <div class="card mb-8">
+                    <div class="p-4 border-b">
+                        <h3 class="font-semibold text-gray-700">Earn More Coins</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button id="show-interstitial-btn" class="btn btn-primary">
+                                <i class="fas fa-ad mr-2"></i>
+                                Watch Full Screen Ad
+                            </button>
+                            <button id="show-rewarded-btn" class="btn btn-success">
+                                <i class="fas fa-coins mr-2"></i>
+                                Earn 50 Coins (Rewarded Ad)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Recent Activity -->
                     <div class="card">
@@ -917,6 +1004,21 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- AdMob App Open Ad Container -->
+                <div class="admob-app-open mt-8">
+                    <div class="ad-label">Ad</div>
+                    <!-- AdMob App Open Ad Unit -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-app-pub-4313544696010088"
+                         data-ad-slot="9263608587"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             </main>
         </div>
     </div>
@@ -1004,28 +1106,38 @@
 
     <!-- Watch Ad Modal -->
     <div id="watch-ad-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 class="text-lg font-semibold">Watch Ad to Earn Coins</h3>
                 <button class="close-modal text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body text-center">
-                <div class="text-5xl text-purple-500 mb-4">
-                    <i class="fas fa-tv"></i>
-                </div>
-                <h4 class="text-xl font-bold mb-2">Watch & Earn</h4>
-                <p class="text-gray-600 mb-4">Watch a short video ad to earn 25 coins</p>
-                
-                <div class="bg-gray-100 p-4 rounded-lg mb-4">
-                    <div class="ad-progress-container">
-                        <div id="ad-progress-bar" class="ad-progress-bar" style="width: 0%"></div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="text-4xl text-purple-500 mb-2">
+                        <i class="fas fa-ad"></i>
                     </div>
-                    <p id="ad-timer" class="text-sm text-gray-600 mt-2">0s / 30s</p>
+                    <h4 class="text-xl font-bold mb-2">Watch & Earn</h4>
+                    <p class="text-gray-600">Watch a short video ad to earn 25 coins</p>
                 </div>
                 
-                <div class="bg-purple-50 p-3 rounded-lg">
+                <!-- AdMob Rewarded Ad Container -->
+                <div class="admob-interstitial">
+                    <div class="ad-label">Ad</div>
+                    <!-- AdMob Interstitial/Rewarded Ad Unit -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-app-pub-4313544696010088"
+                         data-ad-slot="3524196741"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+                
+                <div class="bg-purple-50 p-3 rounded-lg mt-4">
                     <div class="flex items-center justify-center">
                         <i class="fas fa-coins text-yellow-500 mr-2"></i>
                         <p class="text-sm text-purple-700">You'll earn <span class="font-bold">25 coins</span> after watching the ad</p>
@@ -1033,10 +1145,22 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="start-ad-btn" class="btn btn-primary w-full">Start Ad</button>
-                <button id="cancel-ad-btn" class="btn btn-danger w-full" style="display: none;">Cancel</button>
+                <button class="btn btn-primary w-full close-modal">Close</button>
             </div>
         </div>
+    </div>
+
+    <!-- Interstitial Ad Container (Hidden) -->
+    <div id="interstitial-ad-container" style="display: none;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-app-pub-4313544696010088"
+             data-ad-slot="3524196741"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
     </div>
 
     <script>
@@ -1162,6 +1286,33 @@
 
             document.getElementById('watch-ad-btn').addEventListener('click', function() {
                 document.getElementById('watch-ad-modal').style.display = 'flex';
+                // Refresh the ad when modal opens
+                setTimeout(() => {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }, 100);
+            });
+
+            // Interstitial ad button
+            document.getElementById('show-interstitial-btn').addEventListener('click', function() {
+                showNotification('Loading full screen ad...', 'success');
+                // In a real implementation, this would trigger an interstitial ad
+                setTimeout(() => {
+                    showNotification('Ad completed!', 'success');
+                }, 2000);
+            });
+
+            // Rewarded ad button
+            document.getElementById('show-rewarded-btn').addEventListener('click', function() {
+                showNotification('Loading rewarded ad...', 'success');
+                // Simulate rewarded ad completion
+                setTimeout(() => {
+                    userData.coins += 50;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                    document.getElementById('dashboard-coins').textContent = userData.coins;
+                    showNotification('+50 coins earned from rewarded ad!', 'success');
+                    loadActivityData();
+                }, 3000);
             });
 
             // Claim streak reward
@@ -1294,75 +1445,19 @@
                 });
             });
 
-            // Enhanced Watch Ad functionality
-            const startAdButton = document.getElementById('start-ad-btn');
-            const cancelAdButton = document.getElementById('cancel-ad-btn');
-            const adProgressBar = document.getElementById('ad-progress-bar');
-            const adTimerElement = document.getElementById('ad-timer');
-            
-            let adInterval;
-            let adSeconds = 0;
-            const adTotalSeconds = 30; // 30-second ad
-            
-            startAdButton.addEventListener('click', function() {
-                // Disable start button and show cancel button
-                startAdButton.style.display = 'none';
-                cancelAdButton.style.display = 'block';
+            // Initialize all AdMob ads
+            function initializeAds() {
+                // Refresh all ads
+                (adsbygoogle = window.adsbygoogle || []).push({});
                 
-                // Reset progress
-                adSeconds = 0;
-                updateAdProgress();
-                
-                // Start the ad timer
-                adInterval = setInterval(function() {
-                    adSeconds++;
-                    updateAdProgress();
-                    
-                    // If ad is complete
-                    if (adSeconds >= adTotalSeconds) {
-                        clearInterval(adInterval);
-                        completeAd();
-                    }
-                }, 1000);
-            });
-            
-            cancelAdButton.addEventListener('click', function() {
-                clearInterval(adInterval);
-                resetAd();
-                showNotification('Ad cancelled', 'error');
-            });
-            
-            function updateAdProgress() {
-                const progressPercent = (adSeconds / adTotalSeconds) * 100;
-                adProgressBar.style.width = `${progressPercent}%`;
-                adTimerElement.textContent = `${adSeconds}s / ${adTotalSeconds}s`;
+                console.log('AdMob ads initialized with:');
+                console.log('Banner ID: ca-app-pub-4313544696010088/7463441754');
+                console.log('Interstitial ID: ca-app-pub-4313544696010088/3524196741');
+                console.log('App Open ID: ca-app-pub-4313544696010088/9263608587');
             }
-            
-            function completeAd() {
-                // Award coins for watching the ad
-                userData.coins += 25;
-                userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
-                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                
-                // Update UI
-                document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                document.getElementById('dashboard-coins').textContent = userData.coins;
-                
-                // Show success message and close modal
-                showNotification('+25 coins earned from watching ad!', 'success');
-                document.getElementById('watch-ad-modal').style.display = 'none';
-                resetAd();
-                
-                // Add to activity log
-                loadActivityData();
-            }
-            
-            function resetAd() {
-                startAdButton.style.display = 'block';
-                cancelAdButton.style.display = 'none';
-                adProgressBar.style.width = '0%';
-                adTimerElement.textContent = '0s / 30s';
-            }
+
+            // Initialize ads when page loads
+            initializeAds();
         });
     </script>
 </body>

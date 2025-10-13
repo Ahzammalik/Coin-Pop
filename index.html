@@ -309,6 +309,49 @@
         .signup-link a:hover {
             text-decoration: underline;
         }
+
+        /* Registration Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
         
         @media (max-width: 768px) {
             .login-container {
@@ -378,14 +421,14 @@
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <input id="email" name="email" type="email" autocomplete="email" required
-                        class="form-input" placeholder="Enter your email" value="test@example.com">
+                        class="form-input" placeholder="Enter your email">
                 </div>
                 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
                     <div class="password-container">
                         <input id="password" name="password" type="password" autocomplete="current-password" required
-                            class="form-input pr-10" placeholder="Enter your password" value="password123">
+                            class="form-input pr-10" placeholder="Enter your password">
                         <button type="button" class="password-toggle" id="password-toggle">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -432,6 +475,73 @@
         </div>
     </div>
 
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Create Your Account</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="registration-form" class="space-y-4">
+                    <div class="form-group">
+                        <label for="reg-name" class="form-label">Full Name</label>
+                        <input id="reg-name" name="name" type="text" required
+                            class="form-input" placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg-email" class="form-label">Email Address</label>
+                        <input id="reg-email" name="email" type="email" required
+                            class="form-input" placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg-password" class="form-label">Password</label>
+                        <div class="password-container">
+                            <input id="reg-password" name="password" type="password" required
+                                class="form-input pr-10" placeholder="Create a password" minlength="6">
+                            <button type="button" class="password-toggle" id="reg-password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Password must be at least 6 characters long</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg-confirm-password" class="form-label">Confirm Password</label>
+                        <div class="password-container">
+                            <input id="reg-confirm-password" name="confirm-password" type="password" required
+                                class="form-input pr-10" placeholder="Confirm your password">
+                            <button type="button" class="password-toggle" id="reg-confirm-password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="terms-agreement" name="terms-agreement" required>
+                            <label for="terms-agreement" class="text-sm text-gray-700">
+                                I agree to the <a href="#" class="text-primary hover:underline">Terms of Service</a> and <a href="#" class="text-primary hover:underline">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <p id="registration-error" class="text-center text-sm text-red-600 mt-2"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="register-btn">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create Account
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification -->
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i>
@@ -458,8 +568,42 @@
                     icon.classList.add('fa-eye-slash');
                 }
             });
+
+            // Registration password toggle functionality
+            const regPasswordToggle = document.getElementById('reg-password-toggle');
+            const regPasswordInput = document.getElementById('reg-password');
+            const regConfirmPasswordToggle = document.getElementById('reg-confirm-password-toggle');
+            const regConfirmPasswordInput = document.getElementById('reg-confirm-password');
             
-            // Form submission
+            regPasswordToggle.addEventListener('click', function() {
+                const type = regPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                regPasswordInput.setAttribute('type', type);
+                
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+            
+            regConfirmPasswordToggle.addEventListener('click', function() {
+                const type = regConfirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                regConfirmPasswordInput.setAttribute('type', type);
+                
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+            
+            // Form submission - LOGIN
             document.getElementById('login-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -483,14 +627,26 @@
                     return;
                 }
                 
-                // Simulate login process
-                simulateLogin(email, password);
+                // Real login process - NO DEMO ACCOUNT CREATION
+                realLogin(email, password);
             });
             
-            // Sign up link
+            // Sign up link - Show registration modal
             document.getElementById('signup-link').addEventListener('click', function(e) {
                 e.preventDefault();
-                showNotification('Sign up functionality coming soon!', 'info');
+                document.getElementById('registration-modal').style.display = 'flex';
+                // Clear any previous errors
+                document.getElementById('registration-error').textContent = '';
+            });
+            
+            // Close modal functionality
+            document.querySelector('.close-modal').addEventListener('click', function() {
+                document.getElementById('registration-modal').style.display = 'none';
+            });
+            
+            // Register button functionality
+            document.getElementById('register-btn').addEventListener('click', function() {
+                registerUser();
             });
             
             // Forgot password link
@@ -506,10 +662,10 @@
                 });
             });
             
-            // Simulate login process
-            function simulateLogin(email, password) {
+            // Real login process - NO DEMO ACCOUNTS
+            function realLogin(email, password) {
                 // Show loading state
-                const submitButton = document.querySelector('button[type="submit"]');
+                const submitButton = document.querySelector('#login-form button[type="submit"]');
                 const originalText = submitButton.innerHTML;
                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Signing In...';
                 submitButton.disabled = true;
@@ -529,24 +685,116 @@
                             window.location.href = 'dashboard.html';
                         }, 1500);
                     } else {
-                        // Failed login
-                        document.getElementById('login-error').textContent = 'Invalid email or password.';
+                        // Failed login - NO DEMO ACCOUNT CREATION
+                        document.getElementById('login-error').textContent = 'Invalid email or password. Please check your credentials or sign up for a new account.';
                         submitButton.innerHTML = originalText;
                         submitButton.disabled = false;
-                        
-                        // Create demo account if it doesn't exist
-                        if (!userData) {
-                            const demoUser = {
-                                email: email,
-                                password: password,
-                                name: email.split('@')[0],
-                                coins: 1000,
-                                isAdmin: email === 'admin@coinpop.com'
-                            };
-                            localStorage.setItem(`user_${email}`, JSON.stringify(demoUser));
-                            showNotification('Demo account created! Please try logging in again.', 'info');
-                        }
                     }
+                }, 1500);
+            }
+            
+            // User registration function
+            function registerUser() {
+                const name = document.getElementById('reg-name').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                const confirmPassword = document.getElementById('reg-confirm-password').value;
+                const termsAgreed = document.getElementById('terms-agreement').checked;
+                const errorElement = document.getElementById('registration-error');
+                
+                // Reset error message
+                errorElement.textContent = '';
+                
+                // Validation
+                if (!name || !email || !password || !confirmPassword) {
+                    errorElement.textContent = 'Please fill in all fields.';
+                    return;
+                }
+                
+                if (!termsAgreed) {
+                    errorElement.textContent = 'You must agree to the Terms of Service and Privacy Policy.';
+                    return;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    errorElement.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+                
+                // Password validation
+                if (password.length < 6) {
+                    errorElement.textContent = 'Password must be at least 6 characters long.';
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    errorElement.textContent = 'Passwords do not match.';
+                    return;
+                }
+                
+                // Check if user already exists
+                if (localStorage.getItem(`user_${email}`)) {
+                    errorElement.textContent = 'An account with this email already exists.';
+                    return;
+                }
+                
+                // Show loading state
+                const registerButton = document.getElementById('register-btn');
+                const originalText = registerButton.innerHTML;
+                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creating Account...';
+                registerButton.disabled = true;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Create new user account with real initial data
+                    const newUser = {
+                        email: email,
+                        password: password,
+                        name: name,
+                        coins: 0, // Start with 0 coins
+                        isAdmin: false,
+                        stats: {
+                            gamesPlayed: 0,
+                            dailyGoal: 0,
+                            weeklyChallenge: 0,
+                            withdrawalLevel: 1,
+                            loginStreak: 1,
+                            lastLogin: new Date().toISOString().split('T')[0],
+                            friendsInvited: 0,
+                            adsWatched: 0
+                        },
+                        activity: [
+                            { 
+                                type: 'welcome', 
+                                icon: 'star', 
+                                color: 'primary', 
+                                title: 'Welcome to Coin Pop!', 
+                                amount: '+0 coins', 
+                                time: 'Just now' 
+                            }
+                        ],
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    // Save user to localStorage
+                    localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
+                    
+                    // Auto-login the new user
+                    localStorage.setItem('currentUser', email);
+                    
+                    registerButton.innerHTML = originalText;
+                    registerButton.disabled = false;
+                    
+                    showNotification('Account created successfully! Welcome to Coin Pop!', 'success');
+                    
+                    // Close modal and redirect
+                    setTimeout(() => {
+                        document.getElementById('registration-modal').style.display = 'none';
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                    
                 }, 1500);
             }
             
@@ -567,6 +815,14 @@
             if (localStorage.getItem('currentUser')) {
                 window.location.href = 'dashboard.html';
             }
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('registration-modal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>

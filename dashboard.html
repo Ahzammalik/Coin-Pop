@@ -1170,38 +1170,40 @@
                 document.querySelector('.sidebar').classList.toggle('active');
             });
 
-            // Load user data
+            // Load user data - NO DEMO ACCOUNT CREATION
             const currentUserEmail = localStorage.getItem('currentUser');
             if (!currentUserEmail) {
+                // Redirect to login if no user is logged in
                 window.location.href = 'index.html';
                 return;
             }
 
             const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
             if (!userData) {
+                // Redirect to login if user data doesn't exist
                 window.location.href = 'index.html';
                 return;
             }
 
-            // Initialize user stats
+            // Initialize user stats only if they don't exist
             if (!userData.stats) {
                 userData.stats = {
-                    gamesPlayed: 42,
-                    dailyGoal: 150,
-                    weeklyChallenge: 850,
-                    withdrawalLevel: 2,
-                    loginStreak: 7,
+                    gamesPlayed: 0, // Start with 0 games played
+                    dailyGoal: 0, // Start with 0 daily progress
+                    weeklyChallenge: 0, // Start with 0 weekly progress
+                    withdrawalLevel: 1, // Start at level 1
+                    loginStreak: 1, // Start with 1 day streak
                     lastLogin: new Date().toISOString().split('T')[0],
-                    friendsInvited: 3,
-                    adsWatched: 12
+                    friendsInvited: 0, // Start with 0 friends invited
+                    adsWatched: 0 // Start with 0 ads watched
                 };
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
             }
 
-            // Update UI with user data
+            // Update UI with real user data
             document.getElementById('user-email-display').textContent = currentUserEmail;
-            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-            document.getElementById('dashboard-coins').textContent = userData.coins;
+            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins || 0}`;
+            document.getElementById('dashboard-coins').textContent = userData.coins || 0;
             document.getElementById('welcome-message').textContent = `Welcome back, ${userData.name || currentUserEmail.split('@')[0]}!`;
             document.getElementById('friends-invited-count').textContent = userData.stats.friendsInvited || 0;
 
@@ -1210,26 +1212,22 @@
                 document.getElementById('admin-nav-link').style.display = 'flex';
             }
 
-            // Update leaderboard rank (mock data)
-            const rank = Math.floor(Math.random() * 50) + 1;
+            // Update leaderboard rank (real data from user stats if available)
+            const rank = userData.rank || Math.floor(Math.random() * 50) + 1;
             document.getElementById('dashboard-rank').textContent = `#${rank}`;
 
-            // Update notification badge
-            const pendingCount = Math.floor(Math.random() * 5);
+            // Update notification badge based on real data
+            const pendingCount = userData.pendingNotifications || 0;
             if (pendingCount > 0) {
                 document.getElementById('notification-badge').textContent = pendingCount;
                 document.getElementById('notification-badge').classList.remove('hidden');
             }
 
-            // Load activity data
+            // Load activity data from user's actual activity
             function loadActivityData() {
                 const activityList = document.getElementById('activity-list');
-                const activities = [
-                    { type: 'game', icon: 'coins', color: 'success', title: 'Game Completed', amount: '+50 coins', time: '2 hours ago' },
-                    { type: 'reward', icon: 'gift', color: 'primary', title: 'Daily Reward Claimed', amount: '+100 coins', time: 'Yesterday' },
-                    { type: 'rank', icon: 'trophy', color: 'warning', title: 'Rank Improved', amount: '#24 → #22', time: '2 days ago' },
-                    { type: 'withdrawal', icon: 'money-bill-wave', color: 'danger', title: 'Withdrawal Request', amount: '-500 coins', time: '3 days ago' },
-                    { type: 'friend', icon: 'user-plus', color: 'primary', title: 'Friend Invited', amount: '+25 coins', time: '4 days ago' }
+                const activities = userData.activity || [
+                    { type: 'welcome', icon: 'star', color: 'primary', title: 'Welcome to Coin Pop!', amount: '+0 coins', time: 'Just now' }
                 ];
 
                 activityList.innerHTML = '';
@@ -1297,6 +1295,9 @@
                 showNotification('Loading full screen ad...', 'success');
                 // In a real implementation, this would trigger an interstitial ad
                 setTimeout(() => {
+                    // Update user stats for watching ad
+                    userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
+                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
                     showNotification('Ad completed!', 'success');
                 }, 2000);
             });
@@ -1306,10 +1307,14 @@
                 showNotification('Loading rewarded ad...', 'success');
                 // Simulate rewarded ad completion
                 setTimeout(() => {
-                    userData.coins += 50;
+                    userData.coins = (userData.coins || 0) + 50;
+                    userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
                     localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                    
+                    // Update UI
                     document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
                     document.getElementById('dashboard-coins').textContent = userData.coins;
+                    
                     showNotification('+50 coins earned from rewarded ad!', 'success');
                     loadActivityData();
                 }, 3000);
@@ -1324,9 +1329,9 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    // Calculate streak bonus (more coins for longer streaks)
+                    // Calculate streak bonus
                     const streakBonus = userData.stats.loginStreak * 10;
-                    userData.coins += streakBonus;
+                    userData.coins = (userData.coins || 0) + streakBonus;
                     localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
                     
                     // Update UI

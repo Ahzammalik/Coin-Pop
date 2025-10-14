@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
     <style>
         :root {
             --primary: #4f46e5;
@@ -433,6 +438,74 @@
             color: #6b7280;
             margin-top: 0.25rem;
         }
+
+        /* Ad Container Styles */
+        .ad-container {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .ad-label {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .ad-supported-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .ad-settings-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
         
         @media (max-width: 768px) {
             .sidebar {
@@ -458,6 +531,14 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
+            }
+
+            .admob-banner {
+                height: 80px;
+            }
+            
+            .admob-native {
+                min-height: 250px;
             }
         }
     </style>
@@ -535,6 +616,16 @@
             </header>
 
             <main class="flex-1 overflow-auto p-6">
+                <!-- Banner Ad - Top of Content -->
+                <div class="ad-container">
+                    <div class="ad-label">Advertisement</div>
+                    <div class="admob-banner" id="banner-ad-top">
+                        <div class="ad-loading" style="width: 100%; height: 100%;">
+                            Loading Advertisement...
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Hero Section -->
                 <div class="settings-hero relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -548,6 +639,23 @@
                                 <span class="text-2xl font-bold mr-2">Verified</span>
                                 <i class="fas fa-check-circle text-green-300"></i>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad Settings Section -->
+                <div class="ad-settings-section">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="text-center md:text-left">
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">Support Coin Pop</h3>
+                            <p class="text-gray-600">Enable ads to support the app and earn bonus features!</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="ads-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="text-sm font-medium text-gray-700">Enable Ads</span>
                         </div>
                     </div>
                 </div>
@@ -591,6 +699,16 @@
                                 <i class="fas fa-save mr-2"></i>
                                 Save Profile Changes
                             </button>
+                        </div>
+
+                        <!-- Native Ad - Middle of Content -->
+                        <div class="ad-container">
+                            <div class="ad-label">Sponsored</div>
+                            <div class="admob-native" id="native-ad">
+                                <div class="ad-loading" style="width: 100%; height: 100%;">
+                                    Loading Native Advertisement...
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Payment Methods -->
@@ -799,6 +917,21 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Banner Ad - Bottom of Content -->
+                <div class="ad-container">
+                    <div class="ad-label">Advertisement</div>
+                    <div class="admob-banner" id="banner-ad-bottom">
+                        <div class="ad-loading" style="width: 100%; height: 100%;">
+                            Loading Advertisement...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad Supported Text -->
+                <div class="ad-supported-text">
+                    <p>Free app supported by advertisements</p>
+                </div>
             </main>
         </div>
     </div>
@@ -810,7 +943,137 @@
     </div>
 
     <script>
+        // AdMob Configuration
+        const ADMOB_CONFIG = {
+            banner: 'ca-app-pub-4313544696010088/7463441754',
+            native: 'ca-app-pub-4313544696010088/8580882616'
+        };
+
+        // Ad Manager for Settings
+        class SettingsAdManager {
+            constructor() {
+                this.adCounters = {
+                    impressions: 0,
+                    clicks: 0
+                };
+                this.adsEnabled = true;
+                this.initialized = false;
+            }
+
+            initialize() {
+                if (this.initialized) return;
+                
+                console.log('Initializing AdMob ads for settings...');
+                
+                // Load ads if enabled
+                if (this.adsEnabled) {
+                    this.loadBannerAd('banner-ad-top');
+                    this.loadBannerAd('banner-ad-bottom');
+                    this.loadNativeAd('native-ad');
+                }
+                
+                this.setupAdEventListeners();
+                this.initialized = true;
+                
+                console.log('Settings AdMob ads initialized successfully');
+            }
+
+            loadBannerAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.banner}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('banner');
+                }, 1000);
+            }
+
+            loadNativeAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('native');
+                }, 1500);
+            }
+
+            toggleAds(enabled) {
+                this.adsEnabled = enabled;
+                
+                const adContainers = document.querySelectorAll('.ad-container');
+                if (enabled) {
+                    // Show ads
+                    adContainers.forEach(container => {
+                        container.style.display = 'block';
+                    });
+                    // Reload ads
+                    this.loadBannerAd('banner-ad-top');
+                    this.loadBannerAd('banner-ad-bottom');
+                    this.loadNativeAd('native-ad');
+                } else {
+                    // Hide ads
+                    adContainers.forEach(container => {
+                        container.style.display = 'none';
+                    });
+                }
+                
+                // Save preference
+                const currentUserEmail = localStorage.getItem('currentUser');
+                if (currentUserEmail) {
+                    let settingsState = JSON.parse(localStorage.getItem(`settingsState_${currentUserEmail}`)) || {};
+                    settingsState.adsEnabled = enabled;
+                    localStorage.setItem(`settingsState_${currentUserEmail}`, JSON.stringify(settingsState));
+                }
+            }
+
+            setupAdEventListeners() {
+                // Track ad clicks
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.adsbygoogle')) {
+                        this.trackClick();
+                    }
+                });
+            }
+
+            trackImpression(type) {
+                this.adCounters.impressions++;
+                console.log(`Ad Impression: ${type} - Total: ${this.adCounters.impressions}`);
+            }
+
+            trackClick() {
+                this.adCounters.clicks++;
+                console.log(`Ad Click - Total: ${this.adCounters.clicks}`);
+            }
+
+            getStats() {
+                return this.adCounters;
+            }
+        }
+
+        // Initialize Ad Manager
+        const settingsAdManager = new SettingsAdManager();
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ads
+            settingsAdManager.initialize();
+
             // Mobile menu toggle
             document.getElementById('mobile-menu-btn').addEventListener('click', function() {
                 document.querySelector('.sidebar').classList.toggle('active');
@@ -835,6 +1098,7 @@
                 notifications: true,
                 soundEffects: true,
                 vibration: true,
+                adsEnabled: true,
                 memberSince: new Date().toISOString(),
                 totalGames: 142,
                 totalCoinsEarned: 5240
@@ -874,6 +1138,13 @@
                     notification.classList.remove('show');
                 }, 3000);
             }
+
+            // Ads toggle
+            document.getElementById('ads-toggle').checked = settingsState.adsEnabled;
+            document.getElementById('ads-toggle').addEventListener('change', function() {
+                settingsAdManager.toggleAds(this.checked);
+                showNotification(`Ads ${this.checked ? 'enabled' : 'disabled'} successfully!`);
+            });
 
             // Load payment methods
             if (userData.paymentMethods) {
@@ -1072,12 +1343,14 @@
 
             // Update toggle states
             document.querySelectorAll('.toggle-switch input').forEach(toggle => {
-                toggle.addEventListener('change', function() {
-                    const settingId = this.id;
-                    settingsState[settingId.replace('-toggle', '')] = this.checked;
-                    localStorage.setItem(`settingsState_${currentUserEmail}`, JSON.stringify(settingsState));
-                    showNotification('Settings updated successfully!');
-                });
+                if (toggle.id !== 'ads-toggle') {
+                    toggle.addEventListener('change', function() {
+                        const settingId = this.id;
+                        settingsState[settingId.replace('-toggle', '')] = this.checked;
+                        localStorage.setItem(`settingsState_${currentUserEmail}`, JSON.stringify(settingsState));
+                        showNotification('Settings updated successfully!');
+                    });
+                }
             });
 
             // Logout functionality
@@ -1087,6 +1360,12 @@
                     window.location.href = 'index.html';
                 }
             });
+
+            // Ad performance monitoring
+            setInterval(() => {
+                const stats = settingsAdManager.getStats();
+                console.log('Settings Ad Performance Stats:', stats);
+            }, 30000);
         });
     </script>
 </body>

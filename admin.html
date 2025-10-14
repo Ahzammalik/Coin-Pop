@@ -79,7 +79,7 @@
             padding: 1.5rem 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: space-between; /* Fixed from 'between' */
+            justify-content: space-between;
             align-items: center;
         }
         
@@ -238,7 +238,7 @@
             padding: 1.5rem;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
-            justify-content: space-between; /* Fixed from 'between' */
+            justify-content: space-between;
             align-items: center;
         }
         
@@ -352,6 +352,71 @@
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             background-color: white;
+        }
+        
+        .payment-method-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .payment-method-card.active {
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+        
+        .payment-method-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
         }
         
         @media (max-width: 768px) {
@@ -504,6 +569,7 @@
                 <div class="tabs">
                     <div class="tab active" data-tab="users">User Management</div>
                     <div class="tab" data-tab="withdrawals">Withdrawal Requests</div>
+                    <div class="tab" data-tab="payments">Payment Settings</div>
                     <div class="tab" data-tab="settings">System Settings</div>
                 </div>
 
@@ -578,6 +644,137 @@
                     </div>
                 </div>
 
+                <!-- Payment Settings Tab -->
+                <div id="payments-tab" class="tab-content hidden">
+                    <div class="card p-6 mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-4">Payment Methods Configuration</h3>
+                        
+                        <!-- EasyPaisa Settings -->
+                        <div class="payment-method-card" id="easypaisa-card">
+                            <div class="payment-method-header">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">EasyPaisa</h4>
+                                    <p class="text-sm text-gray-600">Mobile wallet and payment system</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="easypaisa-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="payment-settings">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Minimum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="easypaisa-min" value="250" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Maximum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="easypaisa-max" value="50000" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Fee (%)</label>
+                                        <input type="number" class="form-input" id="easypaisa-fee" value="2" min="0" max="100" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Time</label>
+                                        <select class="form-input" id="easypaisa-time">
+                                            <option value="instant">Instant</option>
+                                            <option value="1hour">1 Hour</option>
+                                            <option value="24hours" selected>24 Hours</option>
+                                            <option value="48hours">48 Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- JazzCash Settings -->
+                        <div class="payment-method-card" id="jazzcash-card">
+                            <div class="payment-method-header">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">JazzCash</h4>
+                                    <p class="text-sm text-gray-600">Mobile account and payment system</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="jazzcash-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="payment-settings">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Minimum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="jazzcash-min" value="250" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Maximum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="jazzcash-max" value="50000" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Fee (%)</label>
+                                        <input type="number" class="form-input" id="jazzcash-fee" value="2" min="0" max="100" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Time</label>
+                                        <select class="form-input" id="jazzcash-time">
+                                            <option value="instant">Instant</option>
+                                            <option value="1hour">1 Hour</option>
+                                            <option value="24hours" selected>24 Hours</option>
+                                            <option value="48hours">48 Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bank Transfer Settings -->
+                        <div class="payment-method-card" id="bank-card">
+                            <div class="payment-method-header">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Bank Transfer</h4>
+                                    <p class="text-sm text-gray-600">Direct bank account transfer</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="bank-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="payment-settings">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Minimum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="bank-min" value="1000" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Maximum Withdrawal (PKR)</label>
+                                        <input type="number" class="form-input" id="bank-max" value="100000" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Fee (%)</label>
+                                        <input type="number" class="form-input" id="bank-fee" value="1.5" min="0" max="100" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Processing Time</label>
+                                        <select class="form-input" id="bank-time">
+                                            <option value="24hours">24 Hours</option>
+                                            <option value="48hours" selected>48 Hours</option>
+                                            <option value="3days">3 Business Days</option>
+                                            <option value="5days">5 Business Days</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <button class="btn btn-primary" id="save-payment-settings">
+                                <i class="fas fa-save mr-2"></i>
+                                Save Payment Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- System Settings Tab -->
                 <div id="settings-tab" class="tab-content hidden">
                     <div class="card p-6">
@@ -585,13 +782,13 @@
                         <form id="settings-form">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="form-group">
-                                    <label class="form-label">Minimum Withdrawal Amount</label>
-                                    <input type="number" class="form-input" id="min-withdrawal" value="100" min="1" required>
+                                    <label class="form-label">Minimum Withdrawal Amount (PKR)</label>
+                                    <input type="number" class="form-input" id="min-withdrawal" value="250" min="1" required>
                                     <div class="error-message hidden" id="min-withdrawal-error"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Maximum Withdrawal Amount</label>
-                                    <input type="number" class="form-input" id="max-withdrawal" value="5000" min="1" required>
+                                    <label class="form-label">Maximum Withdrawal Amount (PKR)</label>
+                                    <input type="number" class="form-input" id="max-withdrawal" value="50000" min="1" required>
                                     <div class="error-message hidden" id="max-withdrawal-error"></div>
                                 </div>
                                 <div class="form-group">
@@ -600,9 +797,19 @@
                                     <div class="error-message hidden" id="daily-coin-limit-error"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Withdrawal Processing Fee (%)</label>
+                                    <label class="form-label">Default Withdrawal Fee (%)</label>
                                     <input type="number" class="form-input" id="withdrawal-fee" value="2.5" min="0" max="100" step="0.1" required>
                                     <div class="error-message hidden" id="withdrawal-fee-error"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Coin to PKR Conversion Rate</label>
+                                    <input type="number" class="form-input" id="coin-rate" value="1" min="0.1" step="0.1" required>
+                                    <div class="error-message hidden" id="coin-rate-error"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Daily Withdrawal Limit per User (PKR)</label>
+                                    <input type="number" class="form-input" id="daily-withdrawal-limit" value="50000" min="1" required>
+                                    <div class="error-message hidden" id="daily-withdrawal-limit-error"></div>
                                 </div>
                             </div>
                             <div class="mt-6">
@@ -720,17 +927,17 @@
                     <div class="mt-2 grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-500">Amount</p>
-                            <p id="withdrawal-amount" class="font-medium">$50.00</p>
+                            <p id="withdrawal-amount" class="font-medium">PKR 500</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500">Payment Method</p>
-                            <p id="withdrawal-method" class="font-medium">PayPal</p>
+                            <p id="withdrawal-method" class="font-medium">EasyPaisa</p>
                         </div>
                     </div>
                 </div>
                 <div class="mb-4">
                     <h4 class="font-medium text-gray-700">Payment Details</h4>
-                    <p id="withdrawal-details" class="mt-1 text-sm">PayPal: john.doe@example.com</p>
+                    <p id="withdrawal-details" class="mt-1 text-sm">Mobile: 0300-1234567</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Status</label>
@@ -753,6 +960,33 @@
     </div>
 
     <script>
+        // Initialize admin account
+        function initializeAdminAccount() {
+            const adminEmail = 'Ghazimalik1997@gmail.com';
+            const adminPassword = 'Ghazi123$';
+            
+            // Check if admin account exists
+            let adminData = localStorage.getItem(`user_${adminEmail}`);
+            
+            if (!adminData) {
+                // Create admin account if it doesn't exist
+                const adminUser = {
+                    email: adminEmail,
+                    password: adminPassword,
+                    coins: 100000,
+                    isAdmin: true,
+                    createdAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem(`user_${adminEmail}`, JSON.stringify(adminUser));
+                console.log('Admin account created:', adminEmail);
+            }
+            
+            // Set current user as admin for this session
+            localStorage.setItem('currentUser', adminEmail);
+            document.getElementById('user-email-display').textContent = adminEmail;
+        }
+
         // Sample data for demonstration
         let users = [
             { id: 1, email: 'john.doe@example.com', coins: 1250, isAdmin: false },
@@ -763,11 +997,18 @@
         ];
 
         let withdrawalRequests = [
-            { id: 1, userId: 1, userEmail: 'john.doe@example.com', amount: 50, method: 'PayPal', status: 'pending', date: '2023-05-15', details: 'PayPal: john.doe@example.com' },
-            { id: 2, userId: 2, userEmail: 'jane.smith@example.com', amount: 100, method: 'Bank Transfer', status: 'pending', date: '2023-05-14', details: 'Account: ****1234' },
-            { id: 3, userId: 5, userEmail: 'alex.brown@example.com', amount: 75, method: 'PayPal', status: 'pending', date: '2023-05-13', details: 'PayPal: alex.brown@example.com' },
-            { id: 4, userId: 3, userEmail: 'mike.johnson@example.com', amount: 25, method: 'PayPal', status: 'pending', date: '2023-05-12', details: 'PayPal: mike.johnson@example.com' }
+            { id: 1, userId: 1, userEmail: 'john.doe@example.com', amount: 500, method: 'EasyPaisa', status: 'pending', date: '2023-05-15', details: 'Mobile: 0300-1234567' },
+            { id: 2, userId: 2, userEmail: 'jane.smith@example.com', amount: 1000, method: 'JazzCash', status: 'pending', date: '2023-05-14', details: 'Account: 123456789' },
+            { id: 3, userId: 5, userEmail: 'alex.brown@example.com', amount: 2500, method: 'Bank Transfer', status: 'pending', date: '2023-05-13', details: 'IBAN: PK36SCBL0000001123456702' },
+            { id: 4, userId: 3, userEmail: 'mike.johnson@example.com', amount: 750, method: 'EasyPaisa', status: 'pending', date: '2023-05-12', details: 'Mobile: 0312-7654321' }
         ];
+
+        // Payment settings
+        let paymentSettings = {
+            easypaisa: { enabled: true, min: 250, max: 50000, fee: 2, time: '24hours' },
+            jazzcash: { enabled: true, min: 250, max: 50000, fee: 2, time: '24hours' },
+            bank: { enabled: true, min: 1000, max: 100000, fee: 1.5, time: '48hours' }
+        };
 
         // DOM elements
         const adminUserList = document.getElementById('admin-user-list');
@@ -790,13 +1031,72 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
+            initializeAdminAccount();
+            loadPaymentSettings();
             renderUserList();
             renderWithdrawalRequests();
             updateNotificationBadge();
             
-            // Show admin nav link (for demo purposes)
+            // Show admin nav link
             document.getElementById('admin-nav-link').style.display = 'flex';
         });
+
+        // Load payment settings
+        function loadPaymentSettings() {
+            const savedSettings = localStorage.getItem('paymentSettings');
+            if (savedSettings) {
+                paymentSettings = JSON.parse(savedSettings);
+            }
+            
+            // Apply settings to UI
+            document.getElementById('easypaisa-enabled').checked = paymentSettings.easypaisa.enabled;
+            document.getElementById('easypaisa-min').value = paymentSettings.easypaisa.min;
+            document.getElementById('easypaisa-max').value = paymentSettings.easypaisa.max;
+            document.getElementById('easypaisa-fee').value = paymentSettings.easypaisa.fee;
+            document.getElementById('easypaisa-time').value = paymentSettings.easypaisa.time;
+            
+            document.getElementById('jazzcash-enabled').checked = paymentSettings.jazzcash.enabled;
+            document.getElementById('jazzcash-min').value = paymentSettings.jazzcash.min;
+            document.getElementById('jazzcash-max').value = paymentSettings.jazzcash.max;
+            document.getElementById('jazzcash-fee').value = paymentSettings.jazzcash.fee;
+            document.getElementById('jazzcash-time').value = paymentSettings.jazzcash.time;
+            
+            document.getElementById('bank-enabled').checked = paymentSettings.bank.enabled;
+            document.getElementById('bank-min').value = paymentSettings.bank.min;
+            document.getElementById('bank-max').value = paymentSettings.bank.max;
+            document.getElementById('bank-fee').value = paymentSettings.bank.fee;
+            document.getElementById('bank-time').value = paymentSettings.bank.time;
+        }
+
+        // Save payment settings
+        function savePaymentSettings() {
+            paymentSettings.easypaisa = {
+                enabled: document.getElementById('easypaisa-enabled').checked,
+                min: parseInt(document.getElementById('easypaisa-min').value),
+                max: parseInt(document.getElementById('easypaisa-max').value),
+                fee: parseFloat(document.getElementById('easypaisa-fee').value),
+                time: document.getElementById('easypaisa-time').value
+            };
+            
+            paymentSettings.jazzcash = {
+                enabled: document.getElementById('jazzcash-enabled').checked,
+                min: parseInt(document.getElementById('jazzcash-min').value),
+                max: parseInt(document.getElementById('jazzcash-max').value),
+                fee: parseFloat(document.getElementById('jazzcash-fee').value),
+                time: document.getElementById('jazzcash-time').value
+            };
+            
+            paymentSettings.bank = {
+                enabled: document.getElementById('bank-enabled').checked,
+                min: parseInt(document.getElementById('bank-min').value),
+                max: parseInt(document.getElementById('bank-max').value),
+                fee: parseFloat(document.getElementById('bank-fee').value),
+                time: document.getElementById('bank-time').value
+            };
+            
+            localStorage.setItem('paymentSettings', JSON.stringify(paymentSettings));
+            showNotification('Payment settings saved successfully', 'success');
+        }
 
         // Render user list
         function renderUserList() {
@@ -911,7 +1211,7 @@
                         <div class="text-sm font-medium text-gray-900">${request.userEmail}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">$${request.amount.toFixed(2)}</div>
+                        <div class="text-sm text-gray-900">PKR ${request.amount.toLocaleString()}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-900">${request.method}</div>
@@ -986,7 +1286,7 @@
             const request = withdrawalRequests.find(r => r.id === requestId);
             if (request) {
                 document.getElementById('withdrawal-user').textContent = request.userEmail;
-                document.getElementById('withdrawal-amount').textContent = `$${request.amount.toFixed(2)}`;
+                document.getElementById('withdrawal-amount').textContent = `PKR ${request.amount.toLocaleString()}`;
                 document.getElementById('withdrawal-method').textContent = request.method;
                 document.getElementById('withdrawal-details').textContent = request.details;
                 document.getElementById('withdrawal-status').value = request.status;
@@ -1091,7 +1391,7 @@
         document.getElementById('logout-btn').addEventListener('click', function() {
             if (confirm('Are you sure you want to sign out?')) {
                 // In a real app, you would clear the session and redirect to login
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -1129,6 +1429,11 @@
             }
         });
 
+        // Save payment settings
+        document.getElementById('save-payment-settings').addEventListener('click', function() {
+            savePaymentSettings();
+        });
+
         // Settings form validation and submission
         settingsForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1137,6 +1442,8 @@
             const maxWithdrawal = parseFloat(document.getElementById('max-withdrawal').value);
             const dailyCoinLimit = parseInt(document.getElementById('daily-coin-limit').value);
             const withdrawalFee = parseFloat(document.getElementById('withdrawal-fee').value);
+            const coinRate = parseFloat(document.getElementById('coin-rate').value);
+            const dailyWithdrawalLimit = parseInt(document.getElementById('daily-withdrawal-limit').value);
             
             let isValid = true;
             
@@ -1173,6 +1480,22 @@
                 isValid = false;
             } else {
                 hideFieldError('withdrawal-fee');
+            }
+            
+            // Validate coin rate
+            if (coinRate <= 0) {
+                showFieldError('coin-rate', 'Coin conversion rate must be greater than 0');
+                isValid = false;
+            } else {
+                hideFieldError('coin-rate');
+            }
+            
+            // Validate daily withdrawal limit
+            if (dailyWithdrawalLimit <= 0) {
+                showFieldError('daily-withdrawal-limit', 'Daily withdrawal limit must be greater than 0');
+                isValid = false;
+            } else {
+                hideFieldError('daily-withdrawal-limit');
             }
             
             if (isValid) {

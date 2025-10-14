@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
     <style>
         :root {
             --primary: #4f46e5;
@@ -353,6 +358,109 @@
             gap: 0.75rem;
         }
         
+        /* AdMob Styles for Login Page */
+        .ad-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+        }
+        
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .ad-performance {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            display: none; /* Hide in production */
+        }
+        
+        .ad-close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-supported-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
@@ -364,6 +472,14 @@
             
             .login-form {
                 padding: 2rem;
+            }
+            
+            .admob-banner {
+                height: 80px;
+            }
+            
+            .admob-native {
+                min-height: 250px;
             }
         }
     </style>
@@ -381,6 +497,14 @@
             
             <h2 class="text-3xl font-bold mb-4">Earn While You Play</h2>
             <p class="text-blue-100 mb-6">Join thousands of players earning coins through fun games and challenges.</p>
+            
+            <!-- Native Ad in Hero Section -->
+            <div class="admob-native" id="native-ad-hero">
+                <div class="ad-label">Ad</div>
+                <div class="ad-loading" style="width: 100%; height: 100%;">
+                    Loading Advertisement...
+                </div>
+            </div>
             
             <ul class="feature-list">
                 <li>
@@ -415,6 +539,14 @@
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
                 <p class="text-gray-600 mb-6">Sign in to your account to continue playing and earning.</p>
+            </div>
+            
+            <!-- Banner Ad at Top of Form -->
+            <div class="admob-banner" id="banner-ad-top">
+                <div class="ad-label">Ad</div>
+                <div class="ad-loading" style="width: 100%; height: 100%;">
+                    Loading Advertisement...
+                </div>
             </div>
             
             <form id="login-form" class="space-y-4">
@@ -467,10 +599,22 @@
                 <p id="login-error" class="text-center text-sm text-red-600 mt-2"></p>
             </form>
             
+            <!-- Banner Ad at Bottom of Form -->
+            <div class="admob-banner" id="banner-ad-bottom">
+                <div class="ad-label">Ad</div>
+                <div class="ad-loading" style="width: 100%; height: 100%;">
+                    Loading Advertisement...
+                </div>
+            </div>
+            
             <div class="signup-link">
                 <p>Don't have an account?
                     <a href="#" id="signup-link">Sign up now</a>
                 </p>
+            </div>
+            
+            <div class="ad-supported-text">
+                <p>Free app supported by advertisements</p>
             </div>
         </div>
     </div>
@@ -485,6 +629,14 @@
                 </button>
             </div>
             <div class="modal-body">
+                <!-- Native Ad in Registration Modal -->
+                <div class="admob-native" id="native-ad-registration">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+                
                 <form id="registration-form" class="space-y-4">
                     <div class="form-group">
                         <label for="reg-name" class="form-label">Full Name</label>
@@ -548,8 +700,187 @@
         <span id="notification-text">Operation completed successfully</span>
     </div>
 
+    <!-- Interstitial Ad Container (Hidden) -->
+    <div id="interstitial-ad-container" style="display: none;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-app-pub-4313544696010088"
+             data-ad-slot="3524196741"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+    </div>
+
     <script>
+        // AdMob Configuration
+        const ADMOB_CONFIG = {
+            banner: 'ca-app-pub-4313544696010088/7463441754',
+            interstitial: 'ca-app-pub-4313544696010088/3524196741',
+            native: 'ca-app-pub-4313544696010088/8580882616'
+        };
+
+        // Ad Manager for Login Page
+        class LoginAdManager {
+            constructor() {
+                this.adCounters = {
+                    impressions: 0,
+                    clicks: 0
+                };
+                this.initialized = false;
+            }
+
+            initialize() {
+                if (this.initialized) return;
+                
+                console.log('Initializing AdMob ads for login page...');
+                
+                // Initialize all ad units
+                this.loadBannerAd('banner-ad-top');
+                this.loadBannerAd('banner-ad-bottom');
+                this.loadNativeAd('native-ad-hero');
+                
+                this.setupAdEventListeners();
+                this.initialized = true;
+                
+                console.log('Login page AdMob ads initialized successfully');
+            }
+
+            loadBannerAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.banner}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <div class="ad-performance">Banner Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('banner');
+                }, 1000);
+            }
+
+            loadNativeAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                        <div class="ad-performance">Native Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('native');
+                }, 1500);
+            }
+
+            loadRegistrationNativeAd() {
+                const container = document.getElementById('native-ad-registration');
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                        <div class="ad-performance">Native Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('native');
+                }, 500);
+            }
+
+            showInterstitialAd() {
+                return new Promise((resolve) => {
+                    console.log('Showing interstitial ad on login page...');
+                    
+                    // Create a temporary interstitial container
+                    const interstitialContainer = document.createElement('div');
+                    interstitialContainer.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                    `;
+                    
+                    interstitialContainer.innerHTML = `
+                        <div style="background: white; padding: 2rem; border-radius: 1rem; text-align: center; max-width: 90%;">
+                            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Advertisement</h3>
+                            <div class="ad-loading" style="width: 300px; height: 250px; margin: 1rem auto;">
+                                Loading Full Screen Ad...
+                            </div>
+                            <p style="margin: 1rem 0; color: #666;">Thank you for supporting our app!</p>
+                            <button id="close-interstitial" style="background: #4f46e5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                Close Ad
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(interstitialContainer);
+                    
+                    // Simulate ad loading and completion
+                    setTimeout(() => {
+                        this.trackImpression('interstitial');
+                        resolve(true);
+                    }, 3000);
+                    
+                    // Close button functionality
+                    document.getElementById('close-interstitial').addEventListener('click', () => {
+                        document.body.removeChild(interstitialContainer);
+                        resolve(true);
+                    });
+                });
+            }
+
+            setupAdEventListeners() {
+                // Track ad clicks
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.adsbygoogle')) {
+                        this.trackClick();
+                    }
+                });
+            }
+
+            trackImpression(type) {
+                this.adCounters.impressions++;
+                console.log(`Ad Impression: ${type} - Total: ${this.adCounters.impressions}`);
+            }
+
+            trackClick() {
+                this.adCounters.clicks++;
+                console.log(`Ad Click - Total: ${this.adCounters.clicks}`);
+            }
+
+            getStats() {
+                return this.adCounters;
+            }
+        }
+
+        // Initialize Ad Manager
+        const loginAdManager = new LoginAdManager();
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ads
+            loginAdManager.initialize();
+
             // Password toggle functionality
             const passwordToggle = document.getElementById('password-toggle');
             const passwordInput = document.getElementById('password');
@@ -604,7 +935,7 @@
             });
             
             // Form submission - LOGIN
-            document.getElementById('login-form').addEventListener('submit', function(e) {
+            document.getElementById('login-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
                 const email = document.getElementById('email').value;
@@ -627,6 +958,13 @@
                     return;
                 }
                 
+                // Show interstitial ad before login
+                try {
+                    await loginAdManager.showInterstitialAd();
+                } catch (error) {
+                    console.log('Ad skipped or failed to load');
+                }
+                
                 // Real login process - NO DEMO ACCOUNT CREATION
                 realLogin(email, password);
             });
@@ -637,6 +975,8 @@
                 document.getElementById('registration-modal').style.display = 'flex';
                 // Clear any previous errors
                 document.getElementById('registration-error').textContent = '';
+                // Load native ad in registration modal
+                loginAdManager.loadRegistrationNativeAd();
             });
             
             // Close modal functionality
@@ -645,7 +985,14 @@
             });
             
             // Register button functionality
-            document.getElementById('register-btn').addEventListener('click', function() {
+            document.getElementById('register-btn').addEventListener('click', async function() {
+                // Show interstitial ad before registration
+                try {
+                    await loginAdManager.showInterstitialAd();
+                } catch (error) {
+                    console.log('Ad skipped or failed to load');
+                }
+                
                 registerUser();
             });
             
@@ -679,6 +1026,12 @@
                         // Successful login
                         localStorage.setItem('currentUser', email);
                         showNotification('Login successful! Redirecting...', 'success');
+                        
+                        // Track login in user stats
+                        if (userData.stats) {
+                            userData.stats.lastLogin = new Date().toISOString().split('T')[0];
+                            localStorage.setItem(`user_${email}`, JSON.stringify(userData));
+                        }
                         
                         // Redirect to dashboard after a short delay
                         setTimeout(() => {
@@ -823,6 +1176,12 @@
                     modal.style.display = 'none';
                 }
             });
+
+            // Ad performance monitoring
+            setInterval(() => {
+                const stats = loginAdManager.getStats();
+                console.log('Login Page Ad Performance Stats:', stats);
+            }, 30000);
         });
     </script>
 </body>

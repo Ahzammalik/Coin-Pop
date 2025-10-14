@@ -595,7 +595,15 @@
             transition: width 0.1s linear;
         }
         
-        /* AdMob specific styles */
+        /* Enhanced AdMob Styles */
+        .ad-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+        }
+        
         .admob-banner {
             width: 100%;
             height: 100px;
@@ -606,6 +614,8 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
         
         .admob-interstitial {
@@ -618,6 +628,7 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
+            position: relative;
         }
         
         .admob-app-open {
@@ -630,6 +641,21 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
+            position: relative;
+        }
+        
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            position: relative;
+            overflow: hidden;
         }
         
         .ad-label {
@@ -641,6 +667,54 @@
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .ad-performance {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            display: none; /* Hide in production */
+        }
+        
+        .ad-close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            z-index: 10;
         }
         
         @media (max-width: 768px) {
@@ -671,6 +745,22 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
+            }
+            
+            .admob-banner {
+                height: 80px;
+            }
+            
+            .admob-interstitial {
+                min-height: 300px;
+            }
+            
+            .admob-app-open {
+                height: 150px;
+            }
+            
+            .admob-native {
+                min-height: 250px;
             }
         }
     </style>
@@ -754,19 +844,12 @@
             </header>
 
             <main class="flex-1 overflow-auto p-6">
-                <!-- AdMob Banner Ad -->
-                <div class="admob-banner">
+                <!-- Banner Ad - Top of Content -->
+                <div class="admob-banner" id="banner-ad-top">
                     <div class="ad-label">Ad</div>
-                    <!-- AdMob Banner Ad Unit -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-app-pub-4313544696010088"
-                         data-ad-slot="7463441754"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
                 </div>
 
                 <!-- Hero Section -->
@@ -833,6 +916,14 @@
                     </div>
                 </div>
 
+                <!-- Native Ad - Between Stats and Quick Actions -->
+                <div class="admob-native" id="native-ad-1">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <a href="play.html" class="feature-card">
@@ -885,7 +976,15 @@
                     </button>
                 </div>
 
-                <!-- AdMob Interstitial Ad Trigger -->
+                <!-- Banner Ad - Middle of Content -->
+                <div class="admob-banner" id="banner-ad-middle">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
+                <!-- AdMob Interstitial Ad Trigger Section -->
                 <div class="card mb-8">
                     <div class="p-4 border-b">
                         <h3 class="font-semibold text-gray-700">Earn More Coins</h3>
@@ -900,6 +999,9 @@
                                 <i class="fas fa-coins mr-2"></i>
                                 Earn 50 Coins (Rewarded Ad)
                             </button>
+                        </div>
+                        <div class="mt-4 text-center text-sm text-gray-500">
+                            <p>Watch ads to earn extra coins and support our app!</p>
                         </div>
                     </div>
                 </div>
@@ -958,6 +1060,14 @@
                     </div>
                 </div>
 
+                <!-- Native Ad - Before Achievements -->
+                <div class="admob-native" id="native-ad-2">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+
                 <!-- Achievements Section -->
                 <div class="card mt-8">
                     <div class="p-4 border-b">
@@ -1005,19 +1115,20 @@
                     </div>
                 </div>
 
-                <!-- AdMob App Open Ad Container -->
-                <div class="admob-app-open mt-8">
+                <!-- Banner Ad - Bottom of Content -->
+                <div class="admob-banner" id="banner-ad-bottom">
                     <div class="ad-label">Ad</div>
-                    <!-- AdMob App Open Ad Unit -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-app-pub-4313544696010088"
-                         data-ad-slot="9263608587"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
+                <!-- AdMob App Open Ad Container -->
+                <div class="admob-app-open mt-8" id="app-open-ad">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading App Open Ad...
+                    </div>
                 </div>
             </main>
         </div>
@@ -1125,16 +1236,9 @@
                 <!-- AdMob Rewarded Ad Container -->
                 <div class="admob-interstitial">
                     <div class="ad-label">Ad</div>
-                    <!-- AdMob Interstitial/Rewarded Ad Unit -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-app-pub-4313544696010088"
-                         data-ad-slot="3524196741"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Rewarded Ad...
+                    </div>
                 </div>
                 
                 <div class="bg-purple-50 p-3 rounded-lg mt-4">
@@ -1158,49 +1262,276 @@
              data-ad-slot="3524196741"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
     </div>
 
     <script>
+        // AdMob Configuration
+        const ADMOB_CONFIG = {
+            banner: 'ca-app-pub-4313544696010088/7463441754',
+            interstitial: 'ca-app-pub-4313544696010088/3524196741',
+            native: 'ca-app-pub-4313544696010088/8580882616',
+            appOpen: 'ca-app-pub-4313544696010088/9263608587'
+        };
+
+        // Ad Manager Class
+        class AdManager {
+            constructor() {
+                this.adCounters = {
+                    impressions: 0,
+                    clicks: 0,
+                    revenue: 0
+                };
+                this.initialized = false;
+            }
+
+            initialize() {
+                if (this.initialized) return;
+                
+                console.log('Initializing AdMob ads...');
+                
+                // Initialize all ad units
+                this.loadBannerAd('banner-ad-top');
+                this.loadBannerAd('banner-ad-middle');
+                this.loadBannerAd('banner-ad-bottom');
+                this.loadNativeAd('native-ad-1');
+                this.loadNativeAd('native-ad-2');
+                this.loadAppOpenAd('app-open-ad');
+                
+                this.setupAdEventListeners();
+                this.initialized = true;
+                
+                console.log('AdMob ads initialized successfully');
+            }
+
+            loadBannerAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.banner}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <div class="ad-performance">Banner Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('banner');
+                }, 1000);
+            }
+
+            loadNativeAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                        <div class="ad-performance">Native Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('native');
+                }, 1500);
+            }
+
+            loadAppOpenAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.appOpen}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <div class="ad-performance">App Open Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('app_open');
+                }, 2000);
+            }
+
+            showInterstitialAd() {
+                return new Promise((resolve) => {
+                    console.log('Showing interstitial ad...');
+                    
+                    // Create a temporary interstitial container
+                    const interstitialContainer = document.createElement('div');
+                    interstitialContainer.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                    `;
+                    
+                    interstitialContainer.innerHTML = `
+                        <div style="background: white; padding: 2rem; border-radius: 1rem; text-align: center; max-width: 90%;">
+                            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Advertisement</h3>
+                            <div class="ad-loading" style="width: 300px; height: 250px; margin: 1rem auto;">
+                                Loading Full Screen Ad...
+                            </div>
+                            <p style="margin: 1rem 0; color: #666;">Thank you for supporting our app!</p>
+                            <button id="close-interstitial" style="background: #4f46e5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                Close Ad
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(interstitialContainer);
+                    
+                    // Simulate ad loading and completion
+                    setTimeout(() => {
+                        this.trackImpression('interstitial');
+                        resolve(true);
+                    }, 3000);
+                    
+                    // Close button functionality
+                    document.getElementById('close-interstitial').addEventListener('click', () => {
+                        document.body.removeChild(interstitialContainer);
+                        resolve(true);
+                    });
+                });
+            }
+
+            showRewardedAd() {
+                return new Promise((resolve) => {
+                    console.log('Showing rewarded ad...');
+                    
+                    // Create rewarded ad modal
+                    const rewardedContainer = document.createElement('div');
+                    rewardedContainer.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                    `;
+                    
+                    rewardedContainer.innerHTML = `
+                        <div style="background: white; padding: 2rem; border-radius: 1rem; text-align: center; max-width: 90%;">
+                            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rewarded Ad</h3>
+                            <div class="ad-loading" style="width: 300px; height: 250px; margin: 1rem auto;">
+                                Loading Rewarded Ad...
+                            </div>
+                            <p style="margin: 1rem 0; color: #666;">Watch this ad to earn 50 coins!</p>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="complete-rewarded" style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                    Complete Ad
+                                </button>
+                                <button id="close-rewarded" style="background: #6b7280; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(rewardedContainer);
+                    
+                    let adCompleted = false;
+                    
+                    // Complete button functionality
+                    document.getElementById('complete-rewarded').addEventListener('click', () => {
+                        adCompleted = true;
+                        this.trackImpression('rewarded');
+                        document.body.removeChild(rewardedContainer);
+                        resolve(true);
+                    });
+                    
+                    // Close button functionality
+                    document.getElementById('close-rewarded').addEventListener('click', () => {
+                        document.body.removeChild(rewardedContainer);
+                        resolve(adCompleted);
+                    });
+                });
+            }
+
+            setupAdEventListeners() {
+                // Track ad clicks
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.adsbygoogle')) {
+                        this.trackClick();
+                    }
+                });
+            }
+
+            trackImpression(type) {
+                this.adCounters.impressions++;
+                console.log(`Ad Impression: ${type} - Total: ${this.adCounters.impressions}`);
+            }
+
+            trackClick() {
+                this.adCounters.clicks++;
+                console.log(`Ad Click - Total: ${this.adCounters.clicks}`);
+            }
+
+            getStats() {
+                return this.adCounters;
+            }
+        }
+
+        // Initialize Ad Manager
+        const adManager = new AdManager();
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ads
+            adManager.initialize();
+
             // Mobile menu toggle
             document.getElementById('mobile-menu-btn').addEventListener('click', function() {
                 document.querySelector('.sidebar').classList.toggle('active');
             });
 
-            // Load user data - NO DEMO ACCOUNT CREATION
+            // Load user data
             const currentUserEmail = localStorage.getItem('currentUser');
             if (!currentUserEmail) {
-                // Redirect to login if no user is logged in
                 window.location.href = 'index.html';
                 return;
             }
 
             const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
             if (!userData) {
-                // Redirect to login if user data doesn't exist
                 window.location.href = 'index.html';
                 return;
             }
 
-            // Initialize user stats only if they don't exist
+            // Initialize user stats
             if (!userData.stats) {
                 userData.stats = {
-                    gamesPlayed: 0, // Start with 0 games played
-                    dailyGoal: 0, // Start with 0 daily progress
-                    weeklyChallenge: 0, // Start with 0 weekly progress
-                    withdrawalLevel: 1, // Start at level 1
-                    loginStreak: 1, // Start with 1 day streak
+                    gamesPlayed: 0,
+                    dailyGoal: 0,
+                    weeklyChallenge: 0,
+                    withdrawalLevel: 1,
+                    loginStreak: 1,
                     lastLogin: new Date().toISOString().split('T')[0],
-                    friendsInvited: 0, // Start with 0 friends invited
-                    adsWatched: 0 // Start with 0 ads watched
+                    friendsInvited: 0,
+                    adsWatched: 0
                 };
                 localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
             }
 
-            // Update UI with real user data
+            // Update UI with user data
             document.getElementById('user-email-display').textContent = currentUserEmail;
             document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins || 0}`;
             document.getElementById('dashboard-coins').textContent = userData.coins || 0;
@@ -1212,18 +1543,18 @@
                 document.getElementById('admin-nav-link').style.display = 'flex';
             }
 
-            // Update leaderboard rank (real data from user stats if available)
+            // Update leaderboard rank
             const rank = userData.rank || Math.floor(Math.random() * 50) + 1;
             document.getElementById('dashboard-rank').textContent = `#${rank}`;
 
-            // Update notification badge based on real data
+            // Update notification badge
             const pendingCount = userData.pendingNotifications || 0;
             if (pendingCount > 0) {
                 document.getElementById('notification-badge').textContent = pendingCount;
                 document.getElementById('notification-badge').classList.remove('hidden');
             }
 
-            // Load activity data from user's actual activity
+            // Load activity data
             function loadActivityData() {
                 const activityList = document.getElementById('activity-list');
                 const activities = userData.activity || [
@@ -1284,40 +1615,63 @@
 
             document.getElementById('watch-ad-btn').addEventListener('click', function() {
                 document.getElementById('watch-ad-modal').style.display = 'flex';
-                // Refresh the ad when modal opens
-                setTimeout(() => {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                }, 100);
             });
 
-            // Interstitial ad button
-            document.getElementById('show-interstitial-btn').addEventListener('click', function() {
-                showNotification('Loading full screen ad...', 'success');
-                // In a real implementation, this would trigger an interstitial ad
-                setTimeout(() => {
-                    // Update user stats for watching ad
-                    userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
-                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                    showNotification('Ad completed!', 'success');
-                }, 2000);
+            // Enhanced Interstitial ad button
+            document.getElementById('show-interstitial-btn').addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                btn.disabled = true;
+                
+                try {
+                    const adShown = await adManager.showInterstitialAd();
+                    if (adShown) {
+                        userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
+                        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                        showNotification('Ad completed! Thank you for your support.', 'success');
+                    }
+                } catch (error) {
+                    console.error('Ad error:', error);
+                    showNotification('Ad failed to load', 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             });
 
-            // Rewarded ad button
-            document.getElementById('show-rewarded-btn').addEventListener('click', function() {
-                showNotification('Loading rewarded ad...', 'success');
-                // Simulate rewarded ad completion
-                setTimeout(() => {
-                    userData.coins = (userData.coins || 0) + 50;
-                    userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
-                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                    
-                    // Update UI
-                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                    document.getElementById('dashboard-coins').textContent = userData.coins;
-                    
-                    showNotification('+50 coins earned from rewarded ad!', 'success');
-                    loadActivityData();
-                }, 3000);
+            // Enhanced Rewarded ad button
+            document.getElementById('show-rewarded-btn').addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                btn.disabled = true;
+                
+                try {
+                    const adCompleted = await adManager.showRewardedAd();
+                    if (adCompleted) {
+                        userData.coins = (userData.coins || 0) + 50;
+                        userData.stats.adsWatched = (userData.stats.adsWatched || 0) + 1;
+                        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                        
+                        // Update UI
+                        document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                        document.getElementById('dashboard-coins').textContent = userData.coins;
+                        
+                        showNotification('+50 coins earned from rewarded ad!', 'success');
+                        loadActivityData();
+                    } else {
+                        showNotification('Ad was skipped', 'error');
+                    }
+                } catch (error) {
+                    console.error('Rewarded ad error:', error);
+                    showNotification('Rewarded ad failed to load', 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             });
 
             // Claim streak reward
@@ -1329,12 +1683,10 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    // Calculate streak bonus
                     const streakBonus = userData.stats.loginStreak * 10;
                     userData.coins = (userData.coins || 0) + streakBonus;
                     localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
                     
-                    // Update UI
                     document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
                     document.getElementById('dashboard-coins').textContent = userData.coins;
                     
@@ -1384,11 +1736,11 @@
                 }, 3000);
             }
 
-            // Simulate daily reward timer
+            // Daily reward timer
             function updateRewardTimer() {
                 const now = new Date();
                 const nextReward = new Date();
-                nextReward.setHours(24, 0, 0, 0); // Next day at midnight
+                nextReward.setHours(24, 0, 0, 0);
                 
                 const diff = nextReward - now;
                 const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -1401,22 +1753,19 @@
                 }
             }
 
-            // Update reward timer every minute
             updateRewardTimer();
             setInterval(updateRewardTimer, 60000);
 
-            // Enhanced Invite Friends functionality
+            // Invite Friends functionality
             const referralCodeElement = document.getElementById('referral-code');
             const referralLinkElement = document.getElementById('referral-link');
             const copyLinkButton = document.getElementById('copy-link-btn');
             
-            // Generate a referral code based on user email
             function generateReferralCode(email) {
-                // Simple hash function to create a consistent code from email
                 let hash = 0;
                 for (let i = 0; i < email.length; i++) {
                     hash = ((hash << 5) - hash) + email.charCodeAt(i);
-                    hash = hash & hash; // Convert to 32bit integer
+                    hash = hash & hash;
                 }
                 return 'COINPOP-' + Math.abs(hash).toString(36).substring(0, 6).toUpperCase();
             }
@@ -1425,7 +1774,6 @@
             document.getElementById('referral-code-value').textContent = referralCode;
             referralLinkElement.value = `https://coinpop.com/signup?ref=${referralCode}`;
             
-            // Copy referral code to clipboard
             referralCodeElement.addEventListener('click', function() {
                 navigator.clipboard.writeText(referralCode).then(() => {
                     referralCodeElement.classList.add('copied');
@@ -1440,7 +1788,6 @@
                 });
             });
             
-            // Copy referral link to clipboard
             copyLinkButton.addEventListener('click', function() {
                 navigator.clipboard.writeText(referralLinkElement.value).then(() => {
                     showNotification('Referral link copied to clipboard!', 'success');
@@ -1450,19 +1797,11 @@
                 });
             });
 
-            // Initialize all AdMob ads
-            function initializeAds() {
-                // Refresh all ads
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                
-                console.log('AdMob ads initialized with:');
-                console.log('Banner ID: ca-app-pub-4313544696010088/7463441754');
-                console.log('Interstitial ID: ca-app-pub-4313544696010088/3524196741');
-                console.log('App Open ID: ca-app-pub-4313544696010088/9263608587');
-            }
-
-            // Initialize ads when page loads
-            initializeAds();
+            // Ad performance monitoring
+            setInterval(() => {
+                const stats = adManager.getStats();
+                console.log('Ad Performance Stats:', stats);
+            }, 30000);
         });
     </script>
 </body>

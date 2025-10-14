@@ -627,6 +627,1474 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+
+        .ad-label {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+
+        .admob-interstitial {
+            width: 100%;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            max-width: 90%;
+            width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Particle Effects */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .game-area {
+                height: 450px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                height: 400px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-coins mr-2"></i>
+                Coin Pop
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="play.html" class="nav-link active">
+                <i class="fas fa-play-circle"></i>
+                <span>Play</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link">
+                <i class="fas fa-trophy"></i>
+                <span>Leaderboard</span>
+            </a>
+            <a href="rewards.html" class="nav-link">
+                <i class="fas fa-gift"></i>
+                <span>Daily Rewards</span>
+            </a>
+            <a href="withdraw.html" class="nav-link">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Withdraw</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="contact.html" class="nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Contact Us</span>
+            </a>
+            <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
+            <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
+                Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content flex-1 flex flex-col overflow-hidden">
+        <!-- Coin Balance Header -->
+        <div class="coin-balance-header">
+            <div class="text-sm text-gray-600 mb-2">TOTAL COINS EARNED</div>
+            <div class="balance-amount" id="totalCoinsBalance">0.00</div>
+            <div class="text-xs text-gray-500 mt-2">Keep popping coins to level up and earn rewards! 🚀</div>
+        </div>
+
+        <div class="game-container">
+            <h1 class="game-title">🌟 Ultimate Coin Pop Adventure 🌟</h1>
+            
+            <div class="game-header">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-level">1</div>
+                        <div class="stat-label">Current Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="coins-collected">0</div>
+                        <div class="stat-label">Coins Collected</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="coins-per-level">0.25</div>
+                        <div class="stat-label">Coins/Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="coins-per-minute">0</div>
+                        <div class="stat-label">Coins/Min</div>
+                    </div>
+                </div>
+
+                <div class="level-info">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-semibold text-gray-700">Level Progress</span>
+                        <span id="progress-text" class="font-bold text-primary">0/10 coins</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="level-progress" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-3">
+                        Complete each level to earn <span class="font-bold text-green-600">+0.25 coins</span> and unlock special rewards!
+                    </div>
+                </div>
+            </div>
+
+            <!-- AdMob Banner Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <div class="admob-banner" id="banner-ad">
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-area" id="gameArea">
+                <div class="speed-indicator">
+                    ⚡ TURBO MODE
+                </div>
+                <div class="combo-display" id="comboDisplay" style="display: none;">
+                    🔥 COMBO: <span id="comboCount">0</span>x
+                </div>
+                <!-- Coins will be generated here -->
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="startGame()">
+                    <i class="fas fa-rocket"></i> Start Adventure
+                </button>
+                <button class="btn btn-success" onclick="addCoins(10)">
+                    <i class="fas fa-bolt"></i> Power Up (+10 Coins)
+                </button>
+                <button class="btn btn-warning" onclick="resetGame()">
+                    <i class="fas fa-sync-alt"></i> Restart Game
+                </button>
+            </div>
+
+            <!-- Native Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Sponsored</div>
+                <div class="admob-native" id="native-ad">
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Up Popup -->
+        <div class="level-up" id="levelUpPopup">
+            <div class="reward-coin">🎉</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Level Complete!</h3>
+            <p class="text-green-600 font-semibold text-xl mb-1">+0.25 coins earned!</p>
+            <p class="text-gray-600 mb-4">Amazing! You're climbing the ranks!</p>
+            <div class="text-sm text-gray-500">
+                Next level starting in <span id="countdown">3</span>s
+            </div>
+        </div>
+
+        <!-- Ad Modal for Level Completion -->
+        <div id="ad-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="text-lg font-semibold">Level Complete!</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="text-4xl text-yellow-500 mb-4">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2">Congratulations!</h4>
+                    <p class="text-gray-600 mb-4">You've completed Level <span id="completed-level">1</span>!</p>
+                    
+                    <!-- AdMob Interstitial Ad -->
+                    <div class="admob-interstitial" id="interstitial-ad">
+                        <div class="ad-label">Rewarded Ad</div>
+                        <div class="ad-loading" style="width: 100%; height: 100%;">
+                            Loading Rewarded Advertisement...
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-3 rounded-lg mt-4">
+                        <p class="text-sm text-yellow-700">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Watch an ad to earn bonus coins!
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary w-full close-ad-modal">Continue Playing</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AdMob Configuration
+        const ADMOB_CONFIG = {
+            banner: 'ca-app-pub-4313544696010088/7463441754',
+            interstitial: 'ca-app-pub-4313544696010088/3524196741',
+            native: 'ca-app-pub-4313544696010088/8580882616'
+        };
+
+        class CoinPopGame {
+            constructor() {
+                this.currentLevel = 1;
+                this.coinsCollected = 0;
+                this.totalCoins = 0;
+                this.coinsPerLevel = 0.25;
+                this.coinsToNextLevel = 10;
+                this.gameActive = false;
+                this.coinInterval = null;
+                this.comboCount = 0;
+                this.lastCoinTime = 0;
+                this.comboTimeout = null;
+                this.coinsPerMinute = 0;
+                this.startTime = null;
+                this.coinsGenerated = 0;
+                this.adShown = false;
+                
+                this.coinTypes = [
+                    'coin-gold', 'coin-silver', 'coin-bronze',
+                    'coin-ruby', 'coin-sapphire', 'coin-emerald',
+                    'coin-amethyst', 'coin-diamond'
+                ];
+                
+                this.initializeGame();
+            }
+
+            initializeGame() {
+                this.updateUI();
+                this.loadGameState();
+                this.initializeSidebar();
+                this.initializeAdModal();
+                this.initializeAds();
+            }
+
+            initializeAds() {
+                // Initialize Banner Ad
+                this.loadBannerAd();
+                
+                // Initialize Native Ad
+                this.loadNativeAd();
+            }
+
+            loadBannerAd() {
+                const bannerContainer = document.getElementById('banner-ad');
+                setTimeout(() => {
+                    bannerContainer.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.banner}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }, 1000);
+            }
+
+            loadNativeAd() {
+                const nativeContainer = document.getElementById('native-ad');
+                setTimeout(() => {
+                    nativeContainer.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                }, 1500);
+            }
+
+            showInterstitialAd() {
+                const interstitialContainer = document.getElementById('interstitial-ad');
+                interstitialContainer.innerHTML = `
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-app-pub-4313544696010088"
+                         data-ad-slot="${ADMOB_CONFIG.interstitial}"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                `;
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+
+            initializeSidebar() {
+                // Mobile menu toggle
+                document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                    document.querySelector('.sidebar').classList.toggle('active');
+                });
+
+                // Load user data for sidebar
+                const currentUserEmail = localStorage.getItem('currentUser');
+                if (currentUserEmail) {
+                    const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+                    if (userData) {
+                        document.getElementById('user-email-display').textContent = currentUserEmail;
+                        
+                        // Show admin link if user is admin
+                        if (userData.isAdmin) {
+                            document.getElementById('admin-nav-link').style.display = 'flex';
+                        }
+                    }
+                }
+
+                // Logout functionality
+                document.getElementById('logout-btn').addEventListener('click', function() {
+                    if (confirm('Are you sure you want to sign out?')) {
+                        localStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+
+            initializeAdModal() {
+                // Close modal functionality
+                document.querySelector('.close-ad-modal').addEventListener('click', () => {
+                    document.getElementById('ad-modal').style.display = 'none';
+                    this.continueGame();
+                });
+
+                // Close modal with X button
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    document.getElementById('ad-modal').style.display = 'none';
+                    this.continueGame();
+                });
+            }
+
+            startGame() {
+                if (this.gameActive) return;
+                
+                this.gameActive = true;
+                this.startTime = Date.now();
+                this.coinsGenerated = 0;
+                this.adShown = false;
+                this.clearAllCoins();
+                this.generateInitialCoins();
+                this.startCoinGeneration();
+                
+                // Hide combo display initially
+                document.getElementById('comboDisplay').style.display = 'none';
+            }
+
+            generateInitialCoins() {
+                for (let i = 0; i < 12; i++) {
+                    this.createCoin();
+                }
+            }
+
+            startCoinGeneration() {
+                // Faster coin generation for better gameplay
+                this.coinInterval = setInterval(() => {
+                    if (this.gameActive) {
+                        this.createCoin();
+                        this.coinsGenerated++;
+                        this.updateCoinsPerMinute();
+                    }
+                }, 600);
+            }
+
+            updateCoinsPerMinute() {
+                if (this.startTime) {
+                    const minutesElapsed = (Date.now() - this.startTime) / (1000 * 60);
+                    this.coinsPerMinute = minutesElapsed > 0 ? (this.coinsGenerated / minutesElapsed) : 0;
+                    this.updateUI();
+                }
+            }
+
+            createCoin() {
+                const gameArea = document.getElementById('gameArea');
+                const coin = document.createElement('div');
+                
+                // Random coin type
+                const coinType = this.coinTypes[Math.floor(Math.random() * this.coinTypes.length)];
+                coin.className = `coin ${coinType}`;
+                
+                // Random position within game area
+                const maxX = gameArea.clientWidth - 60;
+                const maxY = gameArea.clientHeight - 60;
+                const x = Math.floor(Math.random() * maxX);
+                const y = Math.floor(Math.random() * maxY);
+                
+                coin.style.left = `${x}px`;
+                coin.style.top = `${y}px`;
+                
+                // Add click event
+                coin.addEventListener('click', () => this.popCoin(coin));
+                
+                gameArea.appendChild(coin);
+
+                // Auto-remove coins after 5 seconds
+                setTimeout(() => {
+                    if (coin.parentNode) {
+                        coin.remove();
+                    }
+                }, 5000);
+            }
+
+            popCoin(coin) {
+                if (!this.gameActive) return;
+
+                // Add pop animation
+                coin.classList.add('coin-pop');
+                
+                // Update combo
+                this.updateCombo();
+                
+                // Update coins collected
+                this.coinsCollected++;
+                
+                // Create floating text with particle effect
+                this.createFloatingText(coin, '+1');
+                this.createParticles(coin);
+                
+                // Check for level completion
+                if (this.coinsCollected >= this.coinsToNextLevel) {
+                    this.completeLevel();
+                }
+                
+                // Remove coin after animation
+                setTimeout(() => {
+                    coin.remove();
+                }, 300);
+                
+                this.updateUI();
+                this.saveGameState();
+            }
+
+            createParticles(element) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < 8; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = `${centerX}px`;
+                    particle.style.top = `${centerY}px`;
+                    particle.style.width = '6px';
+                    particle.style.height = '6px';
+                    particle.style.background = 'radial-gradient(circle, #FFD700, #FFA500)';
+                    particle.style.borderRadius = '50%';
+                    particle.style.boxShadow = '0 0 10px #FFD700';
+                    
+                    document.body.appendChild(particle);
+                    
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 50 + Math.random() * 50;
+                    const duration = 800 + Math.random() * 400;
+                    
+                    particle.animate([
+                        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                        { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`, opacity: 0 }
+                    ], {
+                        duration: duration,
+                        easing: 'ease-out'
+                    });
+                    
+                    setTimeout(() => particle.remove(), duration);
+                }
+            }
+
+            updateCombo() {
+                const now = Date.now();
+                if (now - this.lastCoinTime < 2000) {
+                    this.comboCount++;
+                } else {
+                    this.comboCount = 1;
+                }
+                
+                this.lastCoinTime = now;
+                
+                // Show combo display
+                const comboDisplay = document.getElementById('comboDisplay');
+                const comboCount = document.getElementById('comboCount');
+                comboDisplay.style.display = 'block';
+                comboCount.textContent = this.comboCount;
+                
+                // Add combo animation
+                comboDisplay.style.animation = 'none';
+                setTimeout(() => {
+                    comboDisplay.style.animation = 'pulse 0.3s ease-in-out';
+                }, 10);
+                
+                // Reset combo timeout
+                clearTimeout(this.comboTimeout);
+                this.comboTimeout = setTimeout(() => {
+                    comboDisplay.style.display = 'none';
+                    this.comboCount = 0;
+                }, 2000);
+            }
+
+            completeLevel() {
+                // Award coins
+                this.totalCoins += this.coinsPerLevel;
+                
+                // Show ad after every 3 levels
+                if (this.currentLevel % 3 === 0 && !this.adShown) {
+                    this.showAdModal();
+                    this.adShown = true;
+                    return;
+                }
+                
+                this.continueLevelUp();
+            }
+
+            showAdModal() {
+                document.getElementById('completed-level').textContent = this.currentLevel;
+                document.getElementById('ad-modal').style.display = 'flex';
+                
+                // Load interstitial ad
+                this.showInterstitialAd();
+            }
+
+            continueLevelUp() {
+                // Level up
+                this.currentLevel++;
+                this.coinsCollected = 0;
+                this.coinsToNextLevel = Math.floor(10 + (this.currentLevel * 1.2));
+                
+                // Show level up popup
+                this.showLevelUpPopup();
+                
+                // Clear all existing coins
+                this.clearAllCoins();
+                
+                // Generate new coins after delay
+                setTimeout(() => {
+                    this.generateInitialCoins();
+                }, 3000);
+            }
+
+            continueGame() {
+                this.continueLevelUp();
+            }
+
+            showLevelUpPopup() {
+                const popup = document.getElementById('levelUpPopup');
+                const countdownElement = document.getElementById('countdown');
+                
+                popup.classList.add('active');
+                
+                let countdown = 3;
+                const countdownInterval = setInterval(() => {
+                    countdownElement.textContent = countdown;
+                    countdown--;
+                    
+                    if (countdown < 0) {
+                        clearInterval(countdownInterval);
+                        popup.classList.remove('active');
+                    }
+                }, 1000);
+            }
+
+            createFloatingText(element, text) {
+                const rect = element.getBoundingClientRect();
+                const floatingText = document.createElement('div');
+                
+                floatingText.className = 'floating-text';
+                floatingText.textContent = text;
+                floatingText.style.left = `${rect.left + rect.width/2}px`;
+                floatingText.style.top = `${rect.top}px`;
+                
+                document.body.appendChild(floatingText);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    floatingText.remove();
+                }, 1200);
+            }
+
+            clearAllCoins() {
+                const gameArea = document.getElementById('gameArea');
+                const coins = gameArea.querySelectorAll('.coin');
+                coins.forEach(coin => coin.remove());
+            }
+
+            addCoins(count) {
+                for (let i = 0; i < count; i++) {
+                    this.createCoin();
+                }
+            }
+
+            resetGame() {
+                this.gameActive = false;
+                clearInterval(this.coinInterval);
+                
+                this.currentLevel = 1;
+                this.coinsCollected = 0;
+                this.totalCoins = 0;
+                this.coinsToNextLevel = 10;
+                this.comboCount = 0;
+                this.coinsPerMinute = 0;
+                this.adShown = false;
+                
+                this.clearAllCoins();
+                this.updateUI();
+                this.saveGameState();
+                
+                document.getElementById('comboDisplay').style.display = 'none';
+                document.getElementById('ad-modal').style.display = 'none';
+            }
+
+            updateUI() {
+                document.getElementById('current-level').textContent = this.currentLevel;
+                document.getElementById('coins-collected').textContent = this.coinsCollected;
+                document.getElementById('totalCoinsBalance').textContent = this.totalCoins.toFixed(2);
+                document.getElementById('coins-per-level').textContent = this.coinsPerLevel.toFixed(2);
+                document.getElementById('coins-per-minute').textContent = Math.round(this.coinsPerMinute);
+                
+                const progressPercent = (this.coinsCollected / this.coinsToNextLevel) * 100;
+                document.getElementById('level-progress').style.width = `${progressPercent}%`;
+                document.getElementById('progress-text').textContent = 
+                    `${this.coinsCollected}/${this.coinsToNextLevel} coins`;
+            }
+
+            saveGameState() {
+                const gameState = {
+                    currentLevel: this.currentLevel,
+                    coinsCollected: this.coinsCollected,
+                    totalCoins: this.totalCoins,
+                    coinsToNextLevel: this.coinsToNextLevel
+                };
+                localStorage.setItem('coinPopGameState', JSON.stringify(gameState));
+            }
+
+            loadGameState() {
+                const savedState = localStorage.getItem('coinPopGameState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    this.currentLevel = state.currentLevel || 1;
+                    this.coinsCollected = state.coinsCollected || 0;
+                    this.totalCoins = state.totalCoins || 0;
+                    this.coinsToNextLevel = state.coinsToNextLevel || 10;
+                    this.updateUI();
+                }
+            }
+        }
+
+        // Initialize game
+        let game;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            game = new CoinPopGame();
+        });
+
+        // Global functions for buttons
+        function startGame() {
+            game.startGame();
+        }
+
+        function addCoins(count) {
+            game.addCoins(count);
+        }
+
+        function resetGame() {
+            game.resetGame();
+        }
+
+        // Auto-save when leaving page
+        window.addEventListener('beforeunload', () => {
+            if (game) {
+                game.saveGameState();
+            }
+        });
+
+        // Add CSS for pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Pop Game - Play & Earn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced Coin Balance Header */
+        .coin-balance-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin-balance-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .game-area {
+            position: relative;
+            height: 550px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 25px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin-bottom: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.1);
+        }
+
+        .game-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Enhanced Coin Styles */
+        .coin {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.3),
+                inset 0 -8px 15px rgba(0, 0, 0, 0.3),
+                inset 0 8px 15px rgba(255, 255, 255, 0.4);
+            border: 3px solid;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            user-select: none;
+            animation: float 1s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .coin::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 25%;
+            width: 25%;
+            height: 25%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            filter: blur(3px);
+            transform: rotate(-25deg);
+        }
+
+        .coin::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: 20%;
+            width: 15%;
+            height: 15%;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            filter: blur(2px);
+            transform: rotate(15deg);
+        }
+
+        .coin:hover {
+            transform: scale(1.2) rotate(5deg);
+            filter: brightness(1.2);
+        }
+
+        /* Enhanced Coin Colors with Gradients */
+        .coin-gold {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500, #FF8C00);
+            border-color: #DAA520;
+            color: #8B4513;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .coin-silver {
+            background: radial-gradient(circle at 30% 30%, #F8F8FF, #C0C0C0, #A0A0A0);
+            border-color: #808080;
+            color: #606060;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .coin-bronze {
+            background: radial-gradient(circle at 30% 30%, #CD7F32, #8B4513, #654321);
+            border-color: #654321;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin-ruby {
+            background: radial-gradient(circle at 30% 30%, #FF6B6B, #EE5A24, #C44569);
+            border-color: #C44569;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin-sapphire {
+            background: radial-gradient(circle at 30% 30%, #4FC3F7, #0288D1, #01579B);
+            border-color: #01579B;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin-emerald {
+            background: radial-gradient(circle at 30% 30%, #66BB6A, #2E7D32, #1B5E20);
+            border-color: #1B5E20;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin-amethyst {
+            background: radial-gradient(circle at 30% 30%, #BA68C8, #7B1FA2, #4A148C);
+            border-color: #4A148C;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .coin-diamond {
+            background: radial-gradient(circle at 30% 30%, #E0F7FA, #80DEEA, #00ACC1);
+            border-color: #00ACC1;
+            color: #006978;
+            animation: diamondGlow 2s ease-in-out infinite, float 1s ease-in-out infinite;
+        }
+
+        .coin-pop {
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(8deg); }
+        }
+
+        @keyframes diamondGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 8px 25px rgba(0, 0, 0, 0.3),
+                    inset 0 -8px 15px rgba(0, 0, 0, 0.3),
+                    inset 0 8px 15px rgba(255, 255, 255, 0.4),
+                    0 0 30px rgba(224, 247, 250, 0.6);
+            }
+            50% { 
+                box-shadow: 
+                    0 8px 25px rgba(0, 0, 0, 0.3),
+                    inset 0 -8px 15px rgba(0, 0, 0, 0.3),
+                    inset 0 8px 15px rgba(255, 255, 255, 0.4),
+                    0 0 60px rgba(224, 247, 250, 0.9);
+            }
+        }
+
+        .level-info {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669, #047857);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            position: relative;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+        }
+
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #f59e0b;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 1.2s ease-out forwards;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            font-weight: 800;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .level-up.active {
+            animation: levelUpPopup 2s ease-out;
+        }
+
+        @keyframes levelUpPopup {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .reward-coin {
+            font-size: 4rem;
+            margin: 15px 0;
+            animation: bounce 0.5s ease-in-out 3;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .game-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #FFF, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            padding: 12px 18px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #7c3aed;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .speed-indicator {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: #e11d48;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+        }
+
+        /* Ad Container Styles */
+        .ad-container {
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
         .ad-label {

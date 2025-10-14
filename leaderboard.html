@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
     <style>
         :root {
             --primary: #4f46e5;
@@ -81,7 +86,7 @@
             padding: 1.5rem 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: space-between;
+            justify-content: between;
             align-items: center;
         }
         
@@ -515,6 +520,130 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+
+        /* AdMob Styles for Leaderboard */
+        .ad-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+        }
+        
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admob-interstitial {
+            width: 100%;
+            min-height: 400px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .ad-performance {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            display: none; /* Hide in production */
+        }
+        
+        .ad-close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-supported-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
+        .watch-ad-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
         
         @media (max-width: 768px) {
             .sidebar {
@@ -558,6 +687,18 @@
             .podium-item {
                 transform: none !important;
                 order: unset !important;
+            }
+            
+            .admob-banner {
+                height: 80px;
+            }
+            
+            .admob-native {
+                min-height: 250px;
+            }
+            
+            .admob-interstitial {
+                min-height: 300px;
             }
         }
     </style>
@@ -635,6 +776,14 @@
             </header>
 
             <main class="flex-1 overflow-auto p-6">
+                <!-- Banner Ad - Top of Content -->
+                <div class="admob-banner" id="banner-ad-top">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
                 <!-- Hero Section -->
                 <div class="leaderboard-hero relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -686,6 +835,14 @@
                     </div>
                 </div>
 
+                <!-- Native Ad - Between Stats and Tabs -->
+                <div class="admob-native" id="native-ad-1">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+
                 <!-- Tabs for different leaderboards -->
                 <div class="tabs">
                     <div class="tab active" data-tab="global">Global</div>
@@ -697,6 +854,28 @@
                 <!-- Podium for top 3 players -->
                 <div class="podium" id="podium-container">
                     <!-- Podium items will be populated by JavaScript -->
+                </div>
+
+                <!-- Banner Ad - Middle of Content -->
+                <div class="admob-banner" id="banner-ad-middle">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
+                <!-- Watch Ad Section -->
+                <div class="watch-ad-section">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="text-center md:text-left">
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">Want to Climb Faster?</h3>
+                            <p class="text-gray-600">Watch an ad to earn bonus coins and improve your ranking!</p>
+                        </div>
+                        <button id="watch-ad-for-coins" class="btn btn-primary whitespace-nowrap">
+                            <i class="fas fa-ad mr-2"></i>
+                            Watch Ad for 50 Coins
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Filters -->
@@ -736,6 +915,14 @@
                     </div>
                 </div>
 
+                <!-- Native Ad - After Leaderboard -->
+                <div class="admob-native" id="native-ad-2">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+
                 <!-- Pagination -->
                 <div class="flex justify-between items-center mt-6">
                     <button id="prev-page" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300" disabled>
@@ -748,6 +935,19 @@
                         <i class="fas fa-chevron-right ml-2"></i>
                     </button>
                 </div>
+
+                <!-- Banner Ad - Bottom of Content -->
+                <div class="admob-banner" id="banner-ad-bottom">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
+                <!-- Ad Supported Text -->
+                <div class="ad-supported-text">
+                    <p>Free app supported by advertisements</p>
+                </div>
             </main>
         </div>
     </div>
@@ -758,8 +958,179 @@
         <span id="notification-text">Operation completed successfully</span>
     </div>
 
+    <!-- Interstitial Ad Container (Hidden) -->
+    <div id="interstitial-ad-container" style="display: none;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-app-pub-4313544696010088"
+             data-ad-slot="3524196741"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+    </div>
+
     <script>
+        // AdMob Configuration
+        const ADMOB_CONFIG = {
+            banner: 'ca-app-pub-4313544696010088/7463441754',
+            interstitial: 'ca-app-pub-4313544696010088/3524196741',
+            native: 'ca-app-pub-4313544696010088/8580882616'
+        };
+
+        // Ad Manager for Leaderboard
+        class LeaderboardAdManager {
+            constructor() {
+                this.adCounters = {
+                    impressions: 0,
+                    clicks: 0
+                };
+                this.initialized = false;
+            }
+
+            initialize() {
+                if (this.initialized) return;
+                
+                console.log('Initializing AdMob ads for leaderboard...');
+                
+                // Initialize all ad units
+                this.loadBannerAd('banner-ad-top');
+                this.loadBannerAd('banner-ad-middle');
+                this.loadBannerAd('banner-ad-bottom');
+                this.loadNativeAd('native-ad-1');
+                this.loadNativeAd('native-ad-2');
+                
+                this.setupAdEventListeners();
+                this.initialized = true;
+                
+                console.log('Leaderboard AdMob ads initialized successfully');
+            }
+
+            loadBannerAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.banner}"
+                             data-ad-format="auto"
+                             data-full-width-responsive="true"></ins>
+                        <div class="ad-performance">Banner Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('banner');
+                }, 1000);
+            }
+
+            loadNativeAd(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <ins class="adsbygoogle"
+                             style="display:block"
+                             data-ad-format="fluid"
+                             data-ad-layout-key="-fb+5w+4e-db+86"
+                             data-ad-client="ca-app-pub-4313544696010088"
+                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
+                        <div class="ad-performance">Native Ad</div>
+                    `;
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackImpression('native');
+                }, 1500);
+            }
+
+            showRewardedAd() {
+                return new Promise((resolve) => {
+                    console.log('Showing rewarded ad for leaderboard...');
+                    
+                    // Create rewarded ad modal
+                    const rewardedContainer = document.createElement('div');
+                    rewardedContainer.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                    `;
+                    
+                    rewardedContainer.innerHTML = `
+                        <div style="background: white; padding: 2rem; border-radius: 1rem; text-align: center; max-width: 90%;">
+                            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rewarded Ad</h3>
+                            <div class="ad-loading" style="width: 300px; height: 250px; margin: 1rem auto;">
+                                Loading Rewarded Ad...
+                            </div>
+                            <p style="margin: 1rem 0; color: #666;">Watch this ad to earn 50 coins and climb the leaderboard!</p>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button id="complete-rewarded" style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                    Complete Ad
+                                </button>
+                                <button id="close-rewarded" style="background: #6b7280; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(rewardedContainer);
+                    
+                    let adCompleted = false;
+                    
+                    // Complete button functionality
+                    document.getElementById('complete-rewarded').addEventListener('click', () => {
+                        adCompleted = true;
+                        this.trackImpression('rewarded');
+                        document.body.removeChild(rewardedContainer);
+                        resolve(true);
+                    });
+                    
+                    // Close button functionality
+                    document.getElementById('close-rewarded').addEventListener('click', () => {
+                        document.body.removeChild(rewardedContainer);
+                        resolve(adCompleted);
+                    });
+                });
+            }
+
+            setupAdEventListeners() {
+                // Track ad clicks
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.adsbygoogle')) {
+                        this.trackClick();
+                    }
+                });
+            }
+
+            trackImpression(type) {
+                this.adCounters.impressions++;
+                console.log(`Ad Impression: ${type} - Total: ${this.adCounters.impressions}`);
+            }
+
+            trackClick() {
+                this.adCounters.clicks++;
+                console.log(`Ad Click - Total: ${this.adCounters.clicks}`);
+            }
+
+            getStats() {
+                return this.adCounters;
+            }
+        }
+
+        // Initialize Ad Manager
+        const leaderboardAdManager = new LeaderboardAdManager();
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ads
+            leaderboardAdManager.initialize();
+
             // Mobile menu toggle
             document.getElementById('mobile-menu-btn').addEventListener('click', function() {
                 document.querySelector('.sidebar').classList.toggle('active');
@@ -768,13 +1139,30 @@
             // Load user data
             const currentUserEmail = localStorage.getItem('currentUser');
             if (!currentUserEmail) {
-                window.location.href = 'index.html';
+                // Create demo user data if none exists
+                const demoUser = {
+                    name: 'Demo User',
+                    email: 'demo@example.com',
+                    coins: 1500,
+                    isAdmin: false
+                };
+                localStorage.setItem('currentUser', demoUser.email);
+                localStorage.setItem(`user_${demoUser.email}`, JSON.stringify(demoUser));
+                window.location.reload();
                 return;
             }
 
             const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
             if (!userData) {
-                window.location.href = 'index.html';
+                // Create demo user data if none exists
+                const demoUser = {
+                    name: 'Demo User',
+                    email: currentUserEmail,
+                    coins: 1500,
+                    isAdmin: false
+                };
+                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(demoUser));
+                window.location.reload();
                 return;
             }
 
@@ -979,11 +1367,12 @@
 
             // Initialize leaderboard
             let leaderboardData = generateLeaderboardData();
+            let currentPage = 1;
+            const searchInput = document.getElementById('search-input');
+            
             renderLeaderboard(leaderboardData);
             
             // Search functionality
-            let currentPage = 1;
-            const searchInput = document.getElementById('search-input');
             searchInput.addEventListener('input', function() {
                 currentPage = 1;
                 renderLeaderboard(leaderboardData, this.value, currentPage);
@@ -1066,6 +1455,43 @@
                 }
             });
             
+            // Watch Ad for Coins functionality
+            document.getElementById('watch-ad-for-coins').addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                btn.disabled = true;
+                
+                try {
+                    const adCompleted = await leaderboardAdManager.showRewardedAd();
+                    if (adCompleted) {
+                        // Add coins to user
+                        userData.coins += 50;
+                        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
+                        
+                        // Update UI
+                        document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
+                        
+                        showNotification('+50 coins earned! Your leaderboard position may improve.', 'success');
+                        
+                        // Refresh leaderboard to show updated position
+                        setTimeout(() => {
+                            leaderboardData = generateLeaderboardData();
+                            renderLeaderboard(leaderboardData, searchInput.value, currentPage);
+                        }, 1000);
+                    } else {
+                        showNotification('Ad was skipped', 'error');
+                    }
+                } catch (error) {
+                    console.error('Rewarded ad error:', error);
+                    showNotification('Rewarded ad failed to load', 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+            
             // Logout functionality
             document.getElementById('logout-btn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to sign out?')) {
@@ -1073,6 +1499,12 @@
                     window.location.href = 'index.html';
                 }
             });
+
+            // Ad performance monitoring
+            setInterval(() => {
+                const stats = leaderboardAdManager.getStats();
+                console.log('Leaderboard Ad Performance Stats:', stats);
+            }, 30000);
         });
     </script>
 </body>

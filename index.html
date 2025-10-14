@@ -718,6 +718,50 @@
             native: 'ca-app-pub-4313544696010088/8580882616'
         };
 
+        // Initialize Admin Account
+        function initializeAdminAccount() {
+            const adminEmail = 'Ghazimalik1997@gmail.com';
+            const adminPassword = 'Ghazi123$';
+            
+            // Check if admin account exists
+            let adminData = localStorage.getItem(`user_${adminEmail}`);
+            
+            if (!adminData) {
+                // Create admin account if it doesn't exist
+                const adminUser = {
+                    email: adminEmail,
+                    password: adminPassword,
+                    name: 'Admin User',
+                    coins: 100000,
+                    isAdmin: true,
+                    stats: {
+                        gamesPlayed: 0,
+                        dailyGoal: 0,
+                        weeklyChallenge: 0,
+                        withdrawalLevel: 1,
+                        loginStreak: 1,
+                        lastLogin: new Date().toISOString().split('T')[0],
+                        friendsInvited: 0,
+                        adsWatched: 0
+                    },
+                    activity: [
+                        { 
+                            type: 'admin', 
+                            icon: 'shield', 
+                            color: 'primary', 
+                            title: 'Admin Account Created', 
+                            amount: '+100,000 coins', 
+                            time: 'System' 
+                        }
+                    ],
+                    createdAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem(`user_${adminEmail}`, JSON.stringify(adminUser));
+                console.log('Admin account created:', adminEmail);
+            }
+        }
+
         // Ad Manager for Login Page
         class LoginAdManager {
             constructor() {
@@ -878,6 +922,9 @@
         const loginAdManager = new LoginAdManager();
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize admin account
+            initializeAdminAccount();
+            
             // Initialize ads
             loginAdManager.initialize();
 
@@ -965,7 +1012,7 @@
                     console.log('Ad skipped or failed to load');
                 }
                 
-                // Real login process - NO DEMO ACCOUNT CREATION
+                // Real login process
                 realLogin(email, password);
             });
             
@@ -1009,7 +1056,7 @@
                 });
             });
             
-            // Real login process - NO DEMO ACCOUNTS
+            // Real login process
             function realLogin(email, password) {
                 // Show loading state
                 const submitButton = document.querySelector('#login-form button[type="submit"]');
@@ -1038,7 +1085,7 @@
                             window.location.href = 'dashboard.html';
                         }, 1500);
                     } else {
-                        // Failed login - NO DEMO ACCOUNT CREATION
+                        // Failed login
                         document.getElementById('login-error').textContent = 'Invalid email or password. Please check your credentials or sign up for a new account.';
                         submitButton.innerHTML = originalText;
                         submitButton.disabled = false;

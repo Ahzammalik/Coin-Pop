@@ -803,7 +803,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Coin to PKR Conversion Rate</label>
-                                    <input type="number" class="form-input" id="coin-rate" value="1" min="0.1" step="0.1" required>
+                                    <input type="number" class="form-input" id="coin-rate" value="0.5" min="0.1" step="0.1" required>
                                     <div class="error-message hidden" id="coin-rate-error"></div>
                                 </div>
                                 <div class="form-group">
@@ -986,6 +986,19 @@
                 ];
                 localStorage.setItem('adminWithdrawalRequests', JSON.stringify(initialWithdrawals));
             }
+
+            // Initialize system settings with 0.5 conversion rate
+            if (!localStorage.getItem('systemSettings')) {
+                const systemSettings = {
+                    minWithdrawal: 250,
+                    maxWithdrawal: 50000,
+                    dailyCoinLimit: 1000,
+                    withdrawalFee: 2.5,
+                    coinRate: 0.5, // Updated to 0.5 as requested
+                    dailyWithdrawalLimit: 50000
+                };
+                localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
+            }
         }
 
         // Data management functions
@@ -1005,6 +1018,17 @@
         function saveWithdrawalRequests(requests) {
             localStorage.setItem('adminWithdrawalRequests', JSON.stringify(requests));
             updateWithdrawalStats();
+        }
+
+        // Load system settings
+        function loadSystemSettings() {
+            const settings = JSON.parse(localStorage.getItem('systemSettings')) || {};
+            document.getElementById('min-withdrawal').value = settings.minWithdrawal || 250;
+            document.getElementById('max-withdrawal').value = settings.maxWithdrawal || 50000;
+            document.getElementById('daily-coin-limit').value = settings.dailyCoinLimit || 1000;
+            document.getElementById('withdrawal-fee').value = settings.withdrawalFee || 2.5;
+            document.getElementById('coin-rate').value = settings.coinRate || 0.5; // Default to 0.5
+            document.getElementById('daily-withdrawal-limit').value = settings.dailyWithdrawalLimit || 50000;
         }
 
         // Update statistics
@@ -1048,6 +1072,7 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminData();
+            loadSystemSettings();
             renderUserList();
             renderWithdrawalRequests();
             updateUserStats();

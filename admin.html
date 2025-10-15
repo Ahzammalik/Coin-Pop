@@ -490,7 +490,7 @@
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <div id="user-email-display" class="text-sm truncate mb-2">admin@coinpop.com</div>
+                <div id="user-email-display" class="text-sm truncate mb-2">Ghazimalik1997@gmail.com</div>
                 <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
                     Sign Out
                 </button>
@@ -509,12 +509,12 @@
                 <div class="flex items-center space-x-4">
                     <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
                         <i class="fas fa-coins mr-2"></i>
-                        Coins: 12,450
+                        Coins: 100,000
                     </div>
                     <div class="relative">
                         <button id="notification-btn" class="text-gray-500 hover:text-gray-700">
                             <i class="fas fa-bell text-xl"></i>
-                            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">3</span>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                         </button>
                     </div>
                 </div>
@@ -527,7 +527,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-sm opacity-80">Total Users</p>
-                                <h3 class="text-2xl font-bold mt-1">1,248</h3>
+                                <h3 class="text-2xl font-bold mt-1" id="total-users-count">1,248</h3>
                             </div>
                             <i class="fas fa-users text-xl opacity-80"></i>
                         </div>
@@ -537,7 +537,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-sm opacity-80">Pending Withdrawals</p>
-                                <h3 class="text-2xl font-bold mt-1">24</h3>
+                                <h3 class="text-2xl font-bold mt-1" id="pending-withdrawals-count">24</h3>
                             </div>
                             <i class="fas fa-money-check-alt text-xl opacity-80"></i>
                         </div>
@@ -622,7 +622,7 @@
                     </div>
                     <div class="card overflow-hidden mb-6">
                         <div class="p-4 bg-gray-50 border-b">
-                            <h3 class="font-semibold text-gray-700">Pending Withdrawal Requests</h3>
+                            <h3 class="font-semibold text-gray-700">Withdrawal Requests</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
@@ -960,55 +960,73 @@
     </div>
 
     <script>
-        // Initialize admin account
-        function initializeAdminAccount() {
-            const adminEmail = 'Ghazimalik1997@gmail.com';
-            const adminPassword = 'Ghazi123$';
-            
-            // Check if admin account exists
-            let adminData = localStorage.getItem(`user_${adminEmail}`);
-            
-            if (!adminData) {
-                // Create admin account if it doesn't exist
-                const adminUser = {
-                    email: adminEmail,
-                    password: adminPassword,
-                    coins: 100000,
-                    isAdmin: true,
-                    createdAt: new Date().toISOString()
-                };
-                
-                localStorage.setItem(`user_${adminEmail}`, JSON.stringify(adminUser));
-                console.log('Admin account created:', adminEmail);
+        // Initialize Admin Data
+        function initializeAdminData() {
+            // Check if admin data exists
+            if (!localStorage.getItem('adminUsers')) {
+                // Create initial users data
+                const initialUsers = [
+                    { id: 1, email: 'john.doe@example.com', coins: 1250, isAdmin: false },
+                    { id: 2, email: 'jane.smith@example.com', coins: 3200, isAdmin: false },
+                    { id: 3, email: 'mike.johnson@example.com', coins: 800, isAdmin: false },
+                    { id: 4, email: 'sarah.wilson@example.com', coins: 4500, isAdmin: true },
+                    { id: 5, email: 'alex.brown@example.com', coins: 2100, isAdmin: false }
+                ];
+                localStorage.setItem('adminUsers', JSON.stringify(initialUsers));
             }
-            
-            // Set current user as admin for this session
-            localStorage.setItem('currentUser', adminEmail);
-            document.getElementById('user-email-display').textContent = adminEmail;
+
+            // Check if withdrawal requests exist
+            if (!localStorage.getItem('adminWithdrawalRequests')) {
+                // Create initial withdrawal requests
+                const initialWithdrawals = [
+                    { id: 1, userId: 1, userEmail: 'john.doe@example.com', amount: 500, method: 'EasyPaisa', status: 'pending', date: '2023-05-15', details: 'Mobile: 0300-1234567' },
+                    { id: 2, userId: 2, userEmail: 'jane.smith@example.com', amount: 1000, method: 'JazzCash', status: 'pending', date: '2023-05-14', details: 'Account: 123456789' },
+                    { id: 3, userId: 5, userEmail: 'alex.brown@example.com', amount: 2500, method: 'Bank Transfer', status: 'pending', date: '2023-05-13', details: 'IBAN: PK36SCBL0000001123456702' },
+                    { id: 4, userId: 3, userEmail: 'mike.johnson@example.com', amount: 750, method: 'EasyPaisa', status: 'pending', date: '2023-05-12', details: 'Mobile: 0312-7654321' }
+                ];
+                localStorage.setItem('adminWithdrawalRequests', JSON.stringify(initialWithdrawals));
+            }
         }
 
-        // Sample data for demonstration
-        let users = [
-            { id: 1, email: 'john.doe@example.com', coins: 1250, isAdmin: false },
-            { id: 2, email: 'jane.smith@example.com', coins: 3200, isAdmin: false },
-            { id: 3, email: 'mike.johnson@example.com', coins: 800, isAdmin: false },
-            { id: 4, email: 'sarah.wilson@example.com', coins: 4500, isAdmin: true },
-            { id: 5, email: 'alex.brown@example.com', coins: 2100, isAdmin: false }
-        ];
+        // Data management functions
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('adminUsers')) || [];
+        }
 
-        let withdrawalRequests = [
-            { id: 1, userId: 1, userEmail: 'john.doe@example.com', amount: 500, method: 'EasyPaisa', status: 'pending', date: '2023-05-15', details: 'Mobile: 0300-1234567' },
-            { id: 2, userId: 2, userEmail: 'jane.smith@example.com', amount: 1000, method: 'JazzCash', status: 'pending', date: '2023-05-14', details: 'Account: 123456789' },
-            { id: 3, userId: 5, userEmail: 'alex.brown@example.com', amount: 2500, method: 'Bank Transfer', status: 'pending', date: '2023-05-13', details: 'IBAN: PK36SCBL0000001123456702' },
-            { id: 4, userId: 3, userEmail: 'mike.johnson@example.com', amount: 750, method: 'EasyPaisa', status: 'pending', date: '2023-05-12', details: 'Mobile: 0312-7654321' }
-        ];
+        function saveUsers(users) {
+            localStorage.setItem('adminUsers', JSON.stringify(users));
+            updateUserStats();
+        }
 
-        // Payment settings
-        let paymentSettings = {
-            easypaisa: { enabled: true, min: 250, max: 50000, fee: 2, time: '24hours' },
-            jazzcash: { enabled: true, min: 250, max: 50000, fee: 2, time: '24hours' },
-            bank: { enabled: true, min: 1000, max: 100000, fee: 1.5, time: '48hours' }
-        };
+        function getWithdrawalRequests() {
+            return JSON.parse(localStorage.getItem('adminWithdrawalRequests')) || [];
+        }
+
+        function saveWithdrawalRequests(requests) {
+            localStorage.setItem('adminWithdrawalRequests', JSON.stringify(requests));
+            updateWithdrawalStats();
+        }
+
+        // Update statistics
+        function updateUserStats() {
+            const users = getUsers();
+            document.getElementById('total-users-count').textContent = users.length.toLocaleString();
+        }
+
+        function updateWithdrawalStats() {
+            const requests = getWithdrawalRequests();
+            const pendingCount = requests.filter(req => req.status === 'pending').length;
+            document.getElementById('pending-withdrawals-count').textContent = pendingCount;
+            
+            // Update notification badge
+            const notificationBadge = document.getElementById('notification-badge');
+            if (pendingCount > 0) {
+                notificationBadge.textContent = pendingCount;
+                notificationBadge.style.display = 'flex';
+            } else {
+                notificationBadge.style.display = 'none';
+            }
+        }
 
         // DOM elements
         const adminUserList = document.getElementById('admin-user-list');
@@ -1019,7 +1037,6 @@
         const closeModalButtons = document.querySelectorAll('.close-modal');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
-        const notificationBadge = document.getElementById('notification-badge');
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
         const userSearch = document.getElementById('user-search');
@@ -1027,76 +1044,18 @@
         const withdrawalSearch = document.getElementById('withdrawal-search');
         const withdrawalFilter = document.getElementById('withdrawal-filter');
         const settingsForm = document.getElementById('settings-form');
-        const addUserForm = document.getElementById('add-user-form');
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            initializeAdminAccount();
-            loadPaymentSettings();
+            initializeAdminData();
             renderUserList();
             renderWithdrawalRequests();
-            updateNotificationBadge();
+            updateUserStats();
+            updateWithdrawalStats();
             
             // Show admin nav link
             document.getElementById('admin-nav-link').style.display = 'flex';
         });
-
-        // Load payment settings
-        function loadPaymentSettings() {
-            const savedSettings = localStorage.getItem('paymentSettings');
-            if (savedSettings) {
-                paymentSettings = JSON.parse(savedSettings);
-            }
-            
-            // Apply settings to UI
-            document.getElementById('easypaisa-enabled').checked = paymentSettings.easypaisa.enabled;
-            document.getElementById('easypaisa-min').value = paymentSettings.easypaisa.min;
-            document.getElementById('easypaisa-max').value = paymentSettings.easypaisa.max;
-            document.getElementById('easypaisa-fee').value = paymentSettings.easypaisa.fee;
-            document.getElementById('easypaisa-time').value = paymentSettings.easypaisa.time;
-            
-            document.getElementById('jazzcash-enabled').checked = paymentSettings.jazzcash.enabled;
-            document.getElementById('jazzcash-min').value = paymentSettings.jazzcash.min;
-            document.getElementById('jazzcash-max').value = paymentSettings.jazzcash.max;
-            document.getElementById('jazzcash-fee').value = paymentSettings.jazzcash.fee;
-            document.getElementById('jazzcash-time').value = paymentSettings.jazzcash.time;
-            
-            document.getElementById('bank-enabled').checked = paymentSettings.bank.enabled;
-            document.getElementById('bank-min').value = paymentSettings.bank.min;
-            document.getElementById('bank-max').value = paymentSettings.bank.max;
-            document.getElementById('bank-fee').value = paymentSettings.bank.fee;
-            document.getElementById('bank-time').value = paymentSettings.bank.time;
-        }
-
-        // Save payment settings
-        function savePaymentSettings() {
-            paymentSettings.easypaisa = {
-                enabled: document.getElementById('easypaisa-enabled').checked,
-                min: parseInt(document.getElementById('easypaisa-min').value),
-                max: parseInt(document.getElementById('easypaisa-max').value),
-                fee: parseFloat(document.getElementById('easypaisa-fee').value),
-                time: document.getElementById('easypaisa-time').value
-            };
-            
-            paymentSettings.jazzcash = {
-                enabled: document.getElementById('jazzcash-enabled').checked,
-                min: parseInt(document.getElementById('jazzcash-min').value),
-                max: parseInt(document.getElementById('jazzcash-max').value),
-                fee: parseFloat(document.getElementById('jazzcash-fee').value),
-                time: document.getElementById('jazzcash-time').value
-            };
-            
-            paymentSettings.bank = {
-                enabled: document.getElementById('bank-enabled').checked,
-                min: parseInt(document.getElementById('bank-min').value),
-                max: parseInt(document.getElementById('bank-max').value),
-                fee: parseFloat(document.getElementById('bank-fee').value),
-                time: document.getElementById('bank-time').value
-            };
-            
-            localStorage.setItem('paymentSettings', JSON.stringify(paymentSettings));
-            showNotification('Payment settings saved successfully', 'success');
-        }
 
         // Render user list
         function renderUserList() {
@@ -1105,6 +1064,7 @@
             const searchTerm = userSearch.value.toLowerCase();
             const filterValue = userFilter.value;
             
+            const users = getUsers();
             const filteredUsers = users.filter(user => {
                 const matchesSearch = user.email.toLowerCase().includes(searchTerm);
                 const matchesFilter = filterValue === 'all' || 
@@ -1182,7 +1142,8 @@
             const searchTerm = withdrawalSearch.value.toLowerCase();
             const filterValue = withdrawalFilter.value;
             
-            const filteredRequests = withdrawalRequests.filter(request => {
+            const requests = getWithdrawalRequests();
+            const filteredRequests = requests.filter(request => {
                 const matchesSearch = request.userEmail.toLowerCase().includes(searchTerm);
                 const matchesFilter = filterValue === 'all' || request.status === filterValue;
                 
@@ -1240,17 +1201,6 @@
             });
         }
 
-        // Update notification badge
-        function updateNotificationBadge() {
-            const pendingCount = withdrawalRequests.filter(req => req.status === 'pending').length;
-            if (pendingCount > 0) {
-                notificationBadge.textContent = pendingCount;
-                notificationBadge.classList.remove('hidden');
-            } else {
-                notificationBadge.classList.add('hidden');
-            }
-        }
-
         // Tab switching functionality
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1272,18 +1222,23 @@
 
         // Modal functionality
         function openEditUserModal(userId) {
+            const users = getUsers();
             const user = users.find(u => u.id === userId);
             if (user) {
                 document.getElementById('edit-user-email').value = user.email;
                 document.getElementById('edit-user-coins').value = user.coins;
                 document.getElementById('edit-user-admin').value = user.isAdmin;
                 
+                // Store the current user ID for saving
+                document.getElementById('edit-user-modal').setAttribute('data-current-user-id', userId);
+                
                 document.getElementById('edit-user-modal').style.display = 'flex';
             }
         }
 
         function openWithdrawalDetailsModal(requestId) {
-            const request = withdrawalRequests.find(r => r.id === requestId);
+            const requests = getWithdrawalRequests();
+            const request = requests.find(r => r.id === requestId);
             if (request) {
                 document.getElementById('withdrawal-user').textContent = request.userEmail;
                 document.getElementById('withdrawal-amount').textContent = `PKR ${request.amount.toLocaleString()}`;
@@ -1291,6 +1246,9 @@
                 document.getElementById('withdrawal-details').textContent = request.details;
                 document.getElementById('withdrawal-status').value = request.status;
                 document.getElementById('withdrawal-notes').value = '';
+                
+                // Store the current request ID for saving
+                document.getElementById('withdrawal-details-modal').setAttribute('data-current-request-id', requestId);
                 
                 document.getElementById('withdrawal-details-modal').style.display = 'flex';
             }
@@ -1315,57 +1273,59 @@
 
         // Save user changes
         document.getElementById('save-user-changes').addEventListener('click', function() {
+            const userId = parseInt(document.getElementById('edit-user-modal').getAttribute('data-current-user-id'));
             const email = document.getElementById('edit-user-email').value;
             const coins = parseInt(document.getElementById('edit-user-coins').value);
             const isAdmin = document.getElementById('edit-user-admin').value === 'true';
             
             if (validateUserForm(email, coins, 'edit')) {
-                // In a real app, you would send this data to the server
-                showNotification('User updated successfully', 'success');
-                document.getElementById('edit-user-modal').style.display = 'none';
+                const users = getUsers();
+                const userIndex = users.findIndex(u => u.id === userId);
                 
-                // Update the user in our sample data
-                const userId = users.find(u => u.email === email)?.id;
-                if (userId) {
-                    const userIndex = users.findIndex(u => u.id === userId);
-                    if (userIndex !== -1) {
-                        users[userIndex].email = email;
-                        users[userIndex].coins = coins;
-                        users[userIndex].isAdmin = isAdmin;
-                        renderUserList();
-                    }
+                if (userIndex !== -1) {
+                    users[userIndex].email = email;
+                    users[userIndex].coins = coins;
+                    users[userIndex].isAdmin = isAdmin;
+                    saveUsers(users);
+                    
+                    showNotification('User updated successfully', 'success');
+                    document.getElementById('edit-user-modal').style.display = 'none';
+                    renderUserList();
                 }
             }
         });
 
         // Save withdrawal changes
         document.getElementById('save-withdrawal-changes').addEventListener('click', function() {
+            const requestId = parseInt(document.getElementById('withdrawal-details-modal').getAttribute('data-current-request-id'));
             const status = document.getElementById('withdrawal-status').value;
-            // In a real app, you would send this data to the server
-            showNotification('Withdrawal request updated successfully', 'success');
-            document.getElementById('withdrawal-details-modal').style.display = 'none';
+            const notes = document.getElementById('withdrawal-notes').value;
             
-            // Update the withdrawal request status in our sample data
-            const requestId = withdrawalRequests.find(r => r.status === status)?.id;
-            if (requestId) {
-                const requestIndex = withdrawalRequests.findIndex(r => r.id === requestId);
-                if (requestIndex !== -1) {
-                    withdrawalRequests[requestIndex].status = status;
-                    renderWithdrawalRequests();
+            const requests = getWithdrawalRequests();
+            const requestIndex = requests.findIndex(r => r.id === requestId);
+            
+            if (requestIndex !== -1) {
+                requests[requestIndex].status = status;
+                // Add notes if provided
+                if (notes) {
+                    requests[requestIndex].adminNotes = notes;
                 }
+                saveWithdrawalRequests(requests);
+                
+                showNotification('Withdrawal request updated successfully', 'success');
+                document.getElementById('withdrawal-details-modal').style.display = 'none';
+                renderWithdrawalRequests();
             }
-            
-            // Refresh the UI
-            updateNotificationBadge();
         });
 
         // Delete user
         function deleteUser(userId) {
             if (confirm('Are you sure you want to delete this user?')) {
-                // In a real app, you would send a delete request to the server
+                const users = getUsers();
                 const index = users.findIndex(u => u.id === userId);
                 if (index !== -1) {
                     users.splice(index, 1);
+                    saveUsers(users);
                     renderUserList();
                     showNotification('User deleted successfully', 'success');
                 }
@@ -1390,7 +1350,7 @@
         // Logout functionality
         document.getElementById('logout-btn').addEventListener('click', function() {
             if (confirm('Are you sure you want to sign out?')) {
-                // In a real app, you would clear the session and redirect to login
+                localStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
             }
         });
@@ -1413,7 +1373,7 @@
             const isAdmin = document.getElementById('new-user-admin').value === 'true';
             
             if (validateUserForm(email, coins, 'add', password)) {
-                // In a real app, you would send this data to the server
+                const users = getUsers();
                 const newUser = {
                     id: Math.max(...users.map(u => u.id)) + 1,
                     email: email,
@@ -1422,6 +1382,7 @@
                 };
                 
                 users.push(newUser);
+                saveUsers(users);
                 renderUserList();
                 showNotification('User added successfully', 'success');
                 document.getElementById('add-user-modal').style.display = 'none';
@@ -1431,7 +1392,32 @@
 
         // Save payment settings
         document.getElementById('save-payment-settings').addEventListener('click', function() {
-            savePaymentSettings();
+            const paymentSettings = {
+                easypaisa: {
+                    enabled: document.getElementById('easypaisa-enabled').checked,
+                    min: parseInt(document.getElementById('easypaisa-min').value),
+                    max: parseInt(document.getElementById('easypaisa-max').value),
+                    fee: parseFloat(document.getElementById('easypaisa-fee').value),
+                    time: document.getElementById('easypaisa-time').value
+                },
+                jazzcash: {
+                    enabled: document.getElementById('jazzcash-enabled').checked,
+                    min: parseInt(document.getElementById('jazzcash-min').value),
+                    max: parseInt(document.getElementById('jazzcash-max').value),
+                    fee: parseFloat(document.getElementById('jazzcash-fee').value),
+                    time: document.getElementById('jazzcash-time').value
+                },
+                bank: {
+                    enabled: document.getElementById('bank-enabled').checked,
+                    min: parseInt(document.getElementById('bank-min').value),
+                    max: parseInt(document.getElementById('bank-max').value),
+                    fee: parseFloat(document.getElementById('bank-fee').value),
+                    time: document.getElementById('bank-time').value
+                }
+            };
+            
+            localStorage.setItem('paymentSettings', JSON.stringify(paymentSettings));
+            showNotification('Payment settings saved successfully', 'success');
         });
 
         // Settings form validation and submission
@@ -1499,7 +1485,16 @@
             }
             
             if (isValid) {
-                // In a real app, you would send this data to the server
+                const systemSettings = {
+                    minWithdrawal: minWithdrawal,
+                    maxWithdrawal: maxWithdrawal,
+                    dailyCoinLimit: dailyCoinLimit,
+                    withdrawalFee: withdrawalFee,
+                    coinRate: coinRate,
+                    dailyWithdrawalLimit: dailyWithdrawalLimit
+                };
+                
+                localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
                 showNotification('Settings saved successfully', 'success');
             }
         });

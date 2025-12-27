@@ -3,161 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdraw PKR - Coin Pop</title>
+    <title>Withdraw Money - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
-        * { font-family: 'Inter', sans-serif; }
-        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; }
-        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
-        
-        .withdraw-card { background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .method-card { border: 2px solid #f3f4f6; border-radius: 1rem; cursor: pointer; transition: 0.3s; }
-        .method-card.selected { border-color: #4f46e5; background-color: #f5f3ff; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .method-card input:checked + div { border-color: #4f46e5; background-color: #eff6ff; }
     </style>
 </head>
-<body class="flex bg-gray-50 min-h-screen">
+<body class="antialiased">
 
-    <aside class="sidebar hidden md:flex flex-col">
-        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
-            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
+    <div class="max-w-md mx-auto p-6">
+        <div class="flex items-center mb-8">
+            <a href="dashboard.html" class="mr-4 text-gray-600 hover:text-indigo-600 transition">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-2xl font-bold text-gray-800">Withdraw</h1>
         </div>
-        <nav class="flex-grow mt-4">
-            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
-            <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
-            <a href="withdraw.html" class="nav-link active"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
-            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
-            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
-            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
-            <a href="history.html" class="nav-link"><i class="fas fa-history mr-3 w-5"></i> History</a>
-        </nav>
-        <div class="p-6 border-t border-white/10 bg-black/10 text-center">
-            <p class="text-xs opacity-70">Total PKR</p>
-            <p class="text-xl font-black text-white" id="side-pkr">Rs. 0.00</p>
-        </div>
-    </aside>
 
-    <main class="flex-1 flex flex-col min-w-0">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
-            <h2 class="text-xl font-bold text-gray-800">Withdrawal Portal</h2>
-            <div class="bg-green-600 text-white px-5 py-2 rounded-full font-black">
-                Available: Rs. <span id="header-pkr">0.00</span>
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white mb-8 shadow-xl">
+            <p class="text-gray-400 text-sm mb-1">Available Balance</p>
+            <div class="flex items-baseline gap-2">
+                <h2 id="current-coins" class="text-4xl font-black">0</h2>
+                <span class="text-indigo-400 font-bold">Coins</span>
             </div>
-        </header>
+            <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between text-sm">
+                <span>Estimated PKR:</span>
+                <span class="font-bold text-green-400" id="pkr-val">Rs. 0.00</span>
+            </div>
+        </div>
 
-        <div class="p-8 max-w-4xl mx-auto w-full">
-            <div class="withdraw-card p-8">
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold mb-4">1. Select Payment Method</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div onclick="selectMethod('easypaisa')" id="easypaisa-card" class="method-card p-4 flex items-center">
-                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-mobile-alt text-green-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-black">EasyPaisa</p>
-                                <p class="text-xs text-gray-500">Fast Payment (Rs. 500 Min)</p>
-                            </div>
-                        </div>
-                        <div onclick="selectMethod('jazzcash')" id="jazzcash-card" class="method-card p-4 flex items-center">
-                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-money-bill-wave text-orange-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-black">JazzCash</p>
-                                <p class="text-xs text-gray-500">Fast Payment (Rs. 500 Min)</p>
-                            </div>
-                        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-700 mb-4 text-lg">Select Method</h3>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <label class="method-card cursor-pointer">
+                    <input type="radio" name="method" value="Easypaisa" class="hidden" checked>
+                    <div class="border-2 border-gray-100 rounded-xl p-4 text-center hover:border-indigo-200 transition">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/ff/Easypaisa_logo.png" class="h-8 mx-auto mb-2 object-contain" alt="Easypaisa">
+                        <span class="text-xs font-bold text-gray-600">Easypaisa</span>
                     </div>
-                </div>
-
-                <div class="mb-8">
-                    <h3 class="text-lg font-bold mb-4">2. Account Details</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-600 mb-1">Account Number (03xxxxxxxxx)</label>
-                            <input type="text" id="acc-number" placeholder="Enter number" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-600 mb-1">Amount to Withdraw (PKR)</label>
-                            <input type="number" id="withdraw-amount" placeholder="Min. 500" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
+                </label>
+                <label class="method-card cursor-pointer">
+                    <input type="radio" name="method" value="JazzCash" class="hidden">
+                    <div class="border-2 border-gray-100 rounded-xl p-4 text-center hover:border-indigo-200 transition">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/JazzCash_logo.png" class="h-8 mx-auto mb-2 object-contain" alt="JazzCash">
+                        <span class="text-xs font-bold text-gray-600">JazzCash</span>
                     </div>
+                </label>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Account Number</label>
+                    <input type="number" id="acc-number" placeholder="03xxxxxxxxx" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Amount (Coins)</label>
+                    <input type="number" id="withdraw-amount" placeholder="Min 1000 coins" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
                 </div>
 
-                <div class="bg-blue-50 p-4 rounded-xl mb-8 flex items-start">
-                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
-                    <p class="text-sm text-blue-800">Withdrawal requests are processed within 24-48 hours. Make sure your account details are correct.</p>
+                <div class="bg-orange-50 p-3 rounded-lg flex items-start gap-3">
+                    <i class="fas fa-info-circle text-orange-500 mt-1"></i>
+                    <p class="text-[11px] text-orange-700 leading-relaxed">
+                        Withdrawals are processed within 24 hours. Please double-check your account number.
+                    </p>
                 </div>
 
-                <button onclick="handleWithdraw()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-black text-lg transition-all shadow-lg transform active:scale-95">
-                    REQUEST WITHDRAWAL
+                <button onclick="handleWithdraw()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+                    Submit Request
                 </button>
             </div>
-            
-            <p class="text-center mt-6 text-gray-400 text-sm italic">
-                Withdrawal Fee: 0% | Current Balance: Rs. <span id="bottom-pkr">0.00</span>
-            </p>
         </div>
-    </main>
+    </div>
 
+    <script src="main.js"></script>
     <script>
-        let selectedMethod = '';
+        const COIN_RATE = 0.1; // 10 Coins = 1 PKR (Apni marzi se set karein)
 
-        function syncBalance() {
-            const balance = localStorage.getItem('userPKR') || "0.00";
-            const formatted = parseFloat(balance).toFixed(2);
-            document.getElementById('header-pkr').innerText = formatted;
-            document.getElementById('side-pkr').innerText = "Rs. " + formatted;
-            document.getElementById('bottom-pkr').innerText = formatted;
-        }
-
-        function selectMethod(method) {
-            selectedMethod = method;
-            document.getElementById('easypaisa-card').classList.remove('selected');
-            document.getElementById('jazzcash-card').classList.remove('selected');
-            document.getElementById(method + '-card').classList.add('selected');
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if(user) {
+                const coins = user.coins || 0;
+                document.getElementById('current-coins').innerText = coins.toLocaleString();
+                document.getElementById('pkr-val').innerText = "Rs. " + (coins * COIN_RATE).toFixed(2);
+            }
+        });
 
         function handleWithdraw() {
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const amount = document.getElementById('withdraw-amount').value;
             const number = document.getElementById('acc-number').value;
-            const currentBalance = parseFloat(localStorage.getItem('userPKR') || 0);
+            const method = document.querySelector('input[name="method"]:checked').value;
+            const user = JSON.parse(localStorage.getItem('currentUser'));
 
-            if (!selectedMethod) {
-                alert("Please select a payment method (EasyPaisa or JazzCash).");
-                return;
+            if(!number || number.length < 10) {
+                return alert("Please enter a valid mobile number!");
             }
-            if (!number || number.length < 11) {
-                alert("Please enter a valid 11-digit mobile account number.");
-                return;
+            if(amount < 1000) {
+                return alert("Minimum withdrawal is 1000 coins!");
             }
-            if (isNaN(amount) || amount < 500) {
-                alert("Minimum withdrawal amount is Rs. 500.");
-                return;
-            }
-            if (amount > currentBalance) {
-                alert("Insufficient balance! You only have Rs. " + currentBalance.toFixed(2));
-                return;
+            if(amount > user.coins) {
+                return alert("Insufficient balance!");
             }
 
-            // Success Logic
-            alert("Withdrawal Request Submitted!\nMethod: " + selectedMethod.toUpperCase() + "\nAmount: Rs. " + amount + "\nNumber: " + number + "\nStatus: Pending (24h)");
+            // --- Logik for Withdrawal ---
+            // 1. Coins minus karein
+            user.coins -= parseInt(amount);
             
-            // Deduct amount from balance
-            const newBalance = currentBalance - amount;
-            localStorage.setItem('userPKR', newBalance.toFixed(2));
-            syncBalance();
+            // 2. LocalStorage update
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+
+            // 3. (Optional) History mein record add karein
+            alert(`Withdrawal Request Sent!\nAmount: ${amount} Coins\nMethod: ${method}\nTo: ${number}`);
             
-            // Clear inputs
-            document.getElementById('withdraw-amount').value = '';
-            document.getElementById('acc-number').value = '';
+            window.location.href = 'dashboard.html';
         }
-
-        window.onload = syncBalance;
     </script>
 </body>
 </html>

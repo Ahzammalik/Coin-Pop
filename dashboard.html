@@ -3,112 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Coin Pop PKR</title>
+    <title>Dashboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
-        * { font-family: 'Inter', sans-serif; }
-        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; }
-        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; transition: 0.3s; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .ad-placeholder { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 1rem; height: 90px; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: bold; }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .gradient-bg { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .feature-card:active { transform: scale(0.95); transition: 0.2s; }
     </style>
 </head>
-<body class="flex bg-gray-50 min-h-screen">
+<body class="pb-20">
 
-    <aside class="sidebar hidden md:flex flex-col">
-        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
-            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
-        </div>
-        <nav class="flex-grow mt-4">
-            <a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
-            <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
-            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
-            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
-            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
-            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
-            <a href="history.html" class="nav-link"><i class="fas fa-history mr-3 w-5"></i> History</a>
-            <a href="support.html" class="nav-link"><i class="fas fa-headset mr-3 w-5"></i> Help & Support</a>
-        </nav>
-        <div class="p-6 border-t border-white/10 bg-black/10 text-center">
-            <p class="text-xs opacity-70">Total Balance</p>
-            <p class="text-xl font-black text-white" id="side-pkr">Rs. 0.00</p>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col min-w-0">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
-            <h2 class="text-xl font-bold text-gray-800">Welcome Back!</h2>
-            <div class="bg-indigo-600 text-white px-5 py-2 rounded-full font-black shadow-lg">
-                Rs. <span id="header-pkr">0.00</span>
+    <div class="gradient-bg text-white px-6 pt-10 pb-20 rounded-b-[40px] shadow-lg">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <p class="text-indigo-100 text-sm">Welcome back,</p>
+                <h1 id="user-name" class="text-2xl font-bold italic">User</h1>
             </div>
-        </header>
-
-        <div class="p-8">
-            <div class="ad-placeholder mb-8">Google AdMob Banner Ad</div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card border-l-4 border-indigo-600">
-                    <p class="text-gray-500 text-sm font-bold">Current Balance</p>
-                    <h3 class="text-3xl font-black text-gray-800 mt-2">Rs. <span id="card-pkr">0.00</span></h3>
-                </div>
-                <div class="stat-card border-l-4 border-green-500">
-                    <p class="text-gray-500 text-sm font-bold">Min. Payout</p>
-                    <h3 class="text-3xl font-black text-gray-800 mt-2">Rs. 500</h3>
-                </div>
-                <div class="stat-card border-l-4 border-yellow-500">
-                    <p class="text-gray-500 text-sm font-bold">Today's Clicks</p>
-                    <h3 class="text-3xl font-black text-gray-800 mt-2">0</h3>
-                </div>
-            </div>
-
-            <div class="bg-indigo-900 rounded-2xl p-8 text-white flex justify-between items-center shadow-2xl">
+            <a href="profile.html" class="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md border border-white/30">
+                <i class="fas fa-user text-xl"></i>
+            </a>
+        </div>
+        
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-xl">
+            <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-3xl font-black mb-2">Ready to Earn?</h2>
-                    <p class="opacity-80">Play levels and earn direct PKR in your wallet.</p>
+                    <p class="text-xs uppercase tracking-widest opacity-70">Total Balance</p>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-coins text-yellow-400 text-2xl"></i>
+                        <span id="user-coins" class="text-4xl font-black">0</span>
+                    </div>
                 </div>
-                <button onclick="location.href='play.html'" class="bg-yellow-400 text-indigo-900 px-8 py-4 rounded-xl font-black text-lg hover:bg-white transition-all transform hover:scale-105">
-                    PLAY NOW
-                </button>
+                <a href="withdraw.html" class="bg-yellow-400 text-gray-900 px-5 py-2 rounded-2xl font-bold text-sm hover:bg-yellow-300 transition shadow-lg">
+                    Withdraw
+                </a>
             </div>
         </div>
-    </main>
+    </div>
 
+    <div class="max-w-md mx-auto px-6 -mt-10">
+        <div class="grid grid-cols-2 gap-4">
+            
+            <a href="earn.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                <div class="bg-orange-100 h-14 w-14 rounded-2xl flex items-center justify-center text-orange-600 text-2xl mb-3">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <span class="font-bold text-gray-800">Daily Earn</span>
+                <span class="text-[10px] text-gray-400">Claim Rewards</span>
+            </a>
+
+            <a href="spin.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                <div class="bg-indigo-100 h-14 w-14 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl mb-3">
+                    <i class="fas fa-dharmachakra"></i>
+                </div>
+                <span class="font-bold text-gray-800">Lucky Spin</span>
+                <span class="text-[10px] text-gray-400">Test Your Luck</span>
+            </a>
+
+            <a href="history.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                <div class="bg-green-100 h-14 w-14 rounded-2xl flex items-center justify-center text-green-600 text-2xl mb-3">
+                    <i class="fas fa-history"></i>
+                </div>
+                <span class="font-bold text-gray-800">History</span>
+                <span class="text-[10px] text-gray-400">Transactions</span>
+            </a>
+
+            <a href="support.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
+                <div class="bg-red-100 h-14 w-14 rounded-2xl flex items-center justify-center text-red-600 text-2xl mb-3">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <span class="font-bold text-gray-800">Support</span>
+                <span class="text-[10px] text-gray-400">Get Help</span>
+            </a>
+
+        </div>
+
+        <div id="admin-box" class="mt-8 hidden">
+            <a href="admin.html" class="w-full bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow-xl">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-user-shield text-indigo-400"></i>
+                    <span class="font-bold">Admin Control Panel</span>
+                </div>
+                <i class="fas fa-chevron-right text-gray-500"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-3 flex justify-between items-center md:hidden">
+        <a href="dashboard.html" class="text-indigo-600"><i class="fas fa-home text-xl"></i></a>
+        <a href="earn.html" class="text-gray-400"><i class="fas fa-plus-circle text-3xl"></i></a>
+        <a href="profile.html" class="text-gray-400"><i class="fas fa-user text-xl"></i></a>
+    </div>
+
+    <script src="main.js"></script>
     <script>
-        function syncDashboard() {
-            const balance = localStorage.getItem('userPKR') || "0.00";
-            const formatted = parseFloat(balance).toFixed(2);
-            document.getElementById('header-pkr').innerText = formatted;
-            document.getElementById('card-pkr').innerText = formatted;
-            document.getElementById('side-pkr').innerText = "Rs. " + formatted;
-        }
-        window.onload = syncDashboard;
-        window.addEventListener('storage', (e) => { if(e.key === 'userPKR') syncDashboard(); });
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Fill UI
+            document.getElementById('user-name').innerText = user.name || "User";
+            document.getElementById('user-coins').innerText = (user.coins || 0).toLocaleString();
+
+            // Admin Visibility
+            if (user.email === "ghazimalik1997@gmail.com") {
+                document.getElementById('admin-box').classList.remove('hidden');
+            }
+        });
     </script>
 </body>
 </html>
-
-<nav class="sidebar-nav">
-    <a href="dashboard.html" class="nav-link">
-        <i class="fas fa-home"></i> <span>Dashboard</span>
-    </a>
-    
-    <a href="profile.html" class="nav-link">
-        <i class="fas fa-user-circle"></i> <span>My Profile</span>
-    </a>
-
-    <a href="history.html" class="nav-link">
-        <i class="fas fa-history"></i> <span>History</span>
-    </a>
-
-    <a href="support.html" class="nav-link">
-        <i class="fas fa-headset"></i> <span>Help & Support</span>
-    </a>
-    
-    <a href="admin.html" id="admin-nav-link" class="nav-link hidden">
-        <i class="fas fa-cog"></i> <span>Admin Panel</span>
-    </a>
-</nav>

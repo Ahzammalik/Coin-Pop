@@ -1,63 +1,158 @@
-<div id="splash-screen">
-    <i class="fas fa-coins text-white text-7xl animate-bounce"></i>
-    <h1 class="text-white text-3xl font-black mt-4">COIN POP</h1>
-    <div class="mt-10 w-48 h-1 bg-white/20 rounded-full overflow-hidden">
-        <div class="h-full bg-white animate-[progress_2s_ease-in-out]"></div>
-    </div>
-</div>
-
-<script>
-    // Splash screen hatane ke liye
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const splash = document.getElementById('splash-screen');
-            splash.style.opacity = '0';
-            setTimeout(() => splash.remove(), 500);
-        }, 2000); // 2 seconds splash
-    });
-</script>
-// Login logic with Admin Panel redirection
-loginForm.onsubmit = (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const pass = document.getElementById('password').value;
-
-    const userData = localStorage.getItem(`user_${email}`);
-    
-    if(userData) {
-        const user = JSON.parse(userData);
-        
-        if(user.password === pass) {
-            showToast("Login Successful!", "bg-green-500");
-            localStorage.setItem('currentUser', JSON.stringify(user));
-
-            // Check if User is Admin
-            setTimeout(() => {
-                if(email.toLowerCase() === 'ghazimalik1997@gmail.com') {
-                    // Sirf is ID ke liye Admin Panel
-                    window.location.href = 'admin-pannel.html';
-                } else {
-                    // Baaki sab ke liye Normal Dashboard
-                    window.location.href = 'dashboard.html';
-                }
-            }, 1200);
-            
-        } else {
-            showToast("Ghalat Password!", "bg-red-500");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coin Pop - Login & Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #4f46e5; overflow: hidden; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
         }
-    } else {
-        showToast("Account nahi mila!", "bg-orange-500");
-    }
-};
-#splash-screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #4f46e5;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease;
-}
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #4f46e5; z-index: 100; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
+        .progress-bar { animation: progress 2s linear forwards; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div id="splash-screen">
+        <div class="bg-white p-6 rounded-[2rem] shadow-2xl mb-6">
+            <i class="fas fa-coins text-indigo-600 text-6xl animate-bounce"></i>
+        </div>
+        <h1 class="text-white text-4xl font-black tracking-tighter">COIN POP</h1>
+        <p class="text-indigo-200 text-sm mt-2">Earn While You Play</p>
+        <div class="mt-12 w-40 h-1.5 bg-indigo-800 rounded-full overflow-hidden">
+            <div class="h-full bg-white progress-bar"></div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md px-6 z-10">
+        <div class="glass-card p-8 shadow-2xl">
+            
+            <div class="flex mb-8 bg-gray-100 rounded-2xl p-1">
+                <button onclick="toggleForm('login')" id="btn-login" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all bg-white shadow-sm text-indigo-600">Login</button>
+                <button onclick="toggleForm('register')" id="btn-register" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all text-gray-500">Register</button>
+            </div>
+
+            <form id="loginForm" class="space-y-5">
+                <h2 class="text-2xl font-black text-gray-800">Welcome Back!</h2>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                    <input type="email" id="login-email" required class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="name@email.com">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Password</label>
+                    <input type="password" id="login-pass" required class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition">Sign In</button>
+            </form>
+
+            <form id="registerForm" class="space-y-5 hidden">
+                <h2 class="text-2xl font-black text-gray-800">Create Account</h2>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Full Name</label>
+                    <input type="text" id="reg-name" required class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Ghazi Malik">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                    <input type="email" id="reg-email" required class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="email@example.com">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Set Password</label>
+                    <input type="password" id="reg-pass" required class="w-full mt-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition" placeholder="Min. 6 chars">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 active:scale-95 transition">Register Now</button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        // --- SPLASH SCREEN LOGIC ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.transition = 'opacity 0.8s ease';
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 800);
+            }, 2500);
+        });
+
+        // --- TOGGLE FORMS ---
+        function toggleForm(type) {
+            const loginF = document.getElementById('loginForm');
+            const regF = document.getElementById('registerForm');
+            const btnL = document.getElementById('btn-login');
+            const btnR = document.getElementById('btn-register');
+
+            if(type === 'login') {
+                loginF.classList.remove('hidden');
+                regF.classList.add('hidden');
+                btnL.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all bg-white shadow-sm text-indigo-600";
+                btnR.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all text-gray-500";
+            } else {
+                loginF.classList.add('hidden');
+                regF.classList.remove('hidden');
+                btnR.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all bg-white shadow-sm text-indigo-600";
+                btnL.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all text-gray-500";
+            }
+        }
+
+        // --- REGISTRATION LOGIC ---
+        document.getElementById('registerForm').onsubmit = (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value.toLowerCase();
+            const pass = document.getElementById('reg-pass').value;
+
+            if(localStorage.getItem(`user_${email}`)) {
+                alert("This email is already registered!");
+                return;
+            }
+
+            const newUser = {
+                name: name,
+                email: email,
+                password: pass,
+                coins: 100, // Welcome Bonus
+                accountId: "CP-" + Math.floor(Math.random() * 900000 + 100000)
+            };
+
+            localStorage.setItem(`user_${email}`, JSON.stringify(newUser));
+            alert("Registration Successful! You got 100 Welcome Coins.");
+            location.reload();
+        };
+
+        // --- LOGIN LOGIC ---
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.toLowerCase();
+            const pass = document.getElementById('login-pass').value;
+            const adminEmail = "ghazimalik1997@gmail.com";
+
+            const savedUser = localStorage.getItem(`user_${email}`);
+            if(savedUser) {
+                const user = JSON.parse(savedUser);
+                if(user.password === pass) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    window.location.href = (email === adminEmail) ? 'admin.html' : 'dashboard.html';
+                } else {
+                    alert("Wrong Password!");
+                }
+            } else {
+                alert("No account found with this email!");
+            }
+        };
+    </script>
+</body>
+</html>

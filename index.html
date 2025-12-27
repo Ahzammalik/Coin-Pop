@@ -1,3 +1,21 @@
+<div id="splash-screen">
+    <i class="fas fa-coins text-white text-7xl animate-bounce"></i>
+    <h1 class="text-white text-3xl font-black mt-4">COIN POP</h1>
+    <div class="mt-10 w-48 h-1 bg-white/20 rounded-full overflow-hidden">
+        <div class="h-full bg-white animate-[progress_2s_ease-in-out]"></div>
+    </div>
+</div>
+
+<script>
+    // Splash screen hatane ke liye
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 500);
+        }, 2000); // 2 seconds splash
+    });
+</script>
 // Login logic with Admin Panel redirection
 loginForm.onsubmit = (e) => {
     e.preventDefault();

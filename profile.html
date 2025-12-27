@@ -21,64 +21,71 @@
             </a>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-            <div class="profile-gradient h-32 md:h-48"></div>
-            <div class="px-6 pb-6 text-center">
-                <div class="relative -mt-16 mb-4 inline-block">
-                    <img id="profile-img" src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff&size=128" 
-                         alt="Profile" class="w-32 h-32 rounded-full border-4 border-white shadow-md mx-auto object-cover">
-                    <button class="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow-md text-gray-600 hover:text-indigo-600">
-                        <i class="fas fa-camera"></i>
-                    </button>
-                </div>
-                <h1 id="display-name" class="text-2xl font-bold text-gray-800">User Name</h1>
-                <p id="display-email" class="text-gray-500">user@example.com</p>
-                
-                <div class="mt-6 flex justify-center gap-4">
-                    <div class="bg-indigo-50 px-6 py-2 rounded-full">
-                        <span class="text-indigo-600 font-bold" id="user-coins">0</span>
-                        <span class="text-indigo-400 text-sm ml-1">Coins</span>
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 border border-gray-100">
+            <div class="profile-gradient h-32 md:h-40"></div>
+            <div class="px-6 pb-6">
+                <div class="flex flex-col md:flex-row items-center md:items-end -mt-12 md:-mt-16 mb-4 gap-4">
+                    <img id="profile-img" src="" alt="Profile" class="w-32 h-32 rounded-full border-4 border-white shadow-md object-cover bg-white">
+                    <div class="text-center md:text-left flex-1">
+                        <h1 id="display-name" class="text-2xl font-bold text-gray-800 leading-tight">User Name</h1>
+                        <p class="text-gray-500 flex items-center justify-center md:justify-start">
+                            <i class="fas fa-id-badge mr-2"></i> ID: <span id="display-id" class="ml-1 font-mono font-bold text-indigo-600">CP-000000</span>
+                        </p>
+                    </div>
+                    <div class="bg-indigo-50 px-6 py-2 rounded-xl border border-indigo-100">
+                        <span class="text-indigo-600 font-extrabold text-xl" id="user-coins">0</span>
+                        <span class="text-indigo-400 text-sm block">Available Coins</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-md">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Account Details</h3>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-user-edit mr-2 text-indigo-500"></i> Personal Info
+                </h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Full Name</label>
-                        <input type="text" id="full-name-input" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value="Ghazi Malik">
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Email Address</label>
+                        <div id="display-email" class="w-full mt-1 p-2 bg-gray-50 border rounded-lg text-gray-500 font-medium">user@example.com</div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Phone Number</label>
-                        <input type="text" id="phone-input" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="03xx-xxxxxxx">
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Full Name</label>
+                        <input type="text" id="full-name-input" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition" value="">
                     </div>
-                    <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition">
-                        Update Profile
+                    <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold hover:bg-indigo-700 transition shadow-md">
+                        Update Name
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-md">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Account Status</h3>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-shield-alt mr-2 text-red-500"></i> Security
+                </h3>
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Account Type</span>
-                        <span id="account-badge" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Standard</span>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">New Password</label>
+                        <div class="relative">
+                            <input type="password" id="new-password" class="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" placeholder="Enter new password">
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Joined Date</span>
-                        <span class="text-gray-800 font-medium">Dec 2025</span>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Account Status</label>
+                        <div id="account-badge" class="mt-1 inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Active User</div>
                     </div>
-                    <div class="pt-4">
-                        <button onclick="logout()" class="w-full border border-red-500 text-red-500 py-2 rounded-lg font-bold hover:bg-red-50 transition">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout Account
-                        </button>
-                    </div>
+                    <button onclick="changePassword()" class="w-full bg-gray-800 text-white py-2.5 rounded-lg font-bold hover:bg-black transition shadow-md">
+                        Update Password
+                    </button>
                 </div>
             </div>
+        </div>
+
+        <div class="mt-6">
+            <button onclick="logout()" class="w-full md:w-auto px-8 bg-red-50 text-red-600 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition duration-300">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout from this Device
+            </button>
         </div>
     </div>
 
@@ -91,35 +98,61 @@
                 return;
             }
 
-            // Fill data
+            // Generate Account ID if it doesn't exist
+            if (!user.accountId) {
+                user.accountId = "CP-" + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+            }
+
+            // Fill UI Data
             document.getElementById('display-name').innerText = user.name || "Coin Pop User";
             document.getElementById('display-email').innerText = user.email;
+            document.getElementById('display-id').innerText = user.accountId;
             document.getElementById('user-coins').innerText = (user.coins || 0).toLocaleString();
             document.getElementById('full-name-input').value = user.name || "";
             
-            // Avatar Update
-            document.getElementById('profile-img').src = `https://ui-avatars.com/api/?name=${user.email}&background=4f46e5&color=fff&size=128`;
+            // Avatar
+            document.getElementById('profile-img').src = `https://ui-avatars.com/api/?name=${user.name || user.email}&background=4f46e5&color=fff&size=128`;
 
-            // Admin Badge
+            // Admin Logic
             if(user.email === "ghazimalik1997@gmail.com") {
                 const badge = document.getElementById('account-badge');
-                badge.innerText = "Owner / Admin";
-                badge.className = "bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase";
+                badge.innerText = "Owner Access";
+                badge.className = "mt-1 inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase";
             }
         });
 
+        // 1. Update Name Function
         function saveProfile() {
             const newName = document.getElementById('full-name-input').value;
+            if(!newName) return alert("Please enter a name");
+
             const user = JSON.parse(localStorage.getItem('currentUser'));
-            
             user.name = newName;
             
-            // LocalStorage Update
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
-            
-            alert("Profile Updated Successfully!");
+            updateStorage(user);
+            alert("Name updated successfully!");
             location.reload();
+        }
+
+        // 2. Change Password Function
+        function changePassword() {
+            const newPass = document.getElementById('new-password').value;
+            if(newPass.length < 6) return alert("Password must be at least 6 characters!");
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            user.password = newPass;
+
+            updateStorage(user);
+            alert("Password updated! Please use your new password next time you login.");
+            document.getElementById('new-password').value = "";
+        }
+
+        // Helper function to sync localStorage
+        function updateStorage(userData) {
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            localStorage.setItem(`user_${userData.email}`, JSON.stringify(userData));
         }
 
         function logout() {

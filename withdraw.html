@@ -1,4 +1,112 @@
-<!DOCTYPE html>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- State Management ---
+        let selectedMethod = null;
+        let userBalance = 1250; // Replace with actual balance from your database/Firebase
+
+        // --- DOM Elements ---
+        const amountInput = document.getElementById('withdraw-amount');
+        const coinValueDisplay = document.getElementById('coin-value');
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const accountDetails = document.getElementById('account-details');
+        const accountLabel = document.getElementById('account-label');
+        const withdrawForm = document.getElementById('withdraw-form');
+        const balanceDisplays = [
+            document.getElementById('coin-balance-display'),
+            document.getElementById('available-coins')
+        ];
+
+        // --- Initialization ---
+        updateBalanceUI();
+
+        function updateBalanceUI() {
+            balanceDisplays[0].innerHTML = `<i class="fas fa-coins mr-2"></i> Coins: ${userBalance}`;
+            balanceDisplays[1].textContent = userBalance;
+        }
+
+        // --- Sidebar Logic ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // --- Payment Selection Logic ---
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', () => {
+                // UI Toggle
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+                
+                selectedMethod = method.dataset.method;
+                accountDetails.style.display = 'block';
+
+                // Contextual Labeling
+                if (selectedMethod === 'bank') {
+                    accountLabel.textContent = "IBAN / Bank Account Number";
+                } else {
+                    accountLabel.textContent = "Mobile Number (e.g. 03001234567)";
+                }
+            });
+        });
+
+        // --- Conversion Logic ---
+        amountInput.addEventListener('input', (e) => {
+            const val = e.target.value || 0;
+            coinValueDisplay.textContent = `${val} coins`;
+            
+            // Visual feedback if exceeding balance
+            if (val > userBalance) {
+                coinValueDisplay.classList.add('text-red-500');
+            } else {
+                coinValueDisplay.classList.remove('text-red-500');
+            }
+        });
+
+        // Quick Amount Buttons
+        document.querySelectorAll('.quick-amount').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amount = btn.dataset.amount;
+                amountInput.value = amount;
+                coinValueDisplay.textContent = `${amount} coins`;
+            });
+        });
+
+        // --- Form Submission ---
+        withdrawForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseInt(amountInput.value);
+
+            if (!selectedMethod) {
+                alert("Please select a payment method first.");
+                return;
+            }
+            if (amount < 250) {
+                alert("Minimum withdrawal is PKR 250.");
+                return;
+            }
+            if (amount > userBalance) {
+                alert("Insufficient coin balance.");
+                return;
+            }
+
+            // Success Simulation
+            const btn = document.getElementById('withdraw-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+
+            setTimeout(() => {
+                alert(`Withdrawal request for PKR ${amount} submitted successfully!`);
+                userBalance -= amount;
+                updateBalanceUI();
+                withdrawForm.reset();
+                accountDetails.style.display = 'none';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Request Withdrawal';
+            }, 2000);
+        });
+    });
+</script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">

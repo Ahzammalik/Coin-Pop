@@ -106,3 +106,77 @@ function handleComingSoon(e) {
     // Aap isse har link par onclick="handleComingSoon(event)" laga sakte hain
     showToast("This feature is coming soon!", "bg-blue-500");
 }
+// --- CONFIGURATION ---
+const ADMIN_EMAIL = "ghazimalik1997@gmail.com";
+
+// --- SOUND EFFECTS (Optional: Add small mp3 files to your folder) ---
+const winSound = new Audio('assets/win.mp3'); 
+
+// --- VIBRATION (For Android Professional Feel) ---
+function vibrate(ms = 50) {
+    if (navigator.vibrate) {
+        navigator.vibrate(ms);
+    }
+}
+
+// --- APP INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    checkAccess();
+    updateGlobalBalance();
+});
+
+function updateGlobalBalance() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const coinElements = document.querySelectorAll('#user-coins, #user-coins-display');
+    if (user && coinElements) {
+        coinElements.forEach(el => el.innerText = (user.coins || 0).toLocaleString());
+    }
+}
+
+// --- UPDATED SAVE DATA FUNCTION ---
+function syncData(userData) {
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    localStorage.setItem(`user_${userData.email}`, JSON.stringify(userData));
+    updateGlobalBalance();
+}
+
+// --- SECURITY: PREVENT BACK BUTTON AFTER LOGOUT ---
+function checkAccess() {
+    const path = window.location.pathname;
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    // Agar login nahi hai aur dashboard par jane ki koshish kare
+    if (path.includes('dashboard.html') || path.includes('admin.html') || path.includes('earn.html')) {
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+    }
+}
+
+// --- LOGIN LOGIC ---
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.onsubmit = (e) => {
+        e.preventDefault();
+        vibrate(30);
+        
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('password').value;
+        const userData = localStorage.getItem(`user_${email}`);
+        
+        if (userData) {
+            const user = JSON.parse(userData);
+            if (user.password === pass) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showToast("Welcome Back!", "bg-green-600");
+                setTimeout(() => {
+                    window.location.href = (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ? 'admin.html' : 'dashboard.html';
+                }, 1000);
+            } else {
+                showToast("Invalid Password!", "bg-red-500");
+            }
+        } else {
+            showToast("User not found!", "bg-orange-500");
+        }
+    };
+}

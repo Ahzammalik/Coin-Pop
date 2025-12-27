@@ -1,21 +1,974 @@
-// Dashboard par PKR balance update karne ka function
-function syncBalance() {
-    // LocalStorage se balance uthana, agar nahi hai to 0.00
-    let currentBalance = localStorage.getItem('userPKR') || "0.00";
-    
-    // UI update karna
-    document.getElementById('dashboard-coins').innerText = `Rs. ${parseFloat(currentBalance).toFixed(2)}`;
-    document.getElementById('coin-balance-display').innerHTML = `
-        <i class="fas fa-wallet mr-2"></i> PKR: ${parseFloat(currentBalance).toFixed(2)}
-    `;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Coin Pop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
+    crossorigin="anonymous"></script>
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            width: 280px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .nav-link svg {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .content-header {
+            background-color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-card.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        }
+        
+        .stat-card.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--secondary);
+        }
+        
+        .notification.error {
+            background-color: var(--danger);
+        }
+        
+        .withdraw-request {
+            border-left: 4px solid var(--primary);
+            background-color: #f9fafb;
+        }
+        
+        .withdraw-request.pending {
+            border-left-color: var(--warning);
+        }
+        
+        .withdraw-request.approved {
+            border-left-color: var(--secondary);
+        }
+        
+        .withdraw-request.rejected {
+            border-left-color: var(--danger);
+        }
+        
+        .dashboard-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .dashboard-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-30%, 30%);
+        }
+        
+        .feature-card {
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        .feature-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+        
+        .feature-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .feature-icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+        
+        .activity-icon.primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        .activity-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+        
+        .activity-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .activity-icon.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .streak-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .streak-day {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .streak-day.active {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .streak-day.inactive {
+            background-color: #e5e7eb;
+            color: #9ca3af;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .referral-code {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border: 2px dashed #9ca3af;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .referral-code:hover {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        }
+        
+        .referral-code.copied {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #10b981;
+        }
+        
+        .ad-progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .ad-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
+        /* Enhanced AdMob Styles */
+        .ad-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+        }
+        
+        .admob-banner {
+            width: 100%;
+            height: 100px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admob-interstitial {
+            width: 100%;
+            min-height: 400px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        
+        .admob-app-open {
+            width: 100%;
+            height: 200px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        
+        .admob-native {
+            width: 100%;
+            min-height: 300px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        .ad-loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .ad-performance {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            display: none; /* Hide in production */
+        }
+        
+        .ad-close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .admob-banner {
+                height: 80px;
+            }
+            
+            .admob-interstitial {
+                min-height: 300px;
+            }
+            
+            .admob-app-open {
+                height: 150px;
+            }
+            
+            .admob-native {
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen bg-gray-100">
+    <div id="app-container" class="w-full flex-grow flex">
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
 
-// Page load hote hi sync karein
-window.onload = syncBalance;
+        <!-- Sidebar -->
+        <aside class="sidebar flex flex-col">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-coins mr-2"></i>
+                    Coin Pop
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="play.html" class="nav-link">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Play</span>
+                </a>
+                <a href="leaderboard.html" class="nav-link">
+                    <i class="fas fa-trophy"></i>
+                    <span>Leaderboard</span>
+                </a>
+                <a href="rewards.html" class="nav-link">
+                    <i class="fas fa-gift"></i>
+                    <span>Daily Rewards</span>
+                </a>
+                <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Withdraw</span>
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="contact.html" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
+                <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
+                <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
+                    Sign Out
+                </button>
+            </div>
+        </aside>
 
-// Agar user dusri tab mein game khel raha ho, to balance auto-update hoga
-window.addEventListener('storage', (e) => {
-    if (e.key === 'userPKR') {
-        syncBalance();
-    }
-});
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <header class="content-header">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                    <p id="welcome-message" class="text-gray-600">Welcome back!</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
+                        <i class="fas fa-coins mr-2"></i>
+                        Coins: 0
+                    </div>
+                    <div class="relative">
+                        <button id="notification-btn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">3</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-auto p-6">
+                <!-- Banner Ad - Top of Content -->
+                <div class="admob-banner" id="banner-ad-top">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Advertisement...
+                    </div>
+                </div>
+
+                <!-- Hero Section -->
+                <div class="dashboard-hero relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h1 class="text-3xl font-bold mb-2">Welcome to Coin Pop!</h1>
+                            <p class="text-blue-100">Play games, earn coins, and withdraw your earnings</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                            <p class="text-sm">Daily Login Streak</p>
+                            <div class="streak-container mt-2">
+                                <div class="streak-day active">7</div>
+                                <span class="text-white font-semibold">days</span>
+                                <button id="claim-streak-btn" class="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs py-1 px-2 rounded">
+                                    Claim Reward
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Current Balance</p>
+                                <h3 id="dashboard-coins" class="text-2xl font-bold mt-1">0</h3>
+                            </div>
+                            <i class="fas fa-coins text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-green-300">+150</span> earned today</p>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Leaderboard Rank</p>
+                                <h3 id="dashboard-rank" class="text-2xl font-bold mt-1">#24</h3>
+                            </div>
+                            <i class="fas fa-trophy text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-yellow-300">+2</span> positions this week</p>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Daily Reward</p>
+                                <h3 id="dashboard-reward-timer" class="text-2xl font-bold mt-1">Ready!</h3>
+                            </div>
+                            <i class="fas fa-gift text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80">Claim your free coins</p>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm opacity-80">Games Played</p>
+                                <h3 class="text-2xl font-bold mt-1">42</h3>
+                            </div>
+                            <i class="fas fa-gamepad text-xl opacity-80"></i>
+                        </div>
+                        <p class="text-sm mt-2 opacity-80"><span class="text-green-300">5</span> today</p>
+                    </div>
+                </div>
+
+                <!-- Native Ad - Between Stats and Quick Actions -->
+                <div class="admob-native" id="native-ad-1">
+                    <div class="ad-label">Ad</div>
+                    <div class="ad-loading" style="width: 100%; height: 100%;">
+                        Loading Native Advertisement...
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <a href="play.html" class="feature-card">
+                        <div class="feature-icon primary">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Play Game</h3>
+                        <p class="text-gray-600 text-sm">Earn coins by playing fun games</p>
+                    </a>
+                    <a href="rewards.html" class="feature-card">
+                        <div class="feature-icon success">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Daily Reward</h3>
+                        <p class="text-gray-600 text-sm">Claim your free daily bonus</p>
+                    </a>
+                    <a href="leaderboard.html" class="feature-card">
+                        <div class="feature-icon warning">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Leaderboard</h3>
+                        <p class="text-gray-600 text-sm">See how you rank against others</p>
+                    </a>
+                    <a href="withdraw.html" class="feature-card">
+                        <div class="feature-icon danger">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Withdraw</h3>
+                        <p class="text-gray-600 text-sm">Cash out your earnings</p>
+                    </a>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <button class="quick-action-btn" id="quick-play-btn">
+                        <i class="fas fa-play text-primary text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Quick Play</span>
+                    </button>
+                    <button class="quick-action-btn" id="daily-reward-btn">
+                        <i class="fas fa-gift text-green-500 text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Daily Reward</span>
+                    </button>
+                    <button class="quick-action-btn" id="invite-friend-btn">
+                        <i class="fas fa-user-plus text-blue-500 text-xl mb-2"></i>
+                        <span class="text-sm font-medium">Invite Friend</span>
+                    </button>
+                    <button class="quick-action-btn" id="watch-ad-btn">
+                     

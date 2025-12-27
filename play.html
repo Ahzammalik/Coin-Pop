@@ -3,208 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level Play - Coin Pop PKR</title>
+    <title>Play & Earn PKR - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary: #4f46e5; --primary-dark: #4338ca; }
         * { font-family: 'Inter', sans-serif; }
-        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; }
-        .nav-link { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
-        .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; border-left-color: white; }
+        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; }
+        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
+        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
         
-        #game-area { width: 100%; height: 60vh; background: #0f172a; position: relative; overflow: hidden; border-radius: 1rem; border: 4px solid #334155; }
-        .target-coin { position: absolute; width: 60px; height: 60px; background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #fbbf24; cursor: pointer; z-index: 20; }
+        #game-area { width: 100%; height: 60vh; background: #0f172a; position: relative; overflow: hidden; border-radius: 1.5rem; border: 4px solid #334155; cursor: crosshair; }
+        .target-coin { position: absolute; width: 65px; height: 65px; background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #fbbf24; z-index: 20; transition: transform 0.1s; }
+        .target-coin:active { transform: scale(0.9); }
         .life-heart { color: #ef4444; font-size: 1.5rem; margin-right: 5px; }
-        #game-over { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 50; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; border-radius: 1rem; }
-        .ad-banner-bottom { background: #f8fafc; border: 2px dashed #cbd5e1; height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 1.5rem; border-radius: 0.5rem; color: #64748b; font-weight: bold; width: 100%; }
+        #game-over { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 50; flex-direction: column; align-items: center; justify-content: center; color: white; border-radius: 1.5rem; }
+        .ad-banner-bottom { background: #f8fafc; border: 2px dashed #cbd5e1; height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 1.5rem; border-radius: 1rem; color: #64748b; font-weight: bold; }
     </style>
 </head>
-<body class="flex bg-gray-100">
+<body class="flex bg-gray-50 min-h-screen">
 
     <aside class="sidebar hidden md:flex flex-col">
-        <div class="p-6 text-2xl font-black flex items-center">
-            <i class="fas fa-wallet mr-2"></i> Coin Pop
+        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
+            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
         </div>
-        <nav class="flex-grow">
-            <a href="dashboard.html" class="nav-link"><i class="fas fa-home mr-3"></i> Dashboard</a>
-            <a href="play.html" class="nav-link active"><i class="fas fa-play-circle mr-3"></i> Play & Earn</a>
-            <a href="withdraw.html" class="nav-link"><i class="fas fa-money-bill-wave mr-3"></i> Withdraw PKR</a>
+        <nav class="flex-grow mt-4">
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
+            <a href="play.html" class="nav-link active"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
+            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
+            <a href="support.html" class="nav-link"><i class="fas fa-headset mr-3 w-5"></i> Help & Support</a>
         </nav>
-        <div class="p-6 border-t border-white/10">
-            <p class="text-xs opacity-70">CURRENT LEVEL</p>
-            <p class="text-2xl font-black" id="side-level">Level 1</p>
+        <div class="p-6 border-t border-white/10 bg-black/10">
+            <p class="text-[10px] uppercase font-bold text-indigo-200">Current Level</p>
+            <p class="text-xl font-black text-white" id="side-level">Level 1</p>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col min-h-screen">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center">
-            <div class="flex flex-col">
-                <div id="lives-container" class="flex mb-1">
-                    <i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i>
-                </div>
-                <span class="text-[10px] font-bold text-red-500 uppercase">Don't click on empty space!</span>
+    <main class="flex-1 flex flex-col min-w-0">
+        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
+            <div id="lives-container" class="flex">
+                <i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i>
             </div>
             <div class="text-right">
                 <div class="text-xl font-black text-green-600">Rs. <span id="pkr-balance">0.00</span></div>
-                <div class="text-xs font-bold text-indigo-600 uppercase" id="level-display">Level 1</div>
+                <div class="text-[10px] font-bold text-indigo-600 uppercase">Level Reward: 0.10 PKR</div>
             </div>
         </header>
 
-        <div class="p-6 flex-grow">
-            <div id="game-area" onclick="handleMissClick(event)">
+        <div class="p-8 flex-grow">
+            <div id="game-area" onclick="handleMissClick()">
                 <div id="game-over">
-                    <h2 class="text-5xl font-black mb-4 text-red-500">OUT OF LIVES</h2>
-                    <p class="text-xl mb-6 text-gray-300">Mis-clicks took your lives!</p>
-                    <button onclick="watchAdToRevive()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-full font-black text-lg mb-4">
-                        <i class="fas fa-video mr-2"></i> WATCH AD TO REVIVE
+                    <h2 class="text-5xl font-black mb-4 text-red-500 uppercase">Out of Lives!</h2>
+                    <p class="text-xl mb-8">Level Reached: <span id="final-level">1</span></p>
+                    <button onclick="watchAdToRevive()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-xl font-black text-lg mb-4 shadow-xl">
+                        WATCH AD TO REVIVE
                     </button>
-                    <button onclick="location.reload()" class="text-gray-400 underline">Restart Game</button>
+                    <button onclick="location.reload()" class="text-gray-400 underline">Start New Game</button>
                 </div>
 
-                <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-30 bg-slate-900/80">
-                    <button onclick="startGame()" class="bg-green-500 text-white px-12 py-5 rounded-2xl text-3xl font-black shadow-2xl hover:scale-110 transition">START LEVEL 1</button>
+                <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-30 bg-slate-900/90">
+                    <div class="text-center">
+                        <h1 class="text-white text-4xl font-black mb-6">LEVEL 1</h1>
+                        <button onclick="startGame()" class="bg-green-500 text-white px-12 py-5 rounded-2xl text-2xl font-black shadow-2xl hover:scale-105 transition">TAP TO START</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="ad-banner-bottom">
-                <i class="fas fa-ad mr-2"></i> GOOGLE ADMOB BANNER
-            </div>
+            <div class="ad-banner-bottom">Google AdMob Banner Ad (320x50)</div>
         </div>
     </main>
 
     <script>
         let totalPKR = parseFloat(localStorage.getItem('userPKR') || 0);
-        let level = 1;
-        let coinsInLevel = 0;
-        let lives = 3;
-        let gameActive = false;
-
+        let level = 1; let coinsInLevel = 0; let lives = 3; let gameActive = false;
         document.getElementById('pkr-balance').innerText = totalPKR.toFixed(2);
 
-        function startGame() {
-            document.getElementById('start-screen').style.display = 'none';
-            gameActive = true;
-            spawnTarget();
-        }
+        function startGame() { document.getElementById('start-screen').style.display = 'none'; gameActive = true; spawnTarget(); }
 
         function spawnTarget() {
             if (!gameActive) return;
             const area = document.getElementById('game-area');
-            const oldTarget = document.querySelector('.target-coin');
-            if(oldTarget) oldTarget.remove();
-
+            const old = document.querySelector('.target-coin'); if(old) old.remove();
             const target = document.createElement('div');
             target.className = 'target-coin';
-            
-            // Random Position
-            const x = Math.random() * (area.offsetWidth - 70);
-            const y = Math.random() * (area.offsetHeight - 70);
-            
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
-            target.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
-
-            // Click Event for Coin
-            target.onclick = (e) => {
-                e.stopPropagation(); // Stop mis-click from firing
-                earnPKR(0.10); // Level 1 higher reward
-                coinsInLevel++;
-                checkLevelUp();
-                spawnTarget();
-            };
-
+            target.style.left = Math.random() * (area.offsetWidth - 75) + 'px';
+            target.style.top = Math.random() * (area.offsetHeight - 75) + 'px';
+            target.innerHTML = '<i class="fas fa-bolt text-white text-2xl"></i>';
+            target.onclick = (e) => { e.stopPropagation(); earn(0.10); coinsInLevel++; checkLevelUp(); spawnTarget(); };
             area.appendChild(target);
         }
 
-        // Mis-click Detection
-        function handleMissClick(e) {
+        function handleMissClick() {
             if (!gameActive) return;
-            
-            lives--;
-            updateLivesUI();
-            
-            // Show Interstitial Ad on every mis-click
-            console.log("Life Lost! Showing Interstitial Ad...");
-            alert("Opps! Life Lost. [Ad Showing...]"); 
-
-            if (lives <= 0) {
-                gameOver();
-            }
+            lives--; updateLivesUI();
+            alert("Mis-click! Life Lost. [Interstitial Ad]"); // Ad Logic Here
+            if (lives <= 0) gameOver();
         }
 
-        function earnPKR(amount) {
-            totalPKR += amount;
+        function earn(amt) {
+            totalPKR += amt;
             localStorage.setItem('userPKR', totalPKR.toFixed(2));
             document.getElementById('pkr-balance').innerText = totalPKR.toFixed(2);
         }
 
         function checkLevelUp() {
             if (coinsInLevel >= 10) {
-                level++;
-                coinsInLevel = 0;
-                document.getElementById('level-display').innerText = `Level ${level}`;
-                document.getElementById('side-level').innerText = `Level ${level}`;
-                
-                // Visual feedback for Level Up
-                alert("CONGRATULATIONS! Level " + level + " Started.");
+                level++; coinsInLevel = 0;
+                document.getElementById('side-level').innerText = "Level " + level;
+                alert("LEVEL UP! Welcome to Level " + level);
             }
         }
 
         function updateLivesUI() {
-            const container = document.getElementById('lives-container');
-            container.innerHTML = '';
+            const container = document.getElementById('lives-container'); container.innerHTML = '';
             for(let i=0; i<lives; i++) container.innerHTML += '<i class="fas fa-heart life-heart"></i>';
         }
 
         function gameOver() {
             gameActive = false;
+            document.getElementById('final-level').innerText = level;
             document.getElementById('game-over').style.display = 'flex';
         }
 
         function watchAdToRevive() {
-            alert("Loading Rewarded Video...");
-            lives = 3;
-            updateLivesUI();
+            alert("Rewarded Ad Loading...");
+            lives = 3; updateLivesUI();
             document.getElementById('game-over').style.display = 'none';
-            gameActive = true;
-            spawnTarget();
+            gameActive = true; spawnTarget();
         }
     </script>
 </body>
 </html>
-<aside class="sidebar hidden md:flex flex-col">
-    <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
-        <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
-    </div>
-    <nav class="flex-grow mt-4">
-        <a href="dashboard.html" class="nav-link">
-            <i class="fas fa-th-large mr-3 w-5"></i> Dashboard
-        </a>
-        <a href="play.html" class="nav-link active">
-            <i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn
-        </a>
-        <a href="withdraw.html" class="nav-link">
-            <i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR
-        </a>
-        <a href="leaderboard.html" class="nav-link">
-            <i class="fas fa-trophy mr-3 w-5"></i> Leaderboard
-        </a>
-        <div class="px-6 py-4 text-xs font-bold text-white/40 uppercase tracking-widest">Account</div>
-        <a href="profile.html" class="nav-link">
-            <i class="fas fa-user-circle mr-3 w-5"></i> My Profile
-        </a>
-        <a href="support.html" class="nav-link">
-            <i class="fas fa-headset mr-3 w-5"></i> Help & Support
-        </a>
-    </nav>
-    <div class="p-6 border-t border-white/10 bg-black/10">
-        <div class="mb-4">
-            <p class="text-[10px] uppercase font-bold text-indigo-200">Current Level</p>
-            <p class="text-xl font-black text-white" id="side-level">Level 1</p>
-        </div>
-        <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-            <div id="level-progress-bar" class="bg-yellow-400 h-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-    </div>
-</aside>

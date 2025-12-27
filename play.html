@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play & Earn PKR - Coin Pop</title>
+    <title>Level Play - Coin Pop PKR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,13 +13,10 @@
         .nav-link { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
         .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; border-left-color: white; }
         
-        /* Game Styling */
-        #game-area { width: 100%; height: 60vh; background: #0f172a; position: relative; overflow: hidden; border-radius: 1rem; border: 4px solid #334155; cursor: crosshair; }
-        .target-coin { position: absolute; width: 55px; height: 55px; background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #fbbf24; animation: pulse 0.5s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        #game-area { width: 100%; height: 60vh; background: #0f172a; position: relative; overflow: hidden; border-radius: 1rem; border: 4px solid #334155; }
+        .target-coin { position: absolute; width: 60px; height: 60px; background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); border-radius: 50%; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #fbbf24; cursor: pointer; z-index: 20; }
         .life-heart { color: #ef4444; font-size: 1.5rem; margin-right: 5px; }
         #game-over { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 50; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; border-radius: 1rem; }
-        
         .ad-banner-bottom { background: #f8fafc; border: 2px dashed #cbd5e1; height: 90px; display: flex; align-items: center; justify-content: center; margin-top: 1.5rem; border-radius: 0.5rem; color: #64748b; font-weight: bold; width: 100%; }
     </style>
 </head>
@@ -33,60 +30,56 @@
             <a href="dashboard.html" class="nav-link"><i class="fas fa-home mr-3"></i> Dashboard</a>
             <a href="play.html" class="nav-link active"><i class="fas fa-play-circle mr-3"></i> Play & Earn</a>
             <a href="withdraw.html" class="nav-link"><i class="fas fa-money-bill-wave mr-3"></i> Withdraw PKR</a>
-            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3"></i> Top Earners</a>
         </nav>
-        <div class="p-6 border-t border-white/10 text-sm">
-            Current Session: <span id="side-pkr" class="font-bold">Rs. 0.00</span>
+        <div class="p-6 border-t border-white/10">
+            <p class="text-xs opacity-70">CURRENT LEVEL</p>
+            <p class="text-2xl font-black" id="side-level">Level 1</p>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col min-h-screen">
         <header class="bg-white p-4 shadow-sm flex justify-between items-center">
-            <div class="flex items-center">
-                <span class="mr-3 font-bold text-gray-500 uppercase text-xs tracking-widest">Lives:</span>
-                <div id="lives-container" class="flex">
+            <div class="flex flex-col">
+                <div id="lives-container" class="flex mb-1">
                     <i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i>
                 </div>
+                <span class="text-[10px] font-bold text-red-500 uppercase">Don't click on empty space!</span>
             </div>
-            <div class="text-xl font-black text-green-600 bg-green-50 px-4 py-1 rounded-full border border-green-200">
-                Balance: Rs. <span id="pkr-balance">0.00</span>
+            <div class="text-right">
+                <div class="text-xl font-black text-green-600">Rs. <span id="pkr-balance">0.00</span></div>
+                <div class="text-xs font-bold text-indigo-600 uppercase" id="level-display">Level 1</div>
             </div>
         </header>
 
         <div class="p-6 flex-grow">
-            <div id="game-area">
+            <div id="game-area" onclick="handleMissClick(event)">
                 <div id="game-over">
-                    <h2 class="text-5xl font-black mb-4 text-red-500">GAME OVER</h2>
-                    <p class="text-xl mb-6">You earned <span class="text-green-400 font-bold">Rs. <span id="session-pkr">0.00</span></span></p>
-                    <button onclick="watchAdToRevive()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-full font-black text-lg mb-4 transition-all transform hover:scale-105">
+                    <h2 class="text-5xl font-black mb-4 text-red-500">OUT OF LIVES</h2>
+                    <p class="text-xl mb-6 text-gray-300">Mis-clicks took your lives!</p>
+                    <button onclick="watchAdToRevive()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-full font-black text-lg mb-4">
                         <i class="fas fa-video mr-2"></i> WATCH AD TO REVIVE
                     </button>
-                    <button onclick="location.reload()" class="text-gray-400 hover:text-white underline">Restart New Session</button>
+                    <button onclick="location.reload()" class="text-gray-400 underline">Restart Game</button>
                 </div>
 
-                <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-10 bg-slate-900/80">
-                    <div class="text-center">
-                        <h1 class="text-white text-3xl font-black mb-6">READY TO EARN?</h1>
-                        <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-12 py-5 rounded-2xl text-3xl font-black shadow-2xl transition transform hover:scale-110">
-                            START PLAYING
-                        </button>
-                    </div>
+                <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-30 bg-slate-900/80">
+                    <button onclick="startGame()" class="bg-green-500 text-white px-12 py-5 rounded-2xl text-3xl font-black shadow-2xl hover:scale-110 transition">START LEVEL 1</button>
                 </div>
             </div>
 
             <div class="ad-banner-bottom">
-                <i class="fas fa-ad mr-2"></i> Google AdMob Banner - 320x50 / 728x90
+                <i class="fas fa-ad mr-2"></i> GOOGLE ADMOB BANNER
             </div>
         </div>
     </main>
 
     <script>
         let totalPKR = parseFloat(localStorage.getItem('userPKR') || 0);
-        let sessionPKR = 0;
+        let level = 1;
+        let coinsInLevel = 0;
         let lives = 3;
         let gameActive = false;
 
-        // Initialize UI
         document.getElementById('pkr-balance').innerText = totalPKR.toFixed(2);
 
         function startGame() {
@@ -98,44 +91,64 @@
         function spawnTarget() {
             if (!gameActive) return;
             const area = document.getElementById('game-area');
+            const oldTarget = document.querySelector('.target-coin');
+            if(oldTarget) oldTarget.remove();
+
             const target = document.createElement('div');
             target.className = 'target-coin';
             
+            // Random Position
             const x = Math.random() * (area.offsetWidth - 70);
             const y = Math.random() * (area.offsetHeight - 70);
             
             target.style.left = x + 'px';
             target.style.top = y + 'px';
-            target.innerHTML = '<i class="fas fa-money-bill-wave text-white text-xl"></i>';
+            target.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
 
-            // Speed formula: Start at 800ms, get faster as they earn
-            let speed = Math.max(350, 800 - (sessionPKR * 5));
-            
-            let clicked = false;
-            target.onclick = () => {
-                clicked = true;
-                earn(0.05); // 0.05 PKR per coin
-                target.remove();
+            // Click Event for Coin
+            target.onclick = (e) => {
+                e.stopPropagation(); // Stop mis-click from firing
+                earnPKR(0.10); // Level 1 higher reward
+                coinsInLevel++;
+                checkLevelUp();
                 spawnTarget();
             };
-            area.appendChild(target);
 
-            setTimeout(() => {
-                if (!clicked && gameActive) {
-                    target.remove();
-                    lives--;
-                    updateLivesUI();
-                    if (lives <= 0) gameOver(); else spawnTarget();
-                }
-            }, speed);
+            area.appendChild(target);
         }
 
-        function earn(amount) {
+        // Mis-click Detection
+        function handleMissClick(e) {
+            if (!gameActive) return;
+            
+            lives--;
+            updateLivesUI();
+            
+            // Show Interstitial Ad on every mis-click
+            console.log("Life Lost! Showing Interstitial Ad...");
+            alert("Opps! Life Lost. [Ad Showing...]"); 
+
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+
+        function earnPKR(amount) {
             totalPKR += amount;
-            sessionPKR += amount;
             localStorage.setItem('userPKR', totalPKR.toFixed(2));
             document.getElementById('pkr-balance').innerText = totalPKR.toFixed(2);
-            document.getElementById('side-pkr').innerText = "Rs. " + sessionPKR.toFixed(2);
+        }
+
+        function checkLevelUp() {
+            if (coinsInLevel >= 10) {
+                level++;
+                coinsInLevel = 0;
+                document.getElementById('level-display').innerText = `Level ${level}`;
+                document.getElementById('side-level').innerText = `Level ${level}`;
+                
+                // Visual feedback for Level Up
+                alert("CONGRATULATIONS! Level " + level + " Started.");
+            }
         }
 
         function updateLivesUI() {
@@ -146,14 +159,12 @@
 
         function gameOver() {
             gameActive = false;
-            document.getElementById('session-pkr').innerText = sessionPKR.toFixed(2);
             document.getElementById('game-over').style.display = 'flex';
         }
 
         function watchAdToRevive() {
-            // Integrate AdMob Rewarded Video here
-            alert("Loading Rewarded Video Ad...");
-            lives = 2;
+            alert("Loading Rewarded Video...");
+            lives = 3;
             updateLivesUI();
             document.getElementById('game-over').style.display = 'none';
             gameActive = true;

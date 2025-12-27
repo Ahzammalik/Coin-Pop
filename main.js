@@ -84,3 +84,25 @@ function checkAccess() {
 
 // Page load par access check karein
 window.onload = checkAccess;
+// Sidebar Admin Link Control
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const adminLink = document.getElementById('admin-nav-link');
+
+    if (currentUser && currentUser.email === "ghazimalik1997@gmail.com") {
+        if (adminLink) adminLink.classList.remove('hidden');
+    }
+
+    // Email Display in Sidebar
+    const emailDisplay = document.getElementById('user-email-display');
+    if (emailDisplay && currentUser) {
+        emailDisplay.innerText = currentUser.email;
+    }
+});
+
+// Generic function to handle missing pages (Temporary fix)
+function handleComingSoon(e) {
+    // Agar file abhi nahi banayi toh error ki bajaye ye dikhayega
+    // Aap isse har link par onclick="handleComingSoon(event)" laga sakte hain
+    showToast("This feature is coming soon!", "bg-blue-500");
+}

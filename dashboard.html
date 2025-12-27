@@ -5,161 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Coin Pop PKR</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088" crossorigin="anonymous"></script>
-    
     <style>
-        :root { --primary: #4f46e5; --primary-dark: #4338ca; --secondary: #10b981; --warning: #f59e0b; --danger: #ef4444; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f3f4f6; color: #1f2937; }
-        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; transition: all 0.3s ease; }
-        .nav-link { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
-        .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; border-left-color: white; }
-        .stat-card { padding: 1.5rem; border-radius: 0.75rem; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .stat-card.primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
-        .stat-card.success { background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%); }
-        .feature-card { background: white; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; transition: 0.3s; text-align: center; }
-        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .pkr-badge { background: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 700; }
-        .ad-placeholder { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 0.5rem; height: 90px; display: flex; align-items: center; justify-content: center; margin: 1rem 0; color: #64748b; font-size: 0.8rem; }
+        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; }
+        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; transition: 0.3s; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .ad-placeholder { background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 1rem; height: 90px; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: bold; }
     </style>
 </head>
-<body class="flex">
+<body class="flex bg-gray-50 min-h-screen">
 
     <aside class="sidebar hidden md:flex flex-col">
-        <div class="p-6 text-2xl font-black flex items-center">
-            <i class="fas fa-wallet mr-2"></i> Coin Pop
+        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
+            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
         </div>
-        <nav class="flex-grow">
-            <a href="dashboard.html" class="nav-link active"><i class="fas fa-home mr-3"></i> Dashboard</a>
-            <a href="play.html" class="nav-link"><i class="fas fa-play-circle mr-3"></i> Play & Earn</a>
-            <a href="withdraw.html" class="nav-link"><i class="fas fa-money-bill-wave mr-3"></i> Withdraw PKR</a>
-            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3"></i> Top Earners</a>
+        <nav class="flex-grow mt-4">
+            <a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
+            <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
+            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
+            <a href="history.html" class="nav-link"><i class="fas fa-history mr-3 w-5"></i> History</a>
+            <a href="support.html" class="nav-link"><i class="fas fa-headset mr-3 w-5"></i> Help & Support</a>
         </nav>
-        <div class="p-6 border-t border-white/10 text-sm">
-            Balance: <span class="font-bold header-pkr">Rs. 0.00</span>
+        <div class="p-6 border-t border-white/10 bg-black/10 text-center">
+            <p class="text-xs opacity-70">Total Balance</p>
+            <p class="text-xl font-black text-white" id="side-pkr">Rs. 0.00</p>
         </div>
     </aside>
 
-    <main class="flex-1 min-h-screen flex flex-col">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center">
-            <h2 class="text-xl font-bold">Welcome Back!</h2>
-            <div class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold">
-                <i class="fas fa-wallet mr-2"></i>Rs. <span id="header-pkr">0.00</span>
+    <main class="flex-1 flex flex-col min-w-0">
+        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
+            <h2 class="text-xl font-bold text-gray-800">Welcome Back!</h2>
+            <div class="bg-indigo-600 text-white px-5 py-2 rounded-full font-black shadow-lg">
+                Rs. <span id="header-pkr">0.00</span>
             </div>
         </header>
 
-        <div class="p-6 overflow-y-auto">
-            <div class="ad-placeholder">Banner Advertisement Space</div>
+        <div class="p-8">
+            <div class="ad-placeholder mb-8">Google AdMob Banner Ad</div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card primary">
-                    <p class="text-sm opacity-80">Available PKR</p>
-                    <h3 class="text-3xl font-black mt-1">Rs. <span id="card-pkr">0.00</span></h3>
-                    <p class="text-xs mt-4 bg-white/20 p-1 rounded text-center">Min. Withdraw: Rs. 500</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card border-l-4 border-indigo-600">
+                    <p class="text-gray-500 text-sm font-bold">Current Balance</p>
+                    <h3 class="text-3xl font-black text-gray-800 mt-2">Rs. <span id="card-pkr">0.00</span></h3>
                 </div>
-                <div class="stat-card success">
-                    <p class="text-sm opacity-80">Today's Profit</p>
-                    <h3 class="text-3xl font-black mt-1">Rs. <span id="today-pkr">0.00</span></h3>
-                    <p class="text-xs mt-4 italic text-white/80">Keep playing to earn more!</p>
+                <div class="stat-card border-l-4 border-green-500">
+                    <p class="text-gray-500 text-sm font-bold">Min. Payout</p>
+                    <h3 class="text-3xl font-black text-gray-800 mt-2">Rs. 500</h3>
                 </div>
+                <div class="stat-card border-l-4 border-yellow-500">
+                    <p class="text-gray-500 text-sm font-bold">Today's Clicks</p>
+                    <h3 class="text-3xl font-black text-gray-800 mt-2">0</h3>
                 </div>
-
-            <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="play.html" class="feature-card">
-                    <i class="fas fa-gamepad text-indigo-600 text-3xl mb-2"></i>
-                    <p class="font-bold">Play Game</p>
-                </a>
-                <a href="withdraw.html" class="feature-card">
-                    <i class="fas fa-cash-register text-green-600 text-3xl mb-2"></i>
-                    <p class="font-bold">Withdraw</p>
-                </a>
-                <div class="feature-card cursor-pointer" onclick="alert('Ad Loading...')">
-                    <i class="fas fa-video text-purple-600 text-3xl mb-2"></i>
-                    <p class="font-bold">Watch Ad</p>
-                </div>
-                <a href="leaderboard.html" class="feature-card">
-                    <i class="fas fa-medal text-yellow-500 text-3xl mb-2"></i>
-                    <p class="font-bold">Ranking</p>
-                </a>
             </div>
 
-            <div class="ad-placeholder" style="height: 200px;">Native Advertisement (Earns you Revenue)</div>
+            <div class="bg-indigo-900 rounded-2xl p-8 text-white flex justify-between items-center shadow-2xl">
+                <div>
+                    <h2 class="text-3xl font-black mb-2">Ready to Earn?</h2>
+                    <p class="opacity-80">Play levels and earn direct PKR in your wallet.</p>
+                </div>
+                <button onclick="location.href='play.html'" class="bg-yellow-400 text-indigo-900 px-8 py-4 rounded-xl font-black text-lg hover:bg-white transition-all transform hover:scale-105">
+                    PLAY NOW
+                </button>
+            </div>
         </div>
     </main>
 
     <script>
-        // Real-time Sync Logic
-        function updateDashboardPKR() {
-            // LocalStorage se balance uthana
+        function syncDashboard() {
             const balance = localStorage.getItem('userPKR') || "0.00";
-            const formattedBalance = parseFloat(balance).toFixed(2);
-
-            // UI Elements update karna
-            const headerPKR = document.getElementById('header-pkr');
-            const cardPKR = document.getElementById('card-pkr');
-            const sidePKR = document.querySelector('.header-pkr');
-
-            if(headerPKR) headerPKR.innerText = formattedBalance;
-            if(cardPKR) cardPKR.innerText = formattedBalance;
-            if(sidePKR) sidePKR.innerText = "Rs. " + formattedBalance;
-            
-            // Simulation: Today's profit (you can make this real with dates)
-            document.getElementById('today-pkr').innerText = "0.00"; 
+            const formatted = parseFloat(balance).toFixed(2);
+            document.getElementById('header-pkr').innerText = formatted;
+            document.getElementById('card-pkr').innerText = formatted;
+            document.getElementById('side-pkr').innerText = "Rs. " + formatted;
         }
-
-        // Page load par update
-        window.onload = updateDashboardPKR;
-
-        // Sync with Play.html instantly
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'userPKR') {
-                updateDashboardPKR();
-            }
-        });
+        window.onload = syncDashboard;
+        window.addEventListener('storage', (e) => { if(e.key === 'userPKR') syncDashboard(); });
     </script>
 </body>
 </html>
-<aside class="sidebar hidden md:flex flex-col">
-    <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
-        <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
-    </div>
-    <nav class="flex-grow mt-4">
-        <a href="dashboard.html" class="nav-link active">
-            <i class="fas fa-th-large mr-3 w-5"></i> Dashboard
-        </a>
-        <a href="play.html" class="nav-link">
-            <i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn
-        </a>
-        <a href="withdraw.html" class="nav-link">
-            <i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR
-        </a>
-        <a href="leaderboard.html" class="nav-link">
-            <i class="fas fa-trophy mr-3 w-5"></i> Leaderboard
-        </a>
-        <div class="px-6 py-4 text-xs font-bold text-white/40 uppercase tracking-widest">Account</div>
-        <a href="profile.html" class="nav-link">
-            <i class="fas fa-user-circle mr-3 w-5"></i> My Profile
-        </a>
-        <a href="history.html" class="nav-link">
-            <i class="fas fa-history mr-3 w-5"></i> Transaction History
-        </a>
-        <a href="support.html" class="nav-link">
-            <i class="fas fa-headset mr-3 w-5"></i> Help & Support
-        </a>
-    </nav>
-    <div class="p-6 border-t border-white/10">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <i class="fas fa-user text-white"></i>
-            </div>
-            <div>
-                <p class="text-xs opacity-70">User Balance</p>
-                <p class="font-bold text-sm header-pkr">Rs. 0.00</p>
-            </div>
-        </div>
-    </div>
-</aside>

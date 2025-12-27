@@ -1,1171 +1,163 @@
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- State Management ---
-        let selectedMethod = null;
-        let userBalance = 1250; // Replace with actual balance from your database/Firebase
-
-        // --- DOM Elements ---
-        const amountInput = document.getElementById('withdraw-amount');
-        const coinValueDisplay = document.getElementById('coin-value');
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const accountDetails = document.getElementById('account-details');
-        const accountLabel = document.getElementById('account-label');
-        const withdrawForm = document.getElementById('withdraw-form');
-        const balanceDisplays = [
-            document.getElementById('coin-balance-display'),
-            document.getElementById('available-coins')
-        ];
-
-        // --- Initialization ---
-        updateBalanceUI();
-
-        function updateBalanceUI() {
-            balanceDisplays[0].innerHTML = `<i class="fas fa-coins mr-2"></i> Coins: ${userBalance}`;
-            balanceDisplays[1].textContent = userBalance;
-        }
-
-        // --- Sidebar Logic ---
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
-
-        // --- Payment Selection Logic ---
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', () => {
-                // UI Toggle
-                paymentMethods.forEach(m => m.classList.remove('selected'));
-                method.classList.add('selected');
-                
-                selectedMethod = method.dataset.method;
-                accountDetails.style.display = 'block';
-
-                // Contextual Labeling
-                if (selectedMethod === 'bank') {
-                    accountLabel.textContent = "IBAN / Bank Account Number";
-                } else {
-                    accountLabel.textContent = "Mobile Number (e.g. 03001234567)";
-                }
-            });
-        });
-
-        // --- Conversion Logic ---
-        amountInput.addEventListener('input', (e) => {
-            const val = e.target.value || 0;
-            coinValueDisplay.textContent = `${val} coins`;
-            
-            // Visual feedback if exceeding balance
-            if (val > userBalance) {
-                coinValueDisplay.classList.add('text-red-500');
-            } else {
-                coinValueDisplay.classList.remove('text-red-500');
-            }
-        });
-
-        // Quick Amount Buttons
-        document.querySelectorAll('.quick-amount').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const amount = btn.dataset.amount;
-                amountInput.value = amount;
-                coinValueDisplay.textContent = `${amount} coins`;
-            });
-        });
-
-        // --- Form Submission ---
-        withdrawForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const amount = parseInt(amountInput.value);
-
-            if (!selectedMethod) {
-                alert("Please select a payment method first.");
-                return;
-            }
-            if (amount < 250) {
-                alert("Minimum withdrawal is PKR 250.");
-                return;
-            }
-            if (amount > userBalance) {
-                alert("Insufficient coin balance.");
-                return;
-            }
-
-            // Success Simulation
-            const btn = document.getElementById('withdraw-submit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-
-            setTimeout(() => {
-                alert(`Withdrawal request for PKR ${amount} submitted successfully!`);
-                userBalance -= amount;
-                updateBalanceUI();
-                withdrawForm.reset();
-                accountDetails.style.display = 'none';
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Request Withdrawal';
-            }, 2000);
-        });
-    });
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdraw - Coin Pop</title>
+    <title>Withdraw PKR - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google AdMob SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4313544696010088" crossorigin="anonymous"></script>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1f2937;
-            --light: #f9fafb;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        body {
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        
-        .sidebar {
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            width: 280px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-        }
-        
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-nav {
-            padding: 1rem 0;
-            flex-grow: 1;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border-left: 4px solid transparent;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: white;
-        }
-        
-        .sidebar-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .content-header {
-            background-color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Withdraw-specific styles */
-        .withdraw-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .withdraw-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
-        }
-        
-        .withdraw-hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(-30%, 30%);
-        }
-        
-        .payment-method {
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .payment-method:hover {
-            border-color: var(--primary);
-        }
-        
-        .payment-method.selected {
-            border-color: var(--primary);
-            background-color: rgba(79, 70, 229, 0.05);
-        }
-        
-        .method-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-        }
-        
-        .easypaisa-icon {
-            background: linear-gradient(135deg, #0e9c4e, #0a7a3d);
-        }
-        
-        .jazzcash-icon {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-        
-        .bank-icon {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            outline: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-success {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #059669;
-        }
-        
-        .btn-disabled {
-            background-color: #9ca3af;
-            color: white;
-            cursor: not-allowed;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            background-color: white;
-            color: #1f2937;
-            transition: all 0.2s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        .amount-input-container {
-            position: relative;
-        }
-        
-        .amount-input {
-            padding-left: 2.5rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        
-        .amount-prefix {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            font-weight: 600;
-        }
-        
-        .conversion-display {
-            background: #f0f9ff;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-        
-        .conversion-rate {
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-        
-        .conversion-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-top: 0.25rem;
-        }
-        
-        .quick-amounts {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .quick-amount {
-            flex: 1;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            background: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            font-size: 0.875rem;
-        }
-        
-        .quick-amount:hover {
-            border-color: var(--primary);
-        }
-        
-        .quick-amount.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .withdrawal-history {
-            margin-top: 2rem;
-        }
-        
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        
-        .history-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .status-approved {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-rejected {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background-color: var(--secondary);
-        }
-        
-        .notification.error {
-            background-color: var(--danger);
-        }
-        
-        .notification.warning {
-            background-color: var(--warning);
-        }
-        
-        .withdraw-limits {
-            background: #f8fafc;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .limit-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-        }
-        
-        .limit-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .pkr-amount {
-            color: #059669;
-            font-weight: 700;
-        }
-        
-        /* AdMob Ad Styles */
-        .ad-container {
-            margin: 1.5rem 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        
-        .banner-ad {
-            width: 100%;
-            height: 100px;
-            background-color: #f8fafc;
-            border-radius: 0.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px dashed #d1d5db;
-        }
-        
-        .interstitial-ad {
-            width: 100%;
-            height: 250px;
-            background-color: #f8fafc;
-            border-radius: 0.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px dashed #d1d5db;
-            margin: 1.5rem 0;
-        }
-        
-        .native-ad {
-            width: 100%;
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin: 1.5rem 0;
-        }
-        
-        .native-ad-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .native-ad-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 0.5rem;
-            background-color: #e5e7eb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            color: #6b7280;
-        }
-        
-        .native-ad-text {
-            flex: 1;
-        }
-        
-        .native-ad-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .native-ad-description {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-bottom: 0.5rem;
-        }
-        
-        .native-ad-button {
-            background-color: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .ad-label {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: fixed;
-                height: 100%;
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            .content-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .quick-amounts {
-                flex-wrap: wrap;
-            }
-            
-            .quick-amount {
-                flex: 1 0 calc(50% - 0.5rem);
-            }
-            
-            .native-ad-content {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
+        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; }
+        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
+        
+        .withdraw-card { background: white; border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .method-card { border: 2px solid #f3f4f6; border-radius: 1rem; cursor: pointer; transition: 0.3s; }
+        .method-card.selected { border-color: #4f46e5; background-color: #f5f3ff; }
     </style>
 </head>
-<body class="antialiased flex flex-col min-h-screen bg-gray-100">
-    <div id="app-container" class="w-full flex-grow flex">
-        <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
-        </button>
+<body class="flex bg-gray-50 min-h-screen">
 
-        <!-- Sidebar -->
-        <aside class="sidebar flex flex-col">
-            <div class="sidebar-header">
-                <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-coins mr-2"></i>
-                    Coin Pop
-                </a>
+    <aside class="sidebar hidden md:flex flex-col">
+        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
+            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
+        </div>
+        <nav class="flex-grow mt-4">
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
+            <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
+            <a href="withdraw.html" class="nav-link active"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
+            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
+            <a href="history.html" class="nav-link"><i class="fas fa-history mr-3 w-5"></i> History</a>
+        </nav>
+        <div class="p-6 border-t border-white/10 bg-black/10 text-center">
+            <p class="text-xs opacity-70">Total PKR</p>
+            <p class="text-xl font-black text-white" id="side-pkr">Rs. 0.00</p>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0">
+        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
+            <h2 class="text-xl font-bold text-gray-800">Withdrawal Portal</h2>
+            <div class="bg-green-600 text-white px-5 py-2 rounded-full font-black">
+                Available: Rs. <span id="header-pkr">0.00</span>
             </div>
-            <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="play.html" class="nav-link">
-                    <i class="fas fa-play-circle"></i>
-                    <span>Play</span>
-                </a>
-                <a href="leaderboard.html" class="nav-link">
-                    <i class="fas fa-trophy"></i>
-                    <span>Leaderboard</span>
-                </a>
-                <a href="rewards.html" class="nav-link">
-                    <i class="fas fa-gift"></i>
-                    <span>Daily Rewards</span>
-                </a>
-                <a href="withdraw.html" id="withdraw-nav-link" class="nav-link active">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span>Withdraw</span>
-                </a>
-                <a href="settings.html" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-                <a href="contact.html" class="nav-link">
-                    <i class="fas fa-envelope"></i>
-                    <span>Contact Us</span>
-                </a>
-                <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Admin</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
-                <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
-                    Sign Out
+        </header>
+
+        <div class="p-8 max-w-4xl mx-auto w-full">
+            <div class="withdraw-card p-8">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-4">1. Select Payment Method</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div onclick="selectMethod('easypaisa')" id="easypaisa-card" class="method-card p-4 flex items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-mobile-alt text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-black">EasyPaisa</p>
+                                <p class="text-xs text-gray-500">Fast Payment (Rs. 500 Min)</p>
+                            </div>
+                        </div>
+                        <div onclick="selectMethod('jazzcash')" id="jazzcash-card" class="method-card p-4 flex items-center">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-money-bill-wave text-orange-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-black">JazzCash</p>
+                                <p class="text-xs text-gray-500">Fast Payment (Rs. 500 Min)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-4">2. Account Details</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Account Number (03xxxxxxxxx)</label>
+                            <input type="text" id="acc-number" placeholder="Enter number" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Amount to Withdraw (PKR)</label>
+                            <input type="number" id="withdraw-amount" placeholder="Min. 500" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl mb-8 flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                    <p class="text-sm text-blue-800">Withdrawal requests are processed within 24-48 hours. Make sure your account details are correct.</p>
+                </div>
+
+                <button onclick="handleWithdraw()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-black text-lg transition-all shadow-lg transform active:scale-95">
+                    REQUEST WITHDRAWAL
                 </button>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="main-content flex-1 flex flex-col overflow-hidden">
-            <header class="content-header">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Withdraw Coins</h2>
-                    <p class="text-gray-600">Cash out your earnings and rewards</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
-                        <i class="fas fa-coins mr-2"></i>
-                        Coins: 0
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-auto p-6">
-                <!-- Banner Ad -->
-                <div class="ad-container">
-                    <div class="banner-ad">
-                        <ins class="adsbygoogle"
-                             style="display:block"
-                             data-ad-client="ca-pub-4313544696010088"
-                             data-ad-slot="7463441754"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                </div>
-
-                <!-- Hero Section -->
-                <div class="withdraw-hero relative z-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div class="mb-4 md:mb-0">
-                            <h1 class="text-3xl font-bold mb-2">Cash Out Your Rewards</h1>
-                            <p class="text-blue-100">Convert your coins to Pakistani Rupees and withdraw to your preferred method</p>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                            <p class="text-sm">Available for Withdrawal</p>
-                            <div class="flex items-center mt-2">
-                                <span class="text-2xl font-bold mr-2" id="available-coins">0</span>
-                                <span class="text-sm">coins</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left Column - Withdrawal Form -->
-                    <div class="lg:col-span-2">
-                        <div class="card p-6">
-                            <h3 class="text-xl font-bold text-gray-800 mb-6">Withdrawal Request</h3>
-                            
-                            <form id="withdraw-form" class="space-y-6">
-                                <!-- Step 1: Select Payment Method -->
-                                <div>
-                                    <label class="form-label">1. Select Payment Method</label>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                                        <div class="payment-method" data-method="easypaisa">
-                                            <div class="method-icon easypaisa-icon">
-                                                <i class="fas fa-mobile-alt"></i>
-                                            </div>
-                                            <div class="font-semibold">EasyPaisa</div>
-                                            <div class="text-sm text-gray-600 mt-1">Instant Transfer</div>
-                                        </div>
-                                        <div class="payment-method" data-method="jazzcash">
-                                            <div class="method-icon jazzcash-icon">
-                                                <i class="fas fa-wallet"></i>
-                                            </div>
-                                            <div class="font-semibold">JazzCash</div>
-                                            <div class="text-sm text-gray-600 mt-1">Fast & Secure</div>
-                                        </div>
-                                        <div class="payment-method" data-method="bank">
-                                            <div class="method-icon bank-icon">
-                                                <i class="fas fa-university"></i>
-                                            </div>
-                                            <div class="font-semibold">Bank Transfer</div>
-                                            <div class="text-sm text-gray-600 mt-1">1-2 Business Days</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Interstitial Ad -->
-                                <div class="ad-container">
-                                    <div class="interstitial-ad">
-                                        <ins class="adsbygoogle"
-                                             style="display:block"
-                                             data-ad-client="ca-pub-4313544696010088"
-                                             data-ad-slot="3524196741"
-                                             data-ad-format="auto"
-                                             data-full-width-responsive="true"></ins>
-                                        <script>
-                                             (adsbygoogle = window.adsbygoogle || []).push({});
-                                        </script>
-                                    </div>
-                                </div>
-
-                                <!-- Step 2: Enter Amount in PKR -->
-                                <div>
-                                    <label for="withdraw-amount" class="form-label">2. Enter Amount in PKR</label>
-                                    <div class="amount-input-container">
-                                        <span class="amount-prefix">PKR</span>
-                                        <input type="number" id="withdraw-amount" placeholder="0" min="250" class="form-input amount-input">
-                                    </div>
-                                    
-                                    <div class="quick-amounts">
-                                        <button type="button" class="quick-amount" data-amount="250">250</button>
-                                        <button type="button" class="quick-amount" data-amount="500">500</button>
-                                        <button type="button" class="quick-amount" data-amount="1000">1,000</button>
-                                        <button type="button" class="quick-amount" data-amount="2500">2,500</button>
-                                    </div>
-                                    
-                                    <div class="conversion-display">
-                                        <div class="conversion-rate">Conversion rate: <strong>1 coin = 1 PKR</strong></div>
-                                        <div class="conversion-value" id="coin-value">0 coins</div>
-                                        <div class="text-sm text-gray-600 mt-1">Minimum withdrawal: <span class="pkr-amount">PKR 250</span></div>
-                                    </div>
-                                </div>
-
-                                <!-- Step 3: Account Details -->
-                                <div id="account-details" style="display: none;">
-                                    <label class="form-label">3. Account Details</label>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="form-label" id="account-label">Account Number</label>
-                                            <input type="text" id="account-number" class="form-input" placeholder="Enter account number">
-                                        </div>
-                                        <div>
-                                            <label class="form-label">Account Holder Name</label>
-                                            <input type="text" id="account-name" class="form-input" placeholder="Enter account holder name">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Submit Button -->
-                                <div class="pt-4">
-                                    <button type="submit" id="withdraw-submit" class="btn btn-primary w-full text-lg py-3">
-                                        <i class="fas fa-paper-plane mr-2"></i>
-                                        Request Withdrawal
-                                    </button>
-                                </div>
-
-                                <div id="withdraw-message" class="text-center h-5"></div>
-                            </form>
-                        </div>
-
-                        <!-- Withdrawal Limits -->
-                        <div class="withdraw-limits">
-                            <h4 class="font-semibold text-gray-800 mb-4">Withdrawal Limits & Information</h4>
-                            <div class="space-y-3">
-                                <div class="limit-item">
-                                    <span class="text-gray-600">Minimum Withdrawal</span>
-                                    <span class="font-semibold pkr-amount">PKR 250</span>
-                                </div>
-                                <div class="limit-item">
-                                    <span class="text-gray-600">Maximum Daily Withdrawal</span>
-                                    <span class="font-semibold pkr-amount">PKR 50,000</span>
-                                </div>
-                                <div class="limit-item">
-                                    <span class="text-gray-600">Processing Time</span>
-                                    <span class="font-semibold">24-48 hours</span>
-                                </div>
-                                <div class="limit-item">
-                                    <span class="text-gray-600">Transaction Fee</span>
-                                    <span class="font-semibold">2% (min. PKR 10)</span>
-                                </div>
-                                <div class="limit-item">
-                                    <span class="text-gray-600">Conversion Rate</span>
-                                    <span class="font-semibold">1 Coin = 1 PKR</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column - Recent Withdrawals -->
-                    <div>
-                        <!-- Native Advanced Ad -->
-                        <div class="native-ad">
-                            <div class="native-ad-content">
-                                <div class="native-ad-icon">
-                                    <i class="fas fa-ad"></i>
-                                </div>
-                                <div class="native-ad-text">
-                                    <div class="native-ad-title">Sponsored Content</div>
-                                    <div class="native-ad-description">Discover amazing offers and deals tailored just for you!</div>
-                                    <button class="native-ad-button">Learn More</button>
-                                </div>
-                            </div>
-                            <div class="ad-label">Advertisement</div>
-                            <ins class="adsbygoogle"
-                                 style="display:block"
-                                 data-ad-format="fluid"
-                                 data-ad-layout-key="-fb+5w+4e-db+86"
-                                 data-ad-client="ca-pub-4313544696010088"
-                                 data-ad-slot="8580882616"></ins>
-                            <script>
-                                 (adsbygoogle = window.adsbygoogle || []).push({});
-                            </script>
-                        </div>
-
-                        <div class="card p-6">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Withdrawals</h3>
-                            
-                            <div class="space-y-4">
-                                <div class="history-item">
-                                    <div>
-                                        <div class="font-semibold pkr-amount">PKR 500</div>
-                                        <div class="text-sm text-gray-600">EasyPaisa • Today</div>
-                                    </div>
-                                    <span class="history-status status-pending">Pending</span>
-                                </div>
-                                
-                                <div class="history-item">
-                                    <div>
-                                        <div class="font-semibold pkr-amount">PKR 1,000</div>
-                                        <div class="text-sm text-gray-600">JazzCash • 2 days ago</div>
-                                    </div>
-                                    <span class="history-status status-approved">Approved</span>
-                                </div>
-                                
-                                <div class="history-item">
-                                    <div>
-                                        <div class="font-semibold pkr-amount">PKR 2,500</div>
-                                        <div class="text-sm text-gray-600">Bank Transfer • 1 week ago</div>
-                                    </div>
-                                    <span class="history-status status-approved">Approved</span>
-                                </div>
-                                
-                                <div class="history-item">
-                                    <div>
-                                        <div class="font-semibold pkr-amount">PKR 1,500</div>
-                                        <div class="text-sm text-gray-600">EasyPaisa • 2 weeks ago</div>
-                                    </div>
-                                    <span class="history-status status-rejected">Rejected</span>
-                                </div>
-                            </div>
-                            
-                            <button class="w-full mt-4 text-primary font-medium hover:underline text-sm">
-                                View Full History
-                            </button>
-                        </div>
-
-                        <!-- Support Card -->
-                        <div class="card p-6 mt-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-                            <div class="text-center">
-                                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-headset text-white text-xl"></i>
-                                </div>
-                                <h4 class="font-semibold text-gray-800 mb-2">Need Help?</h4>
-                                <p class="text-gray-600 text-sm mb-3">Our support team is here to help with any withdrawal issues.</p>
-                                <button class="btn btn-primary w-full">
-                                    <i class="fas fa-envelope mr-2"></i>
-                                    Contact Support
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+            
+            <p class="text-center mt-6 text-gray-400 text-sm italic">
+                Withdrawal Fee: 0% | Current Balance: Rs. <span id="bottom-pkr">0.00</span>
+            </p>
         </div>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notification-text">Operation completed successfully</span>
-    </div>
+    </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('active');
-            });
+        let selectedMethod = '';
 
-            // Load user data
-            const currentUserEmail = localStorage.getItem('currentUser');
-            if (!currentUserEmail) {
-                window.location.href = 'index.html';
+        function syncBalance() {
+            const balance = localStorage.getItem('userPKR') || "0.00";
+            const formatted = parseFloat(balance).toFixed(2);
+            document.getElementById('header-pkr').innerText = formatted;
+            document.getElementById('side-pkr').innerText = "Rs. " + formatted;
+            document.getElementById('bottom-pkr').innerText = formatted;
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            document.getElementById('easypaisa-card').classList.remove('selected');
+            document.getElementById('jazzcash-card').classList.remove('selected');
+            document.getElementById(method + '-card').classList.add('selected');
+        }
+
+        function handleWithdraw() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const number = document.getElementById('acc-number').value;
+            const currentBalance = parseFloat(localStorage.getItem('userPKR') || 0);
+
+            if (!selectedMethod) {
+                alert("Please select a payment method (EasyPaisa or JazzCash).");
+                return;
+            }
+            if (!number || number.length < 11) {
+                alert("Please enter a valid 11-digit mobile account number.");
+                return;
+            }
+            if (isNaN(amount) || amount < 500) {
+                alert("Minimum withdrawal amount is Rs. 500.");
+                return;
+            }
+            if (amount > currentBalance) {
+                alert("Insufficient balance! You only have Rs. " + currentBalance.toFixed(2));
                 return;
             }
 
-            const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
-            if (!userData) {
-                window.location.href = 'index.html';
-                return;
-            }
+            // Success Logic
+            alert("Withdrawal Request Submitted!\nMethod: " + selectedMethod.toUpperCase() + "\nAmount: Rs. " + amount + "\nNumber: " + number + "\nStatus: Pending (24h)");
+            
+            // Deduct amount from balance
+            const newBalance = currentBalance - amount;
+            localStorage.setItem('userPKR', newBalance.toFixed(2));
+            syncBalance();
+            
+            // Clear inputs
+            document.getElementById('withdraw-amount').value = '';
+            document.getElementById('acc-number').value = '';
+        }
 
-            // Initialize withdrawal state
-            let withdrawalState = JSON.parse(localStorage.getItem(`withdrawalState_${currentUserEmail}`)) || {
-                history: [
-                    { amount: 500, method: 'easypaisa', status: 'pending', date: new Date().toISOString() },
-                    { amount: 1000, method: 'jazzcash', status: 'approved', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-                    { amount: 2500, method: 'bank', status: 'approved', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() },
-                    { amount: 1500, method: 'easypaisa', status: 'rejected', date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() }
-                ]
-            };
-
-            // Update UI with user data
-            document.getElementById('user-email-display').textContent = currentUserEmail;
-            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-            document.getElementById('available-coins').textContent = userData.coins;
-
-            // Show admin link if user is admin
-            if (userData.isAdmin) {
-                document.getElementById('admin-nav-link').style.display = 'flex';
-            }
-
-            // Show notification
-            function showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                const notificationText = document.getElementById('notification-text');
-                
-                notificationText.textContent = message;
-                notification.className = `notification ${type} show`;
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-
-            // Payment method selection
-            let selectedMethod = null;
-            document.querySelectorAll('.payment-method').forEach(method => {
-                method.addEventListener('click', function() {
-                    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-                    this.classList.add('selected');
-                    
-                    selectedMethod = this.getAttribute('data-method');
-                    const accountDetails = document.getElementById('account-details');
-                    const accountLabel = document.getElementById('account-label');
-                    const accountInput = document.getElementById('account-number');
-                    
-                    accountDetails.style.display = 'block';
-                    
-                    switch(selectedMethod) {
-                        case 'easypaisa':
-                        case 'jazzcash':
-                            accountLabel.textContent = 'Mobile Number';
-                            accountInput.placeholder = '03XX-XXXXXXX';
-                            break;
-                        case 'bank':
-                            accountLabel.textContent = 'Account Number';
-                            accountInput.placeholder = 'Enter bank account number';
-                            break;
-                    }
-                    
-                    // Load existing data
-                    if (userData.paymentMethods && userData.paymentMethods[selectedMethod]) {
-                        document.getElementById('account-number').value = userData.paymentMethods[selectedMethod].account;
-                        document.getElementById('account-name').value = userData.paymentMethods[selectedMethod].name || '';
-                    }
-                });
-            });
-
-            // Quick amount buttons
-            document.querySelectorAll('.quick-amount').forEach(button => {
-                button.addEventListener('click', function() {
-                    document.querySelectorAll('.quick-amount').forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const amount = this.getAttribute('data-amount');
-                    document.getElementById('withdraw-amount').value = amount;
-                    updateConversion(amount);
-                });
-            });
-
-            // Update conversion when amount changes
-            document.getElementById('withdraw-amount').addEventListener('input', function() {
-                updateConversion(this.value);
-            });
-
-            // Update conversion display
-            function updateConversion(pkrAmount) {
-                const coinsRequired = pkrAmount; // 1 coin = 1 PKR
-                document.getElementById('coin-value').textContent = `${coinsRequired} coins`;
-                
-                // Remove active class from quick amount buttons if amount doesn't match
-                if (pkrAmount) {
-                    document.querySelectorAll('.quick-amount').forEach(btn => {
-                        if (btn.getAttribute('data-amount') !== pkrAmount) {
-                            btn.classList.remove('active');
-                        }
-                    });
-                }
-            }
-
-            // Withdrawal form submission
-            document.getElementById('withdraw-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const pkrAmount = parseInt(document.getElementById('withdraw-amount').value);
-                const coinsRequired = pkrAmount; // 1 coin = 1 PKR
-                const accountNumber = document.getElementById('account-number').value;
-                const accountName = document.getElementById('account-name').value;
-                
-                // Validation
-                if (!selectedMethod) {
-                    showNotification('Please select a payment method', 'error');
-                    return;
-                }
-                
-                if (!pkrAmount || pkrAmount < 250) {
-                    showNotification('Minimum withdrawal amount is PKR 250', 'error');
-                    return;
-                }
-                
-                if (coinsRequired > userData.coins) {
-                    showNotification('Insufficient coins for withdrawal', 'error');
-                    return;
-                }
-                
-                if (!accountNumber || !accountName) {
-                    showNotification('Please fill in all account details', 'error');
-                    return;
-                }
-                
-                // Process withdrawal
-                userData.coins -= coinsRequired;
-                localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                
-                // Add to withdrawal history
-                withdrawalState.history.unshift({
-                    amount: pkrAmount,
-                    method: selectedMethod,
-                    status: 'pending',
-                    date: new Date().toISOString()
-                });
-                localStorage.setItem(`withdrawalState_${currentUserEmail}`, JSON.stringify(withdrawalState));
-                
-                // Update UI
-                document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                document.getElementById('available-coins').textContent = userData.coins;
-                
-                // Show success message
-                showNotification(`Withdrawal request submitted for PKR ${pkrAmount.toLocaleString()}!`, 'success');
-                
-                // Reset form
-                this.reset();
-                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-                document.querySelectorAll('.quick-amount').forEach(btn => btn.classList.remove('active'));
-                document.getElementById('account-details').style.display = 'none';
-                document.getElementById('coin-value').textContent = '0 coins';
-                selectedMethod = null;
-            });
-
-            // Logout functionality
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to sign out?')) {
-                    localStorage.removeItem('currentUser');
-                    window.location.href = 'index.html';
-                }
-            });
-        });
+        window.onload = syncBalance;
     </script>
 </body>
 </html>

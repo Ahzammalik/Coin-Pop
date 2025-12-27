@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin & Win - Coin Pop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+        
+        /* Spin Wheel Style */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 8px solid #334155;
+            border-radius: 50%;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+        .wheel-part {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ef4444;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+
+    <a href="dashboard.html" class="absolute top-5 left-5 text-gray-400 hover:text-white">
+        <i class="fas fa-arrow-left text-2xl"></i>
+    </a>
+
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-black text-indigo-400 uppercase tracking-widest">Spin & Win</h1>
+        <p class="text-gray-400 text-sm">Test your luck and earn coins!</p>
+    </div>
+
+    <div class="relative">
+        <div class="pointer"></div>
+        <div id="wheel" class="wheel-container shadow-2xl shadow-indigo-500/20">
+            </div>
+    </div>
+
+    <div class="mt-12 text-center w-full max-w-xs">
+        <div id="status-msg" class="mb-4 text-indigo-300 font-bold h-6"></div>
+        <button id="spin-btn" onclick="spinNow()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-black text-xl shadow-lg shadow-indigo-600/30 transition-all active:scale-95">
+            SPIN NOW
+        </button>
+        <p id="cooldown-timer" class="mt-4 text-xs text-gray-500 hidden">Next spin available in: <span id="timer">00:00</span></p>
+    </div>
+
+    <div class="mt-10 bg-gray-800/50 px-6 py-3 rounded-full border border-gray-700">
+        <span class="text-gray-400 text-sm">Your Balance:</span>
+        <span id="user-balance" class="ml-2 font-bold text-yellow-400">0</span>
+    </div>
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const statusMsg = document.getElementById('status-msg');
+        const spinBtn = document.getElementById('spin-btn');
+        const balanceDisplay = document.getElementById('user-balance');
+        
+        const prizes = [10, 50, 0, 100, 20, 5, 200, 0]; // Points on wheel
+        const colors = ['#4f46e5', '#1e293b', '#6366f1', '#334155', '#4f46e5', '#1e293b', '#818cf8', '#334155'];
+
+        // Initializing Wheel UI
+        prizes.forEach((p, i) => {
+            const div = document.createElement('div');
+            div.className = 'wheel-part';
+            div.style.backgroundColor = colors[i];
+            div.style.transform = `rotate(${i * 45}deg)`;
+            div.innerHTML = `<span style="transform: rotate(45deg)">${p}</span>`;
+            wheel.appendChild(div);
+        });
+
+        function updateBalanceUI() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            balanceDisplay.innerText = (user.coins || 0).toLocaleString();
+        }
+        updateBalanceUI();
+
+        let isSpinning = false;
+
+        function spinNow() {
+            if (isSpinning) return;
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // --- Basic Security Check ---
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.classList.add('opacity-50');
+            statusMsg.innerText = "Spinning...";
+
+            const randomDeg = Math.floor(5000 + Math.random() * 5000); // High number for many rotations
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                
+                // Calculate which prize was landed on
+                const actualDeg = randomDeg % 360;
+                const prizeIndex = Math.floor((360 - actualDeg) / 45) % 8;
+                const winAmount = prizes[prizeIndex];
+
+                // Update Data
+                user.coins = (user.coins || 0) + winAmount;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+
+                // UI Feedback
+                if(winAmount > 0) {
+                    statusMsg.className = "mb-4 text-green-400 font-bold h-6";
+                    statusMsg.innerText = `YOU WON ${winAmount} COINS!`;
+                } else {
+                    statusMsg.className = "mb-4 text-red-400 font-bold h-6";
+                    statusMsg.innerText = "Better luck next time!";
+                }
+
+                updateBalanceUI();
+                
+                // Re-enable after delay
+                setTimeout(() => {
+                    spinBtn.disabled = false;
+                    spinBtn.classList.remove('opacity-50');
+                }, 2000);
+
+            }, 4000); // 4 seconds (duration of CSS transition)
+        }
+    </script>
+</body>
+</html>

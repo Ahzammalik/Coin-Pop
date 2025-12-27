@@ -3,241 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Pop Pro - Next Gen Gaming</title>
+    <title>Play - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --accent-cyan: #22d3ee;
-            --accent-purple: #8b5cf6;
-            --glass: rgba(255, 255, 255, 0.05);
-            --neon-border: rgba(34, 211, 238, 0.3);
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --dark: #1f2937;
         }
 
-        body {
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
-            color: #f8fafc;
-            font-family: 'Rajdhani', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
 
-        /* Particles Background */
-        #particles-js {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-
-        /* Professional Sidebar */
+        /* Sidebar Styling (Same as Settings) */
         .sidebar {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid var(--neon-border);
-            width: 260px;
-            height: 100vh;
-            position: fixed;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; width: 280px; transition: all 0.3s ease;
+            z-index: 100;
         }
 
         .nav-link {
-            transition: 0.3s;
-            border-radius: 0 50px 50px 0;
-            margin: 5px 15px 5px 0;
+            display: flex; align-items: center; padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8); transition: all 0.2s ease;
+            border-left: 4px solid transparent;
         }
 
-        .nav-link.active {
-            background: linear-gradient(90deg, rgba(34, 211, 238, 0.2), transparent);
-            border-left: 4px solid var(--accent-cyan);
-            color: var(--accent-cyan);
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white; border-left-color: white;
         }
 
-        /* Professional Game Cards */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--neon-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* Game Area Styling */
+        #game-container {
+            width: 100%;
+            height: 500px;
+            background: radial-gradient(circle, #ffffff 0%, #e5e7eb 100%);
+            border: 4px solid #fff;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            cursor: crosshair;
         }
 
-        /* New Coin Design */
         .coin {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            cursor: pointer;
             position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-family: 'Orbitron', sans-serif;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: coinPulse 2s infinite alternate;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2), inset 0 -4px 0 rgba(0,0,0,0.1);
+            cursor: pointer;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
         }
 
-        @keyframes coinPulse {
-            from { transform: scale(1); filter: brightness(1); }
-            to { transform: scale(1.05); filter: brightness(1.2); }
+        .coin i { pointer-events: none; }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
         }
 
-        .coin-gold { background: linear-gradient(135deg, #fbbf24, #d97706); border: 3px solid #fef3c7; }
-
-        /* Game Area */
-        .game-area {
-            height: 500px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 30px;
-            position: relative;
-            overflow: hidden;
-            border: 2px dashed rgba(34, 211, 238, 0.2);
+        .pop-effect {
+            position: absolute;
+            color: #f59e0b;
+            font-weight: 800;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
         }
 
-        /* Neon Stats */
-        .stat-value {
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(to right, #22d3ee, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes floatUp {
+            to { transform: translateY(-50px); opacity: 0; }
         }
 
-        .main-content { margin-left: 260px; padding: 2rem; }
-
-        @media (max-width: 1024px) {
-            .sidebar { display: none; }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; }
         }
     </style>
 </head>
-<body>
+<body class="antialiased flex min-h-screen bg-gray-100">
 
-    <aside class="sidebar flex flex-col">
-        <div class="p-8">
-            <h1 class="text-3xl font-bold tracking-tighter italic text-cyan-400">
-                COIN<span class="text-white">POP</span>
-            </h1>
+    <aside class="sidebar flex flex-col hidden md:flex">
+        <div class="p-6 border-bottom border-white/10">
+            <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-coins mr-2"></i> Coin Pop
+            </a>
         </div>
-        <nav class="flex-grow">
-            <a href="#" class="nav-link active flex items-center p-4 text-lg"><i class="fas fa-gamepad mr-3"></i> Mission Control</a>
-            <a href="#" class="nav-link flex items-center p-4 text-lg"><i class="fas fa-trophy mr-3"></i> Leaderboard</a>
-            <a href="#" class="nav-link flex items-center p-4 text-lg"><i class="fas fa-wallet mr-3"></i> Earnings</a>
-            <a href="#" class="nav-link flex items-center p-4 text-lg"><i class="fas fa-user-gear mr-3"></i> Profile</a>
+        <nav class="flex-grow py-4">
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-home mr-3"></i> Dashboard</a>
+            <a href="play.html" class="nav-link active"><i class="fas fa-play-circle mr-3"></i> Play</a>
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3"></i> Leaderboard</a>
+            <a href="rewards.html" class="nav-link"><i class="fas fa-gift mr-3"></i> Rewards</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-money-bill-wave mr-3"></i> Withdraw</a>
+            <a href="settings.html" class="nav-link"><i class="fas fa-cog mr-3"></i> Settings</a>
         </nav>
-        <div class="p-6 border-t border-slate-800">
-            <button class="w-full py-3 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 hover:bg-red-500 hover:text-white transition">Sign Out</button>
+        <div class="p-6 border-t border-white/10">
+            <button class="w-full bg-white text-indigo-600 py-2 rounded-lg font-bold">Sign Out</button>
         </div>
     </aside>
 
-    <main class="main-content">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-card p-6 flex flex-col items-center">
-                <span class="text-slate-400 text-sm uppercase tracking-widest">Total Vault</span>
-                <span class="text-4xl font-bold stat-value" id="totalCoins">0.00</span>
+    <div class="main-content flex-1 flex flex-col min-w-0">
+        <header class="bg-white p-6 shadow-sm flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Play & Earn</h2>
+                <p class="text-gray-500 text-sm">Pop the coins to increase your balance</p>
             </div>
-            <div class="glass-card p-6 flex flex-col items-center">
-                <span class="text-slate-400 text-sm uppercase tracking-widest">Current Level</span>
-                <span class="text-4xl font-bold text-white">LVL <span id="lvl">1</span></span>
+            <div id="score-badge" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg">
+                <i class="fas fa-coins mr-2"></i> Coins: <span id="coin-count">0</span>
             </div>
-            <div class="glass-card p-6 flex flex-col items-center">
-                <span class="text-slate-400 text-sm uppercase tracking-widest">Multiplier</span>
-                <span class="text-4xl font-bold text-green-400">x1.5</span>
-            </div>
-        </div>
+        </header>
 
-        <div class="glass-card p-4 mb-8">
-            <div class="flex justify-between items-center mb-4 px-4">
-                <h2 class="text-xl font-bold italic tracking-wide">ACTIVE MISSION: POP TO EARN</h2>
-                <div class="text-cyan-400 font-bold" id="progressText">0/20 COINS</div>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-6">
-                <div id="progressBar" class="h-full bg-gradient-to-right from-cyan-400 to-purple-500 transition-all duration-500" style="width: 0%"></div>
-            </div>
-            
-            <div class="game-area" id="gameArea">
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <p class="text-slate-600 text-2xl uppercase opacity-20 font-bold">Press Start to Begin</p>
+        <main class="p-6 max-w-5xl mx-auto w-full">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-green-500">
+                    <p class="text-gray-500 text-xs uppercase font-bold">Session High</p>
+                    <p class="text-2xl font-black text-gray-800" id="high-score">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-blue-500">
+                    <p class="text-gray-500 text-xs uppercase font-bold">Speed</p>
+                    <p class="text-2xl font-black text-gray-800" id="speed-level">1.0x</p>
                 </div>
             </div>
 
-            <div class="flex gap-4 justify-center">
-                <button onclick="startGame()" class="px-12 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-2xl shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all transform active:scale-95">
-                    START MISSION
-                </button>
+            <div id="game-container" class="relative">
+                <div id="start-overlay" class="absolute inset-0 bg-indigo-900/80 z-20 flex flex-col items-center justify-center text-white rounded-xl">
+                    <i class="fas fa-play-circle text-7xl mb-4 animate-bounce"></i>
+                    <h3 class="text-3xl font-black mb-2">Ready to Pop?</h3>
+                    <p class="mb-6 opacity-80">Each coin is worth 1 point</p>
+                    <button onclick="startGame()" class="bg-white text-indigo-600 px-10 py-3 rounded-full font-bold text-xl hover:scale-105 transition-transform">
+                        START GAME
+                    </button>
+                </div>
             </div>
-        </div>
-    </main>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-400 text-sm"><i class="fas fa-info-circle mr-1"></i> Coins are automatically saved to your wallet every 10 pops.</p>
+            </div>
+        </main>
+    </div>
 
     <script>
-        let coins = 0;
-        let collected = 0;
-        let target = 20;
+        let score = 0;
+        let highScore = 0;
+        let gameActive = false;
+        const container = document.getElementById('game-container');
+        const coinCountDisplay = document.getElementById('coin-count');
+        const highScoreDisplay = document.getElementById('high-score');
 
         function startGame() {
-            const area = document.getElementById('gameArea');
-            area.innerHTML = ''; // Clear start text
+            gameActive = true;
+            score = 0;
+            coinCountDisplay.innerText = score;
+            document.getElementById('start-overlay').style.display = 'none';
             spawnCoin();
         }
 
         function spawnCoin() {
-            const area = document.getElementById('gameArea');
+            if (!gameActive) return;
+
             const coin = document.createElement('div');
-            coin.className = 'coin coin-gold';
+            coin.className = 'coin';
             
-            const x = Math.random() * (area.clientWidth - 80);
-            const y = Math.random() * (area.clientHeight - 80);
+            // Random Position
+            const x = Math.random() * (container.offsetWidth - 80);
+            const y = Math.random() * (container.offsetHeight - 80);
             
             coin.style.left = x + 'px';
             coin.style.top = y + 'px';
-            coin.innerHTML = '<i class="fas fa-coins text-2xl"></i>';
-            
+            coin.innerHTML = '<i class="fas fa-dollar-sign"></i>';
+
+            // Click Event
             coin.onclick = (e) => {
-                popEffect(e);
-                coin.remove();
-                collectCoin();
-                spawnCoin();
+                popCoin(coin, e.clientX, e.clientY);
             };
-            
-            area.appendChild(coin);
+
+            container.appendChild(coin);
+
+            // Auto-remove if not clicked (increases difficulty)
+            setTimeout(() => {
+                if (coin.parentNode) {
+                    coin.remove();
+                    spawnCoin();
+                }
+            }, 1500);
         }
 
-        function collectCoin() {
-            collected++;
-            coins += 0.05;
-            document.getElementById('totalCoins').innerText = coins.toFixed(2);
-            document.getElementById('progressText').innerText = `${collected}/${target} COINS`;
+        function popCoin(coin, x, y) {
+            score++;
+            coinCountDisplay.innerText = score;
             
-            let percent = (collected / target) * 100;
-            document.getElementById('progressBar').style.width = percent + '%';
-            
-            if(collected >= target) {
-                alert("Level Up! Mission Accomplished.");
-                collected = 0;
-                target += 10;
-                document.getElementById('lvl').innerText = parseInt(document.getElementById('lvl').innerText) + 1;
+            if (score > highScore) {
+                highScore = score;
+                highScoreDisplay.innerText = highScore;
             }
+
+            // Pop Effect
+            const effect = document.createElement('div');
+            effect.className = 'pop-effect';
+            effect.innerText = '+1';
+            effect.style.left = (x - container.offsetLeft) + 'px';
+            effect.style.top = (y - container.offsetTop) + 'px';
+            container.appendChild(effect);
+            
+            setTimeout(() => effect.remove(), 600);
+            
+            coin.remove();
+            spawnCoin(); // Spawn next coin immediately on click
         }
 
-        function popEffect(e) {
-            const ring = document.createElement('div');
-            ring.className = 'absolute border-4 border-cyan-400 rounded-full pointer-events-none';
-            ring.style.left = (e.clientX - 260) + 'px'; // Adjust for sidebar
-            ring.style.top = (e.clientY - 150) + 'px';
-            ring.style.width = '70px';
-            ring.style.height = '70px';
-            
-            document.getElementById('gameArea').appendChild(ring);
-            
-            ring.animate([
-                { transform: 'scale(1)', opacity: 1 },
-                { transform: 'scale(2.5)', opacity: 0 }
-            ], { duration: 400, fill: 'forwards' });
-            
-            setTimeout(() => ring.remove(), 400);
-        }
+        // Sidebar Toggle for Mobile (Basic)
+        document.addEventListener('keydown', (e) => {
+            if(e.key === "Escape") gameActive = false;
+        });
     </script>
 </body>
 </html>

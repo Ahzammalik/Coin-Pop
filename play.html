@@ -3,186 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play & Earn - Coin Pop</title>
+    <title>Earn PKR - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow: hidden; }
-
-        /* Game Container */
-        #game-area {
-            width: 100%;
-            height: 70vh;
-            background: #0f172a; /* Dark theme for focus */
-            position: relative;
-            overflow: hidden;
-            border-radius: 1rem;
-            border: 4px solid #334155;
-        }
-
-        .target-coin {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, #fcd34d 0%, #d97706 100%);
-            border-radius: 50%;
-            border: 2px solid #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px #fbbf24;
-            transition: transform 0.1s ease;
-        }
-
+        #game-area { width: 100%; height: 65vh; background: #0f172a; position: relative; overflow: hidden; border-radius: 1rem; border: 4px solid #334155; }
+        .target-coin { position: absolute; width: 50px; height: 50px; background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px #fbbf24; }
         .life-heart { color: #ef4444; font-size: 1.5rem; margin-right: 5px; }
-        
-        /* Game Over Overlay */
-        #game-over {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 50;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-        }
+        #game-over { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
     </style>
 </head>
-<body class="flex min-h-screen">
-
-    <aside class="w-64 bg-indigo-700 text-white flex flex-col hidden md:flex">
-        <div class="p-6 font-bold text-2xl border-b border-indigo-500">Coin Pop</div>
-        <nav class="flex-grow p-4 space-y-2">
-            <a href="dashboard.html" class="block p-3 hover:bg-indigo-600 rounded">Dashboard</a>
-            <a href="play.html" class="block p-3 bg-indigo-800 rounded">Play Game</a>
-            <a href="withdraw.html" class="block p-3 hover:bg-indigo-600 rounded">Withdraw</a>
-            <a href="settings.html" class="block p-3 hover:bg-indigo-600 rounded">Settings</a>
-        </nav>
-    </aside>
-
-    <div class="flex-1 flex flex-col">
-        <header class="bg-white p-4 shadow flex justify-between items-center">
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-4xl mx-auto p-4">
+        <header class="flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm">
             <div class="flex items-center">
-                <span class="mr-4 font-bold text-gray-600">LIVES:</span>
+                <span class="mr-3 font-bold text-gray-500">LIVES:</span>
                 <div id="lives-container" class="flex">
-                    <i class="fas fa-heart life-heart"></i>
-                    <i class="fas fa-heart life-heart"></i>
-                    <i class="fas fa-heart life-heart"></i>
+                    <i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i><i class="fas fa-heart life-heart"></i>
                 </div>
             </div>
-            <div class="bg-amber-100 border border-amber-500 px-4 py-1 rounded text-amber-700 font-bold">
-                PKR: <span id="balance">0.00</span>
+            <div class="text-xl font-black text-green-600">
+                Balance: Rs. <span id="pkr-balance">0.00</span>
             </div>
         </header>
 
-        <main class="p-4 flex-grow">
-            <div id="game-area">
-                <div id="game-over">
-                    <h2 class="text-4xl font-black mb-4 text-red-500">GAME OVER!</h2>
-                    <p class="mb-6 text-gray-400">Coins are hard to earn. Watch an Ad to continue?</p>
-                    <button onclick="watchAdToContinue()" class="bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full font-bold mb-4 w-64">
-                        WATCH AD (+1 LIFE)
-                    </button>
-                    <button onclick="location.reload()" class="text-sm text-gray-500 underline">Restart Session</button>
-                </div>
-
-                <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-10 bg-slate-900/50">
-                    <button onclick="startGame()" class="bg-indigo-600 text-white px-12 py-4 rounded-xl text-2xl font-black shadow-2xl hover:bg-indigo-500">
-                        START EARNING
-                    </button>
-                </div>
+        <div id="game-area">
+            <div id="game-over">
+                <h2 class="text-4xl font-black mb-2 text-red-500">OUT OF LIVES!</h2>
+                <p class="mb-6 text-gray-400">Earned in this session: Rs. <span id="session-pkr">0.00</span></p>
+                <button onclick="watchAd()" class="bg-indigo-600 px-8 py-3 rounded-full font-bold mb-4 w-64">WATCH AD TO CONTINUE</button>
+                <button onclick="location.href='dashboard.html'" class="text-gray-500 underline">Back to Dashboard</button>
             </div>
-            
-            <div class="mt-4 w-full h-20 bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center text-gray-500">
-                Banner Ad Slot (ca-app-pub-...)
+            <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-10 bg-slate-900/80">
+                <button onclick="startGame()" class="bg-green-600 text-white px-10 py-4 rounded-xl text-2xl font-black shadow-2xl hover:scale-105 transition">START EARNING PKR</button>
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
-        let balance = 0;
+        let pkrBalance = parseFloat(localStorage.getItem('userPKR') || 0);
         let lives = 3;
         let gameActive = false;
-        let spawnRate = 1000; // 1 second initially
-        let gameTimer;
+        document.getElementById('pkr-balance').innerText = pkrBalance.toFixed(2);
 
         function startGame() {
             document.getElementById('start-screen').style.display = 'none';
             gameActive = true;
-            spawnCoin();
+            spawnTarget();
         }
 
-        function spawnCoin() {
+        function spawnTarget() {
             if (!gameActive) return;
-
             const area = document.getElementById('game-area');
-            const coin = document.createElement('div');
-            coin.className = 'target-coin';
-            
-            // Random position
-            const x = Math.random() * (area.offsetWidth - 60);
-            const y = Math.random() * (area.offsetHeight - 60);
-            
-            coin.style.left = x + 'px';
-            coin.style.top = y + 'px';
-            coin.innerHTML = '<i class="fas fa-bolt text-white"></i>';
+            const target = document.createElement('div');
+            target.className = 'target-coin';
+            target.style.left = Math.random() * (area.offsetWidth - 60) + 'px';
+            target.style.top = Math.random() * (area.offsetHeight - 60) + 'px';
+            target.innerHTML = '<i class="fas fa-bolt text-white"></i>';
 
-            // HARD MODE: Coin disappears very fast
-            let despawnTime = Math.max(500, 1000 - (balance * 10)); // Speed increases as you earn
+            // HARD MODE: 700ms to 400ms speed
+            let speed = Math.max(400, 700 - (pkrBalance * 2));
             
-            let clickDetected = false;
-            coin.onclick = () => {
-                clickDetected = true;
-                earnMoney();
-                coin.remove();
-                clearTimeout(autoRemove);
-                spawnCoin();
+            let clicked = false;
+            target.onclick = () => {
+                clicked = true;
+                updatePKR(0.05); // 0.05 PKR per click (20 clicks = 1 PKR)
+                target.remove();
+                spawnTarget();
             };
+            area.appendChild(target);
 
-            area.appendChild(coin);
-
-            const autoRemove = setTimeout(() => {
-                if (!clickDetected) {
-                    coin.remove();
-                    loseLife();
-                    if (lives > 0) spawnCoin();
+            setTimeout(() => {
+                if (!clicked) {
+                    target.remove();
+                    lives--;
+                    updateLivesUI();
+                    if (lives > 0) spawnTarget(); else gameOver();
                 }
-            }, despawnTime);
+            }, speed);
         }
 
-        function earnMoney() {
-            // Hard Calculation: 0.05 PKR per click. 
-            // 20 clicks = 1 PKR. This ensures you show enough ads.
-            balance += 0.05; 
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            
-            // Trigger Interstitial Ad every 1 PKR earned
-            if (Math.floor(balance * 100) % 100 === 0) {
-                console.log("Triggering Interstitial Ad...");
-                // adMob.showInterstitial();
-            }
-        }
-
-        function loseLife() {
-            lives--;
-            updateLivesUI();
-            if (lives <= 0) {
-                gameOver();
-            }
+        function updatePKR(amount) {
+            pkrBalance += amount;
+            localStorage.setItem('userPKR', pkrBalance.toFixed(2));
+            document.getElementById('pkr-balance').innerText = pkrBalance.toFixed(2);
         }
 
         function updateLivesUI() {
             const container = document.getElementById('lives-container');
             container.innerHTML = '';
-            for (let i = 0; i < lives; i++) {
-                container.innerHTML += '<i class="fas fa-heart life-heart"></i>';
-            }
+            for(let i=0; i<lives; i++) container.innerHTML += '<i class="fas fa-heart life-heart"></i>';
         }
 
         function gameOver() {
@@ -190,14 +100,11 @@
             document.getElementById('game-over').style.display = 'flex';
         }
 
-        function watchAdToContinue() {
-            alert("Loading Rewarded Video Ad...");
-            // Jab Ad khatam ho jaye:
-            lives = 1;
-            updateLivesUI();
+        function watchAd() {
+            alert("Loading Rewarded Ad..."); // Replace with AdMob
+            lives = 1; updateLivesUI();
             document.getElementById('game-over').style.display = 'none';
-            gameActive = true;
-            spawnCoin();
+            gameActive = true; spawnTarget();
         }
     </script>
 </body>

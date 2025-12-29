@@ -10,7 +10,8 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .sidebar { background: #1e293b; transition: all 0.3s; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #4f46e5; }
+        .nav-link { transition: 0.2s; border-left: 4px solid transparent; }
+        .nav-link:hover, .nav-link.active { background: rgba(255, 255, 255, 0.1); border-left-color: #4f46e5; color: white; }
         .stat-card { transition: transform 0.2s; }
         .stat-card:hover { transform: translateY(-5px); }
     </style>
@@ -19,16 +20,19 @@
 
     <div class="sidebar w-64 text-white hidden md:flex flex-col fixed h-full z-50">
         <div class="p-6">
-            <h1 class="text-2xl font-black text-indigo-400 italic">COIN POP</h1>
-            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Member Dashboard</p>
+            <h1 class="text-2xl font-black text-indigo-400 italic tracking-tighter">COIN POP</h1>
+            <p class="text-[10px] text-gray-500 tracking-widest uppercase font-bold">User Panel v1.0</p>
         </div>
         
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg bg-indigo-600/20 border-l-4 border-indigo-500">
-                <i class="fas fa-home mr-3 w-5"></i> Dashboard
+        <nav class="flex-1 px-4 space-y-1 mt-4 overflow-y-auto">
+            <a href="dashboard.html" class="nav-link active flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-grid-2 mr-3 w-5"></i> Dashboard
+            </a>
+            <a href="play.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-gamepad mr-3 w-5"></i> Play Games
             </a>
             <a href="reward.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
-                <i class="fas fa-gift mr-3 w-5"></i> Daily Earn
+                <i class="fas fa-gift mr-3 w-5"></i> Daily Rewards
             </a>
             <a href="spin.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
                 <i class="fas fa-dharmachakra mr-3 w-5"></i> Lucky Spin
@@ -37,116 +41,100 @@
                 <i class="fas fa-wallet mr-3 w-5"></i> Withdraw
             </a>
             <a href="history.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
-                <i class="fas fa-history mr-3 w-5"></i> History
+                <i class="fas fa-history mr-3 w-5"></i> My History
             </a>
-            <hr class="border-gray-700 my-4">
+            
+            <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Settings</div>
+            
             <a href="profile.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
-                <i class="fas fa-user-cog mr-3 w-5"></i> Profile Settings
+                <i class="fas fa-user-circle mr-3 w-5"></i> My Profile
             </a>
             <a href="support.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
-                <i class="fas fa-headset mr-3 w-5"></i> Support
+                <i class="fas fa-headset mr-3 w-5"></i> Help & Support
             </a>
-            <div id="admin-link-box" class="hidden pt-4">
-                 <a href="admin.html" class="nav-link flex items-center p-3 rounded-lg text-yellow-400 bg-yellow-400/10 border-l-4 border-yellow-400">
-                    <i class="fas fa-user-shield mr-3 w-5"></i> Admin Panel
+
+            <div id="admin-link-box" class="hidden pt-4 border-t border-gray-700 mt-4">
+                 <a href="admin.html" class="nav-link flex items-center p-3 rounded-lg text-yellow-400 bg-yellow-400/5">
+                    <i class="fas fa-user-shield mr-3 w-5"></i> Admin Control
                 </a>
             </div>
         </nav>
 
-        <div class="p-4 border-t border-gray-700">
-            <button onclick="logout()" class="w-full flex items-center justify-center p-3 text-red-400 hover:bg-red-400/10 rounded-lg transition">
-                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        <div class="p-4 bg-gray-900/50">
+            <button onclick="logout()" class="w-full flex items-center justify-center p-3 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition font-bold text-sm">
+                <i class="fas fa-power-off mr-2"></i> Logout
             </button>
         </div>
     </div>
 
-    <div class="flex-1 md:ml-64 bg-gray-50">
+    <div class="flex-1 md:ml-64">
         
-        <header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-40">
+        <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-40">
             <div class="flex items-center">
-                <button class="md:hidden mr-4 text-gray-600"><i class="fas fa-bars text-xl"></i></button>
-                <h2 class="text-xl font-bold text-gray-800">Overview</h2>
+                <button class="md:hidden mr-4 text-gray-600"><i class="fas fa-bars"></i></button>
+                <span class="text-sm font-bold text-gray-400">Welcome, <span id="user-header-name" class="text-indigo-600">User</span></span>
             </div>
-            
-            <div class="flex items-center gap-6">
-                <div class="hidden sm:flex flex-col text-right">
-                    <span id="user-display-name" class="font-bold text-gray-800">User</span>
-                    <span id="user-display-email" class="text-xs text-gray-400 font-mono">user@example.com</span>
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-50 px-4 py-2 rounded-2xl flex items-center gap-2 border border-indigo-100">
+                    <i class="fas fa-coins text-indigo-600"></i>
+                    <span id="user-coins-top" class="font-black text-indigo-700">0</span>
                 </div>
-                <img id="header-avatar" src="" class="h-10 w-10 rounded-full border-2 border-indigo-500 shadow-sm">
             </div>
         </header>
 
-        <main class="p-8">
-            <div class="mb-10">
-                <h3 class="text-2xl font-black text-gray-800">Welcome Back, <span id="user-greet" class="text-indigo-600">...</span>! 👋</h3>
-                <p class="text-gray-500">Aapka total balance aur earning tasks yahan hain.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
-                    <div class="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl">
-                        <i class="fas fa-coins"></i>
+        <main class="p-6 md:p-10">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <div class="stat-card lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[2rem] p-8 text-white shadow-xl flex justify-between items-center relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-indigo-100 text-sm font-medium">Available Balance</p>
+                        <h2 class="text-5xl font-black mt-2" id="user-coins-main">0</h2>
+                        <p class="text-indigo-200 text-xs mt-4">≈ Rs. <span id="pkr-val">0.00</span> PKR</p>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Total Coins</p>
-                        <h4 id="user-coins" class="text-3xl font-black text-gray-800">0</h4>
-                    </div>
+                    <i class="fas fa-wallet text-9xl absolute -right-5 -bottom-5 text-white/10 rotate-12"></i>
+                    <a href="withdraw.html" class="relative z-10 bg-white text-indigo-600 px-8 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-indigo-50 transition">WITHDRAW</a>
                 </div>
 
-                <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
-                    <div class="h-14 w-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 text-2xl">
-                        <i class="fas fa-id-card"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Account ID</p>
-                        <h4 id="user-id" class="text-lg font-bold text-gray-800">CP-000000</h4>
-                    </div>
-                </div>
-
-                <div class="stat-card bg-indigo-600 p-6 rounded-2xl shadow-xl text-white flex items-center gap-5">
-                    <div class="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center text-white text-2xl">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-indigo-200 uppercase">Value in PKR</p>
-                        <h4 id="pkr-val" class="text-2xl font-black italic">Rs. 0</h4>
+                <div class="stat-card bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-center">
+                    <p class="text-gray-400 text-xs font-bold uppercase mb-2">Account ID</p>
+                    <h4 id="user-id" class="text-xl font-black text-gray-800">CP-000000</h4>
+                    <div class="mt-4 flex items-center gap-2">
+                        <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-xs text-green-600 font-bold uppercase">Verified User</span>
                     </div>
                 </div>
             </div>
 
-            <h4 class="font-bold text-gray-800 mb-6 uppercase tracking-wider text-sm">Quick Earning Tasks</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <a href="reward.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
-                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+            <h3 class="text-gray-800 font-black text-lg mb-6 flex items-center gap-2">
+                <div class="h-6 w-1 bg-indigo-600 rounded-full"></div> Main Activities
+            </h3>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <a href="play.html" class="stat-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-indigo-300 transition text-center">
+                    <div class="w-14 h-14 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-gamepad text-2xl"></i>
+                    </div>
+                    <h5 class="font-bold text-gray-800 text-sm">Play Games</h5>
+                </a>
+
+                <a href="reward.html" class="stat-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-indigo-300 transition text-center">
+                    <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-gift text-2xl"></i>
                     </div>
-                    <h5 class="font-bold text-gray-800">Daily Reward</h5>
-                    <p class="text-[10px] text-gray-400 mt-1">Claim Free Coins</p>
+                    <h5 class="font-bold text-gray-800 text-sm">Daily Reward</h5>
                 </a>
 
-                <a href="spin.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
-                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                <a href="spin.html" class="stat-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-indigo-300 transition text-center">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-dharmachakra text-2xl"></i>
                     </div>
-                    <h5 class="font-bold text-gray-800">Lucky Spin</h5>
-                    <p class="text-[10px] text-gray-400 mt-1">Spin to Win</p>
+                    <h5 class="font-bold text-gray-800 text-sm">Lucky Spin</h5>
                 </a>
 
-                <a href="withdraw.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
-                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-money-check-alt text-2xl"></i>
+                <a href="history.html" class="stat-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-indigo-300 transition text-center">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-receipt text-2xl"></i>
                     </div>
-                    <h5 class="font-bold text-gray-800">Withdraw</h5>
-                    <p class="text-[10px] text-gray-400 mt-1">Cash out Coins</p>
-                </a>
-
-                <a href="support.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
-                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-headset text-2xl"></i>
-                    </div>
-                    <h5 class="font-bold text-gray-800">Help Center</h5>
-                    <p class="text-[10px] text-gray-400 mt-1">Contact Support</p>
+                    <h5 class="font-bold text-gray-800 text-sm">History</h5>
                 </a>
             </div>
         </main>
@@ -161,26 +149,24 @@
                 return;
             }
 
-            // Fill User Data
-            document.getElementById('user-greet').innerText = user.name || "Member";
-            document.getElementById('user-display-name').innerText = user.name || "Member";
-            document.getElementById('user-display-email').innerText = user.email;
+            // Sync UI
+            document.getElementById('user-header-name').innerText = user.name || "Member";
+            document.getElementById('user-coins-top').innerText = (user.coins || 0).toLocaleString();
+            document.getElementById('user-coins-main').innerText = (user.coins || 0).toLocaleString();
+            document.getElementById('pkr-val').innerText = ((user.coins || 0) * 0.1).toFixed(2);
             document.getElementById('user-id').innerText = user.accountId || "CP-000000";
-            document.getElementById('user-coins').innerText = (user.coins || 0).toLocaleString();
-            document.getElementById('pkr-val').innerText = "Rs. " + ((user.coins || 0) * 0.1).toFixed(2);
-            
-            // Set Avatar
-            document.getElementById('header-avatar').src = `https://ui-avatars.com/api/?name=${user.name || user.email}&background=4f46e5&color=fff`;
 
-            // Admin Logic
+            // Admin Visibility
             if(user.email === "ghazimalik1997@gmail.com") {
                 document.getElementById('admin-link-box').classList.remove('hidden');
             }
         });
 
         function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
         }
     </script>
 </body>

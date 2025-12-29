@@ -120,3 +120,28 @@
     </script>
 </body>
 </html>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <a href="reward.html" class="bg-white p-6 rounded-3xl shadow-sm hover:shadow-md transition text-center border border-gray-100">
+        <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-gift text-xl"></i>
+        </div>
+        <p class="font-bold text-gray-800 text-sm">Reward</p>
+    </a>
+    </div>
+
+<script>
+    function updateUI() {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if(!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Coins display ko update karna
+        const coinElements = document.querySelectorAll('#user-coins-top, #user-coins-main');
+        coinElements.forEach(el => {
+            el.innerText = (user.coins || 0).toLocaleString();
+        });
+        document.getElementById('user-id').innerText = user.accountId || "CP-001";
+    }
+    document.addEventListener('DOMContentLoaded', updateUI);
+</script>

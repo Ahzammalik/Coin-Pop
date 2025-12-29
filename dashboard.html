@@ -9,91 +9,147 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .gradient-bg { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
-        .feature-card:active { transform: scale(0.95); transition: 0.2s; }
+        .sidebar { background: #1e293b; transition: all 0.3s; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #4f46e5; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
     </style>
 </head>
-<body class="pb-20">
+<body class="flex min-h-screen">
 
-    <div class="gradient-bg text-white px-6 pt-10 pb-20 rounded-b-[40px] shadow-lg">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <p class="text-indigo-100 text-sm">Welcome back,</p>
-                <h1 id="user-name" class="text-2xl font-bold italic">User</h1>
-            </div>
-            <a href="profile.html" class="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md border border-white/30">
-                <i class="fas fa-user text-xl"></i>
-            </a>
+    <div class="sidebar w-64 text-white hidden md:flex flex-col fixed h-full z-50">
+        <div class="p-6">
+            <h1 class="text-2xl font-black text-indigo-400 italic">COIN POP</h1>
+            <p class="text-[10px] text-gray-400 tracking-widest uppercase">Member Dashboard</p>
         </div>
         
-        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-xl">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-xs uppercase tracking-widest opacity-70">Total Balance</p>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-coins text-yellow-400 text-2xl"></i>
-                        <span id="user-coins" class="text-4xl font-black">0</span>
-                    </div>
-                </div>
-                <a href="withdraw.html" class="bg-yellow-400 text-gray-900 px-5 py-2 rounded-2xl font-bold text-sm hover:bg-yellow-300 transition shadow-lg">
-                    Withdraw
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-lg bg-indigo-600/20 border-l-4 border-indigo-500">
+                <i class="fas fa-home mr-3 w-5"></i> Dashboard
+            </a>
+            <a href="reward.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-gift mr-3 w-5"></i> Daily Earn
+            </a>
+            <a href="spin.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-dharmachakra mr-3 w-5"></i> Lucky Spin
+            </a>
+            <a href="withdraw.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-wallet mr-3 w-5"></i> Withdraw
+            </a>
+            <a href="history.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-history mr-3 w-5"></i> History
+            </a>
+            <hr class="border-gray-700 my-4">
+            <a href="profile.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-user-cog mr-3 w-5"></i> Profile Settings
+            </a>
+            <a href="support.html" class="nav-link flex items-center p-3 rounded-lg text-gray-300">
+                <i class="fas fa-headset mr-3 w-5"></i> Support
+            </a>
+            <div id="admin-link-box" class="hidden pt-4">
+                 <a href="admin.html" class="nav-link flex items-center p-3 rounded-lg text-yellow-400 bg-yellow-400/10 border-l-4 border-yellow-400">
+                    <i class="fas fa-user-shield mr-3 w-5"></i> Admin Panel
                 </a>
             </div>
+        </nav>
+
+        <div class="p-4 border-t border-gray-700">
+            <button onclick="logout()" class="w-full flex items-center justify-center p-3 text-red-400 hover:bg-red-400/10 rounded-lg transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
         </div>
     </div>
 
-    <div class="max-w-md mx-auto px-6 -mt-10">
-        <div class="grid grid-cols-2 gap-4">
+    <div class="flex-1 md:ml-64 bg-gray-50">
+        
+        <header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-40">
+            <div class="flex items-center">
+                <button class="md:hidden mr-4 text-gray-600"><i class="fas fa-bars text-xl"></i></button>
+                <h2 class="text-xl font-bold text-gray-800">Overview</h2>
+            </div>
             
-            <a href="earn.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                <div class="bg-orange-100 h-14 w-14 rounded-2xl flex items-center justify-center text-orange-600 text-2xl mb-3">
-                    <i class="fas fa-gift"></i>
+            <div class="flex items-center gap-6">
+                <div class="hidden sm:flex flex-col text-right">
+                    <span id="user-display-name" class="font-bold text-gray-800">User</span>
+                    <span id="user-display-email" class="text-xs text-gray-400 font-mono">user@example.com</span>
                 </div>
-                <span class="font-bold text-gray-800">Daily Earn</span>
-                <span class="text-[10px] text-gray-400">Claim Rewards</span>
-            </a>
+                <img id="header-avatar" src="" class="h-10 w-10 rounded-full border-2 border-indigo-500 shadow-sm">
+            </div>
+        </header>
 
-            <a href="spin.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                <div class="bg-indigo-100 h-14 w-14 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl mb-3">
-                    <i class="fas fa-dharmachakra"></i>
+        <main class="p-8">
+            <div class="mb-10">
+                <h3 class="text-2xl font-black text-gray-800">Welcome Back, <span id="user-greet" class="text-indigo-600">...</span>! 👋</h3>
+                <p class="text-gray-500">Aapka total balance aur earning tasks yahan hain.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+                    <div class="h-14 w-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Total Coins</p>
+                        <h4 id="user-coins" class="text-3xl font-black text-gray-800">0</h4>
+                    </div>
                 </div>
-                <span class="font-bold text-gray-800">Lucky Spin</span>
-                <span class="text-[10px] text-gray-400">Test Your Luck</span>
-            </a>
 
-            <a href="history.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                <div class="bg-green-100 h-14 w-14 rounded-2xl flex items-center justify-center text-green-600 text-2xl mb-3">
-                    <i class="fas fa-history"></i>
+                <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+                    <div class="h-14 w-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 text-2xl">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Account ID</p>
+                        <h4 id="user-id" class="text-lg font-bold text-gray-800">CP-000000</h4>
+                    </div>
                 </div>
-                <span class="font-bold text-gray-800">History</span>
-                <span class="text-[10px] text-gray-400">Transactions</span>
-            </a>
 
-            <a href="support.html" class="feature-card bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                <div class="bg-red-100 h-14 w-14 rounded-2xl flex items-center justify-center text-red-600 text-2xl mb-3">
-                    <i class="fas fa-headset"></i>
+                <div class="stat-card bg-indigo-600 p-6 rounded-2xl shadow-xl text-white flex items-center gap-5">
+                    <div class="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-indigo-200 uppercase">Value in PKR</p>
+                        <h4 id="pkr-val" class="text-2xl font-black italic">Rs. 0</h4>
+                    </div>
                 </div>
-                <span class="font-bold text-gray-800">Support</span>
-                <span class="text-[10px] text-gray-400">Get Help</span>
-            </a>
+            </div>
 
-        </div>
+            <h4 class="font-bold text-gray-800 mb-6 uppercase tracking-wider text-sm">Quick Earning Tasks</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="reward.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
+                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-gift text-2xl"></i>
+                    </div>
+                    <h5 class="font-bold text-gray-800">Daily Reward</h5>
+                    <p class="text-[10px] text-gray-400 mt-1">Claim Free Coins</p>
+                </a>
 
-        <div id="admin-box" class="mt-8 hidden">
-            <a href="admin.html" class="w-full bg-gray-900 text-white p-4 rounded-2xl flex items-center justify-between shadow-xl">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-user-shield text-indigo-400"></i>
-                    <span class="font-bold">Admin Control Panel</span>
-                </div>
-                <i class="fas fa-chevron-right text-gray-500"></i>
-            </a>
-        </div>
-    </div>
+                <a href="spin.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
+                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-dharmachakra text-2xl"></i>
+                    </div>
+                    <h5 class="font-bold text-gray-800">Lucky Spin</h5>
+                    <p class="text-[10px] text-gray-400 mt-1">Spin to Win</p>
+                </a>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-3 flex justify-between items-center md:hidden">
-        <a href="dashboard.html" class="text-indigo-600"><i class="fas fa-home text-xl"></i></a>
-        <a href="earn.html" class="text-gray-400"><i class="fas fa-plus-circle text-3xl"></i></a>
-        <a href="profile.html" class="text-gray-400"><i class="fas fa-user text-xl"></i></a>
+                <a href="withdraw.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
+                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-money-check-alt text-2xl"></i>
+                    </div>
+                    <h5 class="font-bold text-gray-800">Withdraw</h5>
+                    <p class="text-[10px] text-gray-400 mt-1">Cash out Coins</p>
+                </a>
+
+                <a href="support.html" class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition text-center group">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-headset text-2xl"></i>
+                    </div>
+                    <h5 class="font-bold text-gray-800">Help Center</h5>
+                    <p class="text-[10px] text-gray-400 mt-1">Contact Support</p>
+                </a>
+            </div>
+        </main>
     </div>
 
     <script src="main.js"></script>
@@ -105,15 +161,27 @@
                 return;
             }
 
-            // Fill UI
-            document.getElementById('user-name').innerText = user.name || "User";
+            // Fill User Data
+            document.getElementById('user-greet').innerText = user.name || "Member";
+            document.getElementById('user-display-name').innerText = user.name || "Member";
+            document.getElementById('user-display-email').innerText = user.email;
+            document.getElementById('user-id').innerText = user.accountId || "CP-000000";
             document.getElementById('user-coins').innerText = (user.coins || 0).toLocaleString();
+            document.getElementById('pkr-val').innerText = "Rs. " + ((user.coins || 0) * 0.1).toFixed(2);
+            
+            // Set Avatar
+            document.getElementById('header-avatar').src = `https://ui-avatars.com/api/?name=${user.name || user.email}&background=4f46e5&color=fff`;
 
-            // Admin Visibility
-            if (user.email === "ghazimalik1997@gmail.com") {
-                document.getElementById('admin-box').classList.remove('hidden');
+            // Admin Logic
+            if(user.email === "ghazimalik1997@gmail.com") {
+                document.getElementById('admin-link-box').classList.remove('hidden');
             }
         });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 </html>

@@ -2,177 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rewards Center - Coin Pop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reward - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .reward-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .reward-card:active { transform: scale(0.97); }
-        .glow-indigo { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2); }
-        
-        /* Shimmer Effect for Loading/Ads */
-        .shimmer {
-            background: linear-gradient(90deg, #eff6ff 25%, #dbeafe 50%, #eff6ff 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    </style>
 </head>
-<body class="antialiased pb-24">
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-6">
 
-    <div class="bg-white/80 backdrop-blur-md sticky top-0 z-30 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-        <a href="dashboard.html" class="h-10 w-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-500 active:bg-gray-200">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <h1 class="text-lg font-extrabold text-gray-800 tracking-tight">Earning Hub</h1>
-        <div class="flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
-            <i class="fas fa-coins text-indigo-600 text-sm"></i>
-            <span id="user-coins-display" class="text-indigo-600 font-bold text-sm">0</span>
+    <div class="max-w-sm w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center">
+        <div class="w-24 h-24 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <i class="fas fa-gift text-4xl"></i>
         </div>
-    </div>
-
-    <div class="max-w-md mx-auto p-6">
         
-        <div class="reward-card bg-indigo-600 rounded-[2.5rem] p-8 text-white mb-8 relative overflow-hidden glow-indigo">
-            <div class="relative z-10">
-                <span class="bg-indigo-500/50 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Daily Bonus</span>
-                <h2 class="text-3xl font-black mt-3 mb-1">+50 Coins</h2>
-                <p class="text-indigo-200 text-xs mb-6">Come back tomorrow for more!</p>
-                <button id="daily-btn" onclick="claimDaily()" class="w-full bg-white text-indigo-600 py-4 rounded-2xl font-black shadow-xl hover:shadow-2xl transition-all active:scale-95">
-                    CLAIM REWARD
-                </button>
-            </div>
-            <i class="fas fa-gem absolute -right-6 -bottom-6 text-9xl text-white/10 rotate-12"></i>
-        </div>
+        <h1 class="text-3xl font-black text-gray-800">Daily Bonus</h1>
+        <p class="text-gray-400 text-sm mt-3 mb-8">Get 50 free coins every day. Just click the button below!</p>
 
-        <h3 class="font-black text-gray-800 text-sm uppercase tracking-widest mb-4 ml-2">Available Tasks</h3>
+        <button onclick="claimReward()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-indigo-700 transition-all active:scale-95">
+            CLAIM 50 COINS
+        </button>
 
-        <div class="reward-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-4 flex items-center gap-4">
-            <div class="h-14 w-14 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 text-2xl">
-                <i class="fas fa-play-circle"></i>
-            </div>
-            <div class="flex-1">
-                <h4 class="font-bold text-gray-800">Watch & Earn</h4>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">+25 Coins</span>
-                    <span class="text-[10px] text-gray-400">Ends in 15s</span>
-                </div>
-            </div>
-            <button onclick="simulateAd(this)" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md">
-                WATCH
-            </button>
-        </div>
-
-        <div class="reward-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-4 flex items-center gap-4">
-            <div class="h-14 w-14 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600 text-2xl">
-                <i class="fas fa-user-plus"></i>
-            </div>
-            <div class="flex-1">
-                <h4 class="font-bold text-gray-800">Invite Friends</h4>
-                <p class="text-[10px] text-gray-400 mt-1">Earn +500 Coins per friend</p>
-            </div>
-            <button onclick="shareApp()" class="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-bold text-xs">
-                INVITE
-            </button>
-        </div>
-
+        <a href="dashboard.html" class="block mt-6 text-indigo-600 font-bold text-sm">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
     </div>
 
-    <div id="ad-overlay" class="fixed inset-0 bg-black z-50 hidden flex flex-col items-center justify-center p-10">
-        <div id="ad-timer" class="absolute top-10 right-10 text-white font-mono bg-white/10 px-4 py-2 rounded-full border border-white/20">15s</div>
-        <div class="text-center">
-            <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-pulse">
-                <i class="fas fa-play text-white text-3xl"></i>
-            </div>
-            <h2 class="text-white text-xl font-bold">Sponsor Video</h2>
-            <p class="text-gray-500 text-sm mt-2 leading-relaxed">Please wait while the video finishes to receive your reward.</p>
-        </div>
-    </div>
-
-    <script src="main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', updateUI);
-
-        function updateUI() {
+        function claimReward() {
             const user = JSON.parse(localStorage.getItem('currentUser'));
-            if(!user) return window.location.href = 'index.html';
-            
-            document.getElementById('user-coins-display').innerText = (user.coins || 0).toLocaleString();
-            
-            // Check Daily Status
+            const today = new Date().toDateString();
             const lastClaim = localStorage.getItem(`lastClaim_${user.email}`);
-            const today = new Date().toDateString();
+
             if(lastClaim === today) {
-                const btn = document.getElementById('daily-btn');
-                btn.innerText = "ALREADY CLAIMED";
-                btn.disabled = true;
-                btn.className = "w-full bg-indigo-400/50 text-white/50 py-4 rounded-2xl font-black cursor-not-allowed";
-            }
-        }
-
-        function claimDaily() {
-            vibrate(50);
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            const today = new Date().toDateString();
-
-            user.coins = (user.coins || 0) + 50;
-            localStorage.setItem(`lastClaim_${user.email}`, today);
-            saveAndSync(user);
-            
-            alert("Success! 50 Coins added to your wallet.");
-            updateUI();
-        }
-
-        function simulateAd(btn) {
-            vibrate(30);
-            const overlay = document.getElementById('ad-overlay');
-            const timer = document.getElementById('ad-timer');
-            overlay.classList.remove('hidden');
-            
-            let count = 15;
-            const timerInt = setInterval(() => {
-                count--;
-                timer.innerText = count + "s";
-                if(count <= 0) {
-                    clearInterval(timerInt);
-                    overlay.classList.add('hidden');
-                    addReward(25);
-                }
-            }, 1000);
-        }
-
-        function addReward(amount) {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            user.coins = (user.coins || 0) + amount;
-            saveAndSync(user);
-            alert(`Amazing! You earned ${amount} coins.`);
-            updateUI();
-        }
-
-        function saveAndSync(user) {
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
-        }
-
-        function shareApp() {
-            vibrate(20);
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Coin Pop',
-                    text: 'Join Coin Pop and earn real money!',
-                    url: window.location.href
-                });
+                alert("You have already claimed today's reward! Come back tomorrow.");
             } else {
-                alert("Referral Link: https://coinpop.link/ref/" + Math.random().toString(36).substr(2, 9));
+                user.coins = (user.coins || 0) + 50;
+                localStorage.setItem(`lastClaim_${user.email}`, today);
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+                
+                alert("Success! 50 Coins added.");
+                window.location.href = 'dashboard.html';
             }
-        }
-
-        function vibrate(ms) {
-            if (navigator.vibrate) navigator.vibrate(ms);
         }
     </script>
 </body>

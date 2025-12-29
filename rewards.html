@@ -2,1531 +2,178 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Rewards - Coin Pop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rewards Center - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google AdMob SDK -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-4313544696010088"
-    crossorigin="anonymous"></script>
-    
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1f2937;
-            --light: #f9fafb;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .reward-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reward-card:active { transform: scale(0.97); }
+        .glow-indigo { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2); }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        body {
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        
-        .sidebar {
-            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            width: 280px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-        }
-        
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-nav {
-            padding: 1rem 0;
-            flex-grow: 1;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border-left: 4px solid transparent;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: white;
-        }
-        
-        .sidebar-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .content-header {
-            background-color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Rewards-specific styles */
-        .rewards-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .rewards-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
-        }
-        
-        .rewards-hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(-30%, 30%);
-        }
-        
-        .reward-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
-            position: relative;
-        }
-        
-        .reward-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .reward-card.claimed {
-            opacity: 0.7;
-        }
-        
-        .reward-card.active {
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        .reward-card.upcoming {
-            border: 2px dashed #d1d5db;
-        }
-        
-        .reward-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-            color: white;
-        }
-        
-        .reward-icon.primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        }
-        
-        .reward-icon.success {
-            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
-        }
-        
-        .reward-icon.warning {
-            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
-        }
-        
-        .reward-icon.danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-        }
-        
-        .reward-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: var(--secondary);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            outline: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-success {
-            background-color: var(--secondary);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #059669;
-        }
-        
-        .btn-disabled {
-            background-color: #9ca3af;
-            color: white;
-            cursor: not-allowed;
-        }
-        
-        .streak-counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .streak-day {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            background: #e5e7eb;
-            color: #6b7280;
-            position: relative;
-        }
-        
-        .streak-day.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .streak-day.current {
-            background: var(--secondary);
-            color: white;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-        }
-        
-        .streak-day.missed {
-            background: #fca5a5;
-            color: #991b1b;
-        }
-        
-        .progress-container {
-            width: 100%;
-            background: #e5e7eb;
-            border-radius: 1rem;
-            overflow: hidden;
-            height: 10px;
-            margin: 1rem 0;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 1rem;
-            transition: width 0.5s ease;
-        }
-        
-        .reward-animation {
-            animation: rewardPop 0.5s ease-in-out;
-        }
-        
-        @keyframes rewardPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .notification {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background-color: var(--secondary);
-        }
-        
-        .notification.error {
-            background-color: var(--danger);
-        }
-        
-        .countdown-timer {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
-            text-align: center;
-            margin: 1rem 0;
-        }
-        
-        .bonus-info {
-            background: rgba(79, 70, 229, 0.05);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .reward-status {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-claimed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-available {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .status-locked {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        
-        .status-upcoming {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .special-reward {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-        
-        .special-reward .reward-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .reward-details {
-            background: #f8fafc;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .reward-progress {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        
-        .milestone-reward {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            background: white;
-            margin-bottom: 0.5rem;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .milestone-reward.claimed {
-            background: #f0fdf4;
-            border-color: #bbf7d0;
-        }
-
-        /* Ad Container Styles */
-        .ad-container {
-            width: 100%;
-            margin: 20px 0;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            background: white;
-        }
-
-        .ad-label {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 15px;
-            font-size: 0.8rem;
-            text-align: center;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .admob-banner {
-            width: 100%;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-        }
-
-        .admob-native {
-            width: 100%;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-        }
-
-        .admob-interstitial {
-            width: 100%;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-        }
-
-        .ad-loading {
-            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+        /* Shimmer Effect for Loading/Ads */
+        .shimmer {
+            background: linear-gradient(90deg, #eff6ff 25%, #dbeafe 50%, #eff6ff 75%);
             background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            font-size: 0.875rem;
+            animation: shimmer 1.5s infinite;
         }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 0;
-            max-width: 90%;
-            width: 500px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .watch-ad-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: fixed;
-                height: 100%;
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            .content-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .streak-day {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .reward-card {
-                margin-bottom: 1rem;
-            }
-
-            .admob-banner {
-                height: 80px;
-            }
-            
-            .admob-native {
-                min-height: 250px;
-            }
-            
-            .admob-interstitial {
-                min-height: 300px;
-            }
-        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
-<body class="antialiased flex flex-col min-h-screen bg-gray-100">
-    <div id="app-container" class="w-full flex-grow flex">
-        <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
-        </button>
+<body class="antialiased pb-24">
 
-        <!-- Sidebar -->
-        <aside class="sidebar flex flex-col">
-            <div class="sidebar-header">
-                <a href="dashboard.html" class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-coins mr-2"></i>
-                    Coin Pop
-                </a>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="play.html" class="nav-link">
-                    <i class="fas fa-play-circle"></i>
-                    <span>Play</span>
-                </a>
-                <a href="leaderboard.html" class="nav-link">
-                    <i class="fas fa-trophy"></i>
-                    <span>Leaderboard</span>
-                </a>
-                <a href="rewards.html" class="nav-link active">
-                    <i class="fas fa-gift"></i>
-                    <span>Daily Rewards</span>
-                </a>
-                <a href="withdraw.html" id="withdraw-nav-link" class="nav-link">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span>Withdraw</span>
-                </a>
-                <a href="settings.html" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-                <a href="contact.html" class="nav-link">
-                    <i class="fas fa-envelope"></i>
-                    <span>Contact Us</span>
-                </a>
-                <a href="admin.html" id="admin-nav-link" class="nav-link" style="display: none;">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Admin</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <div id="user-email-display" class="text-sm truncate mb-2">user@example.com</div>
-                <button id="logout-btn" class="logout-btn w-full bg-white text-primary py-2 px-4 rounded-md font-medium hover:bg-gray-100 transition-colors">
-                    Sign Out
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="main-content flex-1 flex flex-col overflow-hidden">
-            <header class="content-header">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Daily Rewards</h2>
-                    <p class="text-gray-600">Claim your daily bonuses and build your streak!</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div id="coin-balance-display" class="coin-balance-display bg-primary text-white py-2 px-4 rounded-md font-medium">
-                        <i class="fas fa-coins mr-2"></i>
-                        Coins: 0
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-auto p-6">
-                <!-- Banner Ad - Top of Content -->
-                <div class="ad-container">
-                    <div class="ad-label">Advertisement</div>
-                    <div class="admob-banner" id="banner-ad-top">
-                        <div class="ad-loading" style="width: 100%; height: 100%;">
-                            Loading Advertisement...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hero Section -->
-                <div class="rewards-hero relative z-10">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div class="mb-4 md:mb-0">
-                            <h1 class="text-3xl font-bold mb-2">Daily Rewards</h1>
-                            <p class="text-blue-100">Claim your free coins every day and build your streak for bigger bonuses!</p>
-                        </div>
-                        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                            <p class="text-sm">Current Streak</p>
-                            <div class="flex items-center mt-2">
-                                <span id="streak-count" class="text-2xl font-bold mr-2">0</span>
-                                <span class="text-sm">days</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Watch Ad for Bonus Section -->
-                <div class="watch-ad-section">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div class="text-center md:text-left">
-                            <h3 class="font-bold text-lg text-gray-800 mb-2">Want Extra Coins?</h3>
-                            <p class="text-gray-600">Watch an ad to earn bonus coins on top of your daily reward!</p>
-                        </div>
-                        <button id="watch-ad-for-bonus" class="btn btn-primary whitespace-nowrap">
-                            <i class="fas fa-ad mr-2"></i>
-                            Watch Ad for 25 Bonus Coins
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Streak Counter -->
-                <div class="card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Your Login Streak</h3>
-                    <div class="streak-counter" id="streak-container">
-                        <!-- Streak days will be populated by JavaScript -->
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="streak-progress" style="width: 0%"></div>
-                    </div>
-                    <p class="text-center text-gray-600 mt-2" id="streak-message">Complete 7 days for a 100 coin bonus!</p>
-                </div>
-
-                <!-- Daily Reward Card -->
-                <div class="card max-w-lg mx-auto p-8 relative mb-8">
-                    <div class="reward-badge">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-2">Today's Reward</h3>
-                    <p class="text-gray-600 text-center mb-6">Claim your daily bonus and keep your streak going!</p>
-                    
-                    <div class="my-6">
-                        <div class="reward-icon success" id="reward-icon">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mb-6">
-                        <div class="text-3xl font-bold text-primary" id="reward-amount">50 Coins</div>
-                        <p class="text-gray-500 mt-2" id="streak-bonus">+10 coins streak bonus</p>
-                    </div>
-                    
-                    <button id="claim-reward-btn" class="btn btn-success w-full text-lg py-3">
-                        <i class="fas fa-gift mr-2"></i>
-                        Claim Your Reward
-                    </button>
-                    
-                    <div id="timer-message" class="countdown-timer" style="display: none;">
-                        Next reward in: <span id="countdown-timer">23:59:59</span>
-                    </div>
-                </div>
-
-                <!-- Native Ad - Middle of Content -->
-                <div class="ad-container">
-                    <div class="ad-label">Sponsored</div>
-                    <div class="admob-native" id="native-ad">
-                        <div class="ad-loading" style="width: 100%; height: 100%;">
-                            Loading Native Advertisement...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Weekly Rewards -->
-                <div class="mt-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Weekly Rewards</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="weekly-rewards-container">
-                        <!-- Weekly rewards will be populated by JavaScript -->
-                    </div>
-                </div>
-
-                <!-- Milestone Rewards -->
-                <div class="mt-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Milestone Rewards</h3>
-                    <div class="reward-details">
-                        <div class="reward-progress">
-                            <span>Login Milestones</span>
-                            <span id="milestone-progress">0/5 claimed</span>
-                        </div>
-                        <div id="milestone-rewards-container">
-                            <!-- Milestone rewards will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bonus Information -->
-                <div class="bonus-info mt-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Bonus Rewards</h3>
-                    <p class="text-gray-600 mb-4">Complete your daily streak to unlock special bonuses and increase your daily rewards!</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-fire text-green-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">7-Day Streak</h4>
-                                <p class="text-sm text-gray-600">100 coin bonus</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-calendar-alt text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">30-Day Streak</h4>
-                                <p class="text-sm text-gray-600">500 coin bonus</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-crown text-purple-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">90-Day Streak</h4>
-                                <p class="text-sm text-gray-600">2000 coin bonus</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Special Rewards -->
-                <div class="card mt-8 special-reward">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">Special Weekend Bonus</h3>
-                        <p class="text-white opacity-90 mb-4">Get double coins on weekends! Claim your reward on Saturday or Sunday for twice the coins.</p>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-2xl font-bold">2x Coins</div>
-                                <div class="text-sm opacity-90">Saturday & Sunday only</div>
-                            </div>
-                            <div class="reward-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Banner Ad - Bottom of Content -->
-                <div class="ad-container">
-                    <div class="ad-label">Advertisement</div>
-                    <div class="admob-banner" id="banner-ad-bottom">
-                        <div class="ad-loading" style="width: 100%; height: 100%;">
-                            Loading Advertisement...
-                        </div>
-                    </div>
-                </div>
-            </main>
+    <div class="bg-white/80 backdrop-blur-md sticky top-0 z-30 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+        <a href="dashboard.html" class="h-10 w-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-500 active:bg-gray-200">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h1 class="text-lg font-extrabold text-gray-800 tracking-tight">Earning Hub</h1>
+        <div class="flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+            <i class="fas fa-coins text-indigo-600 text-sm"></i>
+            <span id="user-coins-display" class="text-indigo-600 font-bold text-sm">0</span>
         </div>
     </div>
 
-    <!-- Notification -->
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notification-text">Operation completed successfully</span>
-    </div>
-
-    <!-- Reward Claimed Modal -->
-    <div id="reward-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="text-lg font-semibold">Reward Claimed!</h3>
-                <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
+    <div class="max-w-md mx-auto p-6">
+        
+        <div class="reward-card bg-indigo-600 rounded-[2.5rem] p-8 text-white mb-8 relative overflow-hidden glow-indigo">
+            <div class="relative z-10">
+                <span class="bg-indigo-500/50 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Daily Bonus</span>
+                <h2 class="text-3xl font-black mt-3 mb-1">+50 Coins</h2>
+                <p class="text-indigo-200 text-xs mb-6">Come back tomorrow for more!</p>
+                <button id="daily-btn" onclick="claimDaily()" class="w-full bg-white text-indigo-600 py-4 rounded-2xl font-black shadow-xl hover:shadow-2xl transition-all active:scale-95">
+                    CLAIM REWARD
                 </button>
             </div>
-            <div class="modal-body text-center">
-                <div class="text-6xl text-green-500 mb-4">
-                    <i class="fas fa-gift"></i>
-                </div>
-                <h4 class="text-xl font-bold mb-2">Congratulations!</h4>
-                <p class="text-gray-600 mb-4">You've successfully claimed your daily reward</p>
-                <div class="bg-green-50 p-4 rounded-lg mb-4">
-                    <p class="text-2xl font-bold text-green-700" id="modal-reward-amount">+50 Coins</p>
-                    <p class="text-sm text-green-600" id="modal-streak-bonus">+10 coins streak bonus</p>
-                </div>
-                <p class="text-sm text-gray-500">Your streak is now <span id="modal-streak-count">6</span> days!</p>
+            <i class="fas fa-gem absolute -right-6 -bottom-6 text-9xl text-white/10 rotate-12"></i>
+        </div>
+
+        <h3 class="font-black text-gray-800 text-sm uppercase tracking-widest mb-4 ml-2">Available Tasks</h3>
+
+        <div class="reward-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-4 flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 text-2xl">
+                <i class="fas fa-play-circle"></i>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary w-full close-modal">Continue</button>
+            <div class="flex-1">
+                <h4 class="font-bold text-gray-800">Watch & Earn</h4>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">+25 Coins</span>
+                    <span class="text-[10px] text-gray-400">Ends in 15s</span>
+                </div>
             </div>
+            <button onclick="simulateAd(this)" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md">
+                WATCH
+            </button>
+        </div>
+
+        <div class="reward-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-4 flex items-center gap-4">
+            <div class="h-14 w-14 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600 text-2xl">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="font-bold text-gray-800">Invite Friends</h4>
+                <p class="text-[10px] text-gray-400 mt-1">Earn +500 Coins per friend</p>
+            </div>
+            <button onclick="shareApp()" class="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-bold text-xs">
+                INVITE
+            </button>
+        </div>
+
+    </div>
+
+    <div id="ad-overlay" class="fixed inset-0 bg-black z-50 hidden flex flex-col items-center justify-center p-10">
+        <div id="ad-timer" class="absolute top-10 right-10 text-white font-mono bg-white/10 px-4 py-2 rounded-full border border-white/20">15s</div>
+        <div class="text-center">
+            <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-pulse">
+                <i class="fas fa-play text-white text-3xl"></i>
+            </div>
+            <h2 class="text-white text-xl font-bold">Sponsor Video</h2>
+            <p class="text-gray-500 text-sm mt-2 leading-relaxed">Please wait while the video finishes to receive your reward.</p>
         </div>
     </div>
 
-    <!-- Ad Modal for Bonus Coins -->
-    <div id="ad-bonus-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="text-lg font-semibold">Bonus Coins</h3>
-                <button class="close-modal text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="text-4xl text-yellow-500 mb-4">
-                    <i class="fas fa-ad"></i>
-                </div>
-                <h4 class="text-xl font-bold mb-2">Watch Ad for Bonus Coins</h4>
-                <p class="text-gray-600 mb-4">Watch a short ad to earn 25 bonus coins!</p>
-                
-                <!-- AdMob Interstitial Ad -->
-                <div class="admob-interstitial" id="interstitial-ad">
-                    <div class="ad-label">Rewarded Ad</div>
-                    <div class="ad-loading" style="width: 100%; height: 100%;">
-                        Loading Rewarded Advertisement...
-                    </div>
-                </div>
-                
-                <div class="bg-yellow-50 p-3 rounded-lg mt-4">
-                    <p class="text-sm text-yellow-700">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        Watch the ad completely to receive your bonus coins!
-                    </p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary w-full close-ad-bonus-modal">Skip for Now</button>
-            </div>
-        </div>
-    </div>
-
+    <script src="main.js"></script>
     <script>
-        // AdMob Configuration
-        const ADMOB_CONFIG = {
-            banner: 'ca-app-pub-4313544696010088/7463441754',
-            interstitial: 'ca-app-pub-4313544696010088/3524196741',
-            native: 'ca-app-pub-4313544696010088/8580882616'
-        };
+        document.addEventListener('DOMContentLoaded', updateUI);
 
-        // Ad Manager for Rewards
-        class RewardsAdManager {
-            constructor() {
-                this.adCounters = {
-                    impressions: 0,
-                    clicks: 0
-                };
-                this.initialized = false;
-            }
-
-            initialize() {
-                if (this.initialized) return;
-                
-                console.log('Initializing AdMob ads for rewards...');
-                
-                // Initialize all ad units
-                this.loadBannerAd('banner-ad-top');
-                this.loadBannerAd('banner-ad-bottom');
-                this.loadNativeAd('native-ad');
-                
-                this.setupAdEventListeners();
-                this.initialized = true;
-                
-                console.log('Rewards AdMob ads initialized successfully');
-            }
-
-            loadBannerAd(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-
-                setTimeout(() => {
-                    container.innerHTML = `
-                        <ins class="adsbygoogle"
-                             style="display:block"
-                             data-ad-client="ca-app-pub-4313544696010088"
-                             data-ad-slot="${ADMOB_CONFIG.banner}"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                    `;
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                    this.trackImpression('banner');
-                }, 1000);
-            }
-
-            loadNativeAd(containerId) {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-
-                setTimeout(() => {
-                    container.innerHTML = `
-                        <ins class="adsbygoogle"
-                             style="display:block"
-                             data-ad-format="fluid"
-                             data-ad-layout-key="-fb+5w+4e-db+86"
-                             data-ad-client="ca-app-pub-4313544696010088"
-                             data-ad-slot="${ADMOB_CONFIG.native}"></ins>
-                    `;
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                    this.trackImpression('native');
-                }, 1500);
-            }
-
-            showRewardedAd() {
-                return new Promise((resolve) => {
-                    console.log('Showing rewarded ad for bonus coins...');
-                    
-                    // Create rewarded ad modal
-                    const rewardedContainer = document.createElement('div');
-                    rewardedContainer.style.cssText = `
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: rgba(0,0,0,0.9);
-                        z-index: 9999;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex-direction: column;
-                    `;
-                    
-                    rewardedContainer.innerHTML = `
-                        <div style="background: white; padding: 2rem; border-radius: 1rem; text-align: center; max-width: 90%;">
-                            <h3 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Rewarded Ad</h3>
-                            <div class="ad-loading" style="width: 300px; height: 250px; margin: 1rem auto;">
-                                Loading Rewarded Ad...
-                            </div>
-                            <p style="margin: 1rem 0; color: #666;">Watch this ad to earn 25 bonus coins!</p>
-                            <div style="display: flex; gap: 1rem; justify-content: center;">
-                                <button id="complete-rewarded" style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
-                                    Complete Ad
-                                </button>
-                                <button id="close-rewarded" style="background: #6b7280; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">
-                                    Skip
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(rewardedContainer);
-                    
-                    let adCompleted = false;
-                    
-                    // Complete button functionality
-                    document.getElementById('complete-rewarded').addEventListener('click', () => {
-                        adCompleted = true;
-                        this.trackImpression('rewarded');
-                        document.body.removeChild(rewardedContainer);
-                        resolve(true);
-                    });
-                    
-                    // Close button functionality
-                    document.getElementById('close-rewarded').addEventListener('click', () => {
-                        document.body.removeChild(rewardedContainer);
-                        resolve(adCompleted);
-                    });
-                });
-            }
-
-            setupAdEventListeners() {
-                // Track ad clicks
-                document.addEventListener('click', (e) => {
-                    if (e.target.closest('.adsbygoogle')) {
-                        this.trackClick();
-                    }
-                });
-            }
-
-            trackImpression(type) {
-                this.adCounters.impressions++;
-                console.log(`Ad Impression: ${type} - Total: ${this.adCounters.impressions}`);
-            }
-
-            trackClick() {
-                this.adCounters.clicks++;
-                console.log(`Ad Click - Total: ${this.adCounters.clicks}`);
-            }
-
-            getStats() {
-                return this.adCounters;
+        function updateUI() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if(!user) return window.location.href = 'index.html';
+            
+            document.getElementById('user-coins-display').innerText = (user.coins || 0).toLocaleString();
+            
+            // Check Daily Status
+            const lastClaim = localStorage.getItem(`lastClaim_${user.email}`);
+            const today = new Date().toDateString();
+            if(lastClaim === today) {
+                const btn = document.getElementById('daily-btn');
+                btn.innerText = "ALREADY CLAIMED";
+                btn.disabled = true;
+                btn.className = "w-full bg-indigo-400/50 text-white/50 py-4 rounded-2xl font-black cursor-not-allowed";
             }
         }
 
-        // Initialize Ad Manager
-        const rewardsAdManager = new RewardsAdManager();
+        function claimDaily() {
+            vibrate(50);
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const today = new Date().toDateString();
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize ads
-            rewardsAdManager.initialize();
+            user.coins = (user.coins || 0) + 50;
+            localStorage.setItem(`lastClaim_${user.email}`, today);
+            saveAndSync(user);
+            
+            alert("Success! 50 Coins added to your wallet.");
+            updateUI();
+        }
 
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('active');
-            });
-
-            // Load user data
-            const currentUserEmail = localStorage.getItem('currentUser');
-            if (!currentUserEmail) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            const userData = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
-            if (!userData) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Initialize rewards state
-            let rewardsState = JSON.parse(localStorage.getItem(`rewardsState_${currentUserEmail}`)) || {
-                lastClaimed: null,
-                streak: 0,
-                totalClaims: 0,
-                weeklyClaims: [false, false, false, false, false, false, false],
-                milestoneClaims: {
-                    3: false,
-                    7: false,
-                    14: false,
-                    30: false,
-                    90: false
+        function simulateAd(btn) {
+            vibrate(30);
+            const overlay = document.getElementById('ad-overlay');
+            const timer = document.getElementById('ad-timer');
+            overlay.classList.remove('hidden');
+            
+            let count = 15;
+            const timerInt = setInterval(() => {
+                count--;
+                timer.innerText = count + "s";
+                if(count <= 0) {
+                    clearInterval(timerInt);
+                    overlay.classList.add('hidden');
+                    addReward(25);
                 }
-            };
+            }, 1000);
+        }
 
-            // Update UI with user data
-            document.getElementById('user-email-display').textContent = currentUserEmail;
-            document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-            document.getElementById('streak-count').textContent = rewardsState.streak;
+        function addReward(amount) {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            user.coins = (user.coins || 0) + amount;
+            saveAndSync(user);
+            alert(`Amazing! You earned ${amount} coins.`);
+            updateUI();
+        }
 
-            // Show admin link if user is admin
-            if (userData.isAdmin) {
-                document.getElementById('admin-nav-link').style.display = 'flex';
-            }
+        function saveAndSync(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+        }
 
-            // Render streak counter
-            function renderStreakCounter() {
-                const streakContainer = document.getElementById('streak-container');
-                const streakProgress = document.getElementById('streak-progress');
-                const streakMessage = document.getElementById('streak-message');
-                
-                streakContainer.innerHTML = '';
-                
-                for (let i = 1; i <= 7; i++) {
-                    const dayElement = document.createElement('div');
-                    
-                    if (i <= rewardsState.streak) {
-                        dayElement.className = 'streak-day active';
-                        dayElement.innerHTML = `<i class="fas fa-check"></i>`;
-                    } else if (i === rewardsState.streak + 1) {
-                        dayElement.className = 'streak-day current';
-                        dayElement.textContent = i;
-                    } else {
-                        dayElement.className = 'streak-day';
-                        dayElement.textContent = i;
-                    }
-                    
-                    streakContainer.appendChild(dayElement);
-                }
-                
-                // Update progress bar
-                const progress = Math.min((rewardsState.streak / 7) * 100, 100);
-                streakProgress.style.width = `${progress}%`;
-                
-                // Update message
-                if (rewardsState.streak >= 7) {
-                    streakMessage.textContent = 'Amazing! You completed the weekly streak!';
-                } else {
-                    const daysLeft = 7 - rewardsState.streak;
-                    streakMessage.textContent = `Complete ${daysLeft} more ${daysLeft === 1 ? 'day' : 'days'} for a 100 coin bonus!`;
-                }
-            }
-
-            // Render weekly rewards
-            function renderWeeklyRewards() {
-                const weeklyContainer = document.getElementById('weekly-rewards-container');
-                weeklyContainer.innerHTML = '';
-                
-                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                const rewards = [25, 30, 35, 40, 45, 50, 100];
-                const today = new Date().getDay();
-                const adjustedToday = today === 0 ? 6 : today - 1; // Adjust for Sunday being 0
-                
-                for (let i = 0; i < 7; i++) {
-                    const rewardCard = document.createElement('div');
-                    rewardCard.className = 'reward-card';
-                    
-                    let status = 'locked';
-                    let statusClass = 'status-locked';
-                    let iconClass = 'primary';
-                    
-                    if (rewardsState.weeklyClaims[i]) {
-                        status = 'claimed';
-                        statusClass = 'status-claimed';
-                    } else if (i === adjustedToday) {
-                        status = 'available';
-                        statusClass = 'status-available';
-                        rewardCard.classList.add('active');
-                        iconClass = 'success';
-                    } else if (i < adjustedToday) {
-                        status = 'missed';
-                        statusClass = 'status-locked';
-                    } else if (i > adjustedToday) {
-                        status = 'upcoming';
-                        statusClass = 'status-upcoming';
-                        rewardCard.classList.add('upcoming');
-                    }
-                    
-                    // Special styling for day 7
-                    if (i === 6) {
-                        iconClass = 'warning';
-                    }
-                    
-                    rewardCard.innerHTML = `
-                        <div class="reward-icon ${iconClass}">
-                            <i class="fas fa-${i === 6 ? 'star' : 'coins'}"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-800">${days[i]}</h4>
-                        <p class="text-gray-600 text-sm mt-1">${rewards[i]} Coins</p>
-                        <div class="mt-2">
-                            <span class="reward-status ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
-                        </div>
-                    `;
-                    
-                    weeklyContainer.appendChild(rewardCard);
-                }
-            }
-
-            // Render milestone rewards
-            function renderMilestoneRewards() {
-                const milestoneContainer = document.getElementById('milestone-rewards-container');
-                const milestoneProgress = document.getElementById('milestone-progress');
-                
-                milestoneContainer.innerHTML = '';
-                
-                const milestones = [
-                    { days: 3, reward: 25 },
-                    { days: 7, reward: 100 },
-                    { days: 14, reward: 250 },
-                    { days: 30, reward: 500 },
-                    { days: 90, reward: 2000 }
-                ];
-                
-                let claimedCount = 0;
-                
-                milestones.forEach(milestone => {
-                    const isClaimed = rewardsState.milestoneClaims[milestone.days] || rewardsState.streak >= milestone.days;
-                    if (isClaimed) claimedCount++;
-                    
-                    const milestoneElement = document.createElement('div');
-                    milestoneElement.className = `milestone-reward ${isClaimed ? 'claimed' : ''}`;
-                    
-                    milestoneElement.innerHTML = `
-                        <div>
-                            <div class="font-semibold">${milestone.days} Day Streak</div>
-                            <div class="text-sm text-gray-500">${milestone.reward} coins</div>
-                        </div>
-                        <div>
-                            ${isClaimed ? 
-                                '<span class="reward-status status-claimed">Claimed</span>' : 
-                                `<button class="btn btn-primary btn-sm claim-milestone" data-days="${milestone.days}" data-reward="${milestone.reward}">
-                                    Claim
-                                </button>`
-                            }
-                        </div>
-                    `;
-                    
-                    milestoneContainer.appendChild(milestoneElement);
+        function shareApp() {
+            vibrate(20);
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Coin Pop',
+                    text: 'Join Coin Pop and earn real money!',
+                    url: window.location.href
                 });
-                
-                milestoneProgress.textContent = `${claimedCount}/${milestones.length} claimed`;
-                
-                // Add event listeners to claim buttons
-                document.querySelectorAll('.claim-milestone').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const days = parseInt(this.getAttribute('data-days'));
-                        const reward = parseInt(this.getAttribute('data-reward'));
-                        claimMilestoneReward(days, reward);
-                    });
-                });
+            } else {
+                alert("Referral Link: https://coinpop.link/ref/" + Math.random().toString(36).substr(2, 9));
             }
+        }
 
-            // Claim milestone reward
-            function claimMilestoneReward(days, reward) {
-                if (rewardsState.streak >= days && !rewardsState.milestoneClaims[days]) {
-                    // Update user coins
-                    userData.coins += reward;
-                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                    
-                    // Update milestone claims
-                    rewardsState.milestoneClaims[days] = true;
-                    localStorage.setItem(`rewardsState_${currentUserEmail}`, JSON.stringify(rewardsState));
-                    
-                    // Update UI
-                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                    renderMilestoneRewards();
-                    
-                    showNotification(`Congratulations! You claimed ${reward} coins for your ${days}-day streak!`, 'success');
-                }
-            }
-
-            // Check if reward is available
-            function checkRewardAvailability() {
-                const now = new Date();
-                const lastClaimed = rewardsState.lastClaimed ? new Date(rewardsState.lastClaimed) : null;
-                
-                // If never claimed or claimed more than 24 hours ago
-                if (!lastClaimed || (now - lastClaimed) >= 24 * 60 * 60 * 1000) {
-                    // Reward is available
-                    document.getElementById('claim-reward-btn').disabled = false;
-                    document.getElementById('claim-reward-btn').className = 'btn btn-success w-full text-lg py-3';
-                    document.getElementById('timer-message').style.display = 'none';
-                    
-                    // Calculate reward amount
-                    const baseReward = 50;
-                    const streakBonus = Math.min(rewardsState.streak * 5, 50); // Max 50 coin bonus
-                    
-                    // Weekend bonus (double coins on weekends)
-                    const isWeekend = now.getDay() === 0 || now.getDay() === 6; // 0 = Sunday, 6 = Saturday
-                    const weekendMultiplier = isWeekend ? 2 : 1;
-                    
-                    const totalReward = (baseReward + streakBonus) * weekendMultiplier;
-                    
-                    document.getElementById('reward-amount').textContent = `${totalReward} Coins`;
-                    
-                    if (streakBonus > 0) {
-                        document.getElementById('streak-bonus').textContent = `+${streakBonus} coins streak bonus${isWeekend ? ' + weekend 2x bonus' : ''}`;
-                        document.getElementById('streak-bonus').style.display = 'block';
-                    } else if (isWeekend) {
-                        document.getElementById('streak-bonus').textContent = 'Weekend 2x bonus!';
-                        document.getElementById('streak-bonus').style.display = 'block';
-                    } else {
-                        document.getElementById('streak-bonus').style.display = 'none';
-                    }
-                } else {
-                    // Reward is not available yet
-                    document.getElementById('claim-reward-btn').disabled = true;
-                    document.getElementById('claim-reward-btn').className = 'btn btn-disabled w-full text-lg py-3';
-                    document.getElementById('claim-reward-btn').innerHTML = '<i class="fas fa-clock mr-2"></i> Already Claimed';
-                    document.getElementById('timer-message').style.display = 'block';
-                    
-                    // Start countdown timer
-                    startCountdown(lastClaimed);
-                }
-            }
-
-            // Start countdown timer
-            function startCountdown(lastClaimed) {
-                const updateTimer = () => {
-                    const now = new Date();
-                    const nextClaim = new Date(lastClaimed);
-                    nextClaim.setHours(nextClaim.getHours() + 24);
-                    
-                    const diff = nextClaim - now;
-                    
-                    if (diff <= 0) {
-                        checkRewardAvailability();
-                        return;
-                    }
-                    
-                    const hours = Math.floor(diff / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    
-                    document.getElementById('countdown-timer').textContent = 
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                };
-                
-                updateTimer();
-                setInterval(updateTimer, 1000);
-            }
-
-            // Claim reward functionality
-            document.getElementById('claim-reward-btn').addEventListener('click', function() {
-                const btn = this;
-                const originalText = btn.innerHTML;
-                
-                // Show loading state
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading-spinner"></span> Claiming...';
-                
-                // Calculate reward amount
-                const baseReward = 50;
-                const streakBonus = Math.min(rewardsState.streak * 5, 50);
-                
-                // Weekend bonus
-                const now = new Date();
-                const isWeekend = now.getDay() === 0 || now.getDay() === 6;
-                const weekendMultiplier = isWeekend ? 2 : 1;
-                
-                const totalReward = (baseReward + streakBonus) * weekendMultiplier;
-                
-                setTimeout(() => {
-                    // Update user coins
-                    userData.coins += totalReward;
-                    localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                    
-                    // Update rewards state
-                    rewardsState.lastClaimed = new Date().toISOString();
-                    rewardsState.streak += 1;
-                    rewardsState.totalClaims += 1;
-                    
-                    // Update weekly claims
-                    const today = new Date().getDay();
-                    const adjustedToday = today === 0 ? 6 : today - 1;
-                    rewardsState.weeklyClaims[adjustedToday] = true;
-                    
-                    localStorage.setItem(`rewardsState_${currentUserEmail}`, JSON.stringify(rewardsState));
-                    
-                    // Update UI
-                    document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                    document.getElementById('streak-count').textContent = rewardsState.streak;
-                    
-                    // Render updated components
-                    renderStreakCounter();
-                    renderWeeklyRewards();
-                    renderMilestoneRewards();
-                    
-                    // Show success modal
-                    document.getElementById('modal-reward-amount').textContent = `+${totalReward} Coins`;
-                    document.getElementById('modal-streak-bonus').textContent = streakBonus > 0 ? 
-                        `+${streakBonus} coins streak bonus${isWeekend ? ' + weekend 2x bonus' : ''}` : 
-                        (isWeekend ? 'Weekend 2x bonus!' : '');
-                    document.getElementById('modal-streak-count').textContent = rewardsState.streak;
-                    document.getElementById('reward-modal').style.display = 'flex';
-                    
-                    // Reset button
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                    
-                    // Update reward availability
-                    checkRewardAvailability();
-                    
-                    // Add animation to reward icon
-                    const rewardIcon = document.getElementById('reward-icon');
-                    rewardIcon.classList.add('reward-animation');
-                    setTimeout(() => {
-                        rewardIcon.classList.remove('reward-animation');
-                    }, 500);
-                }, 1500);
-            });
-
-            // Watch Ad for Bonus Coins
-            document.getElementById('watch-ad-for-bonus').addEventListener('click', async function() {
-                const btn = this;
-                const originalText = btn.innerHTML;
-                
-                btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
-                btn.disabled = true;
-                
-                try {
-                    const adCompleted = await rewardsAdManager.showRewardedAd();
-                    if (adCompleted) {
-                        // Add bonus coins to user
-                        userData.coins += 25;
-                        localStorage.setItem(`user_${currentUserEmail}`, JSON.stringify(userData));
-                        
-                        // Update UI
-                        document.getElementById('coin-balance-display').textContent = `Coins: ${userData.coins}`;
-                        
-                        showNotification('+25 bonus coins earned from watching ad!', 'success');
-                    } else {
-                        showNotification('Ad was skipped', 'error');
-                    }
-                } catch (error) {
-                    console.error('Rewarded ad error:', error);
-                    showNotification('Rewarded ad failed to load', 'error');
-                } finally {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            });
-
-            // Show notification
-            function showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                const notificationText = document.getElementById('notification-text');
-                
-                notificationText.textContent = message;
-                notification.className = `notification ${type} show`;
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-
-            // Modal functionality
-            document.querySelectorAll('.close-modal').forEach(button => {
-                button.addEventListener('click', function() {
-                    document.querySelectorAll('.modal').forEach(modal => {
-                        modal.style.display = 'none';
-                    });
-                });
-            });
-
-            window.addEventListener('click', function(event) {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            });
-
-            // Logout functionality
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to sign out?')) {
-                    localStorage.removeItem('currentUser');
-                    window.location.href = 'index.html';
-                }
-            });
-
-            // Initialize all components
-            renderStreakCounter();
-            renderWeeklyRewards();
-            renderMilestoneRewards();
-            checkRewardAvailability();
-
-            // Ad performance monitoring
-            setInterval(() => {
-                const stats = rewardsAdManager.getStats();
-                console.log('Rewards Ad Performance Stats:', stats);
-            }, 30000);
-        });
+        function vibrate(ms) {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        }
     </script>
 </body>
 </html>

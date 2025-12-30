@@ -2,19 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play Game - Coin Pop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Play - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        #game-box { height: 500px; background: #0f172a; border-radius: 2.5rem; position: relative; overflow: hidden; border: 5px solid #334155; cursor: crosshair; }
-        .target { position: absolute; width: 65px; height: 65px; background: radial-gradient(circle, #fcd34d, #d97706); border-radius: 50%; border: 4px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #fbbf24; animation: pop 0.3s ease-out; }
-        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        body { margin: 0; padding: 0; overflow: hidden; background: #f8fafc; }
+        .sidebar { background: #1e293b; width: 260px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 1000; }
+        .game-wrapper { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        
+        #game-box { 
+            flex-grow: 1; background: #0f172a; border-radius: 2.5rem; 
+            position: relative; overflow: hidden; border: 4px solid #334155;
+            touch-action: none; /* Prevents scrolling while playing */
+        }
+
+        .coin { 
+            position: absolute; width: 70px; height: 70px; 
+            background: radial-gradient(circle, #fbbf24, #d97706); 
+            border-radius: 50%; border: 4px solid #fff; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 0 20px #fbbf24; cursor: pointer; z-index: 50;
+            user-select: none;
+        }
+
+        #start-overlay {
+            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; border-radius: 2.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .game-wrapper { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
-    <aside class="sidebar">
+
+    <aside class="sidebar hidden md:block">
         <div class="p-8 text-white font-black text-2xl italic">COIN POP</div>
         <nav>
             <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
@@ -23,58 +50,106 @@
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="flex justify-between items-center mb-6">
-            <div id="lives" class="text-2xl">❤❤❤</div>
-            <div class="text-xl font-bold text-indigo-600">Session Score: <span id="score">0</span></div>
-        </div>
+    <div class="game-wrapper">
+        <header class="flex justify-between items-center mb-4">
+            <div id="hearts-ui" class="text-red-500 text-2xl font-bold">❤❤❤</div>
+            <div class="bg-white px-6 py-2 rounded-2xl shadow-sm border font-black text-indigo-600">
+                Coins: <span id="coin-display">0</span>
+            </div>
+        </header>
 
-        <div id="game-box" onclick="miss(event)">
-            <div id="overlay" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center z-50">
-                <h2 class="text-white text-4xl font-black mb-6">READY TO POP?</h2>
-                <button onclick="start()" class="bg-indigo-500 text-white px-12 py-4 rounded-2xl font-bold shadow-2xl hover:bg-indigo-600">START MATCH</button>
+        <div id="game-box">
+            <div id="start-overlay">
+                <div class="bg-indigo-600 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 animate-bounce">
+                    <i class="fas fa-play text-white text-3xl"></i>
+                </div>
+                <h1 class="text-white text-3xl font-black mb-6">READY TO PLAY?</h1>
+                <button onclick="initGame()" class="bg-green-500 text-white px-12 py-4 rounded-2xl font-black text-xl hover:scale-105 transition">START GAME</button>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('currentUser'));
-        let score = 0, lives = 3, active = false;
-
-        function start() {
-            document.getElementById('overlay').style.display = 'none';
-            active = true; lives = 3; score = 0; spawn();
+        // Data safety check
+        let userData = JSON.parse(localStorage.getItem('currentUser'));
+        if (!userData) {
+            // Default data if user not found (for testing)
+            userData = { coins: 0, email: 'guest@coinpop.com' };
         }
 
-        function spawn() {
-            if(!active) return;
+        let gameActive = false;
+        let lives = 3;
+
+        function updateStats() {
+            document.getElementById('coin-display').innerText = (userData.coins || 0).toLocaleString();
+            let heartIcons = '';
+            for(let i=0; i<3; i++) heartIcons += i < lives ? '❤' : '🖤';
+            document.getElementById('hearts-ui').innerText = heartIcons;
+        }
+
+        function initGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            gameActive = true;
+            lives = 3;
+            updateStats();
+            createCoin();
+        }
+
+        function createCoin() {
+            if (!gameActive) return;
             const box = document.getElementById('game-box');
-            const old = document.querySelector('.target'); if(old) old.remove();
             
-            const t = document.createElement('div');
-            t.className = 'target';
-            t.style.left = Math.random() * (box.clientWidth - 70) + 'px';
-            t.style.top = Math.random() * (box.clientHeight - 70) + 'px';
-            t.innerHTML = '<i class="fas fa-coins text-white"></i>';
+            // Remove any existing coin
+            const oldCoin = document.querySelector('.coin');
+            if (oldCoin) oldCoin.remove();
+
+            const coin = document.createElement('div');
+            coin.className = 'coin';
             
-            t.onpointerdown = (e) => {
+            // Random position within box boundaries
+            const x = Math.random() * (box.clientWidth - 80);
+            const y = Math.random() * (box.clientHeight - 80);
+
+            coin.style.left = x + 'px';
+            coin.style.top = y + 'px';
+            coin.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
+
+            // Click event (Mouse & Touch)
+            coin.addEventListener('pointerdown', function(e) {
                 e.stopPropagation();
-                score += 5;
-                user.coins += 5;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                document.getElementById('score').innerText = score;
-                spawn();
-            };
-            box.appendChild(t);
+                if (!gameActive) return;
+
+                userData.coins = (parseInt(userData.coins) || 0) + 5;
+                saveUserData();
+                updateStats();
+                createCoin(); // Respawn
+            });
+
+            box.appendChild(coin);
         }
 
-        function miss(e) {
-            if(!active || e.target.id !== 'game-box') return;
+        // Missed click logic
+        document.getElementById('game-box').addEventListener('pointerdown', function(e) {
+            if (!gameActive || e.target.closest('.coin')) return;
+            
             lives--;
-            let l = ''; for(let i=0; i<3; i++) l += i < lives ? '❤' : '🖤';
-            document.getElementById('lives').innerText = l;
-            if(lives <= 0) { active = false; alert("Game Over! Score: " + score); location.reload(); }
+            updateStats();
+            
+            if (lives <= 0) {
+                gameActive = false;
+                alert("Game Over! Better luck next time.");
+                location.reload();
+            }
+        });
+
+        function saveUserData() {
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            // Also update the main user list if needed
+            localStorage.setItem(`user_${userData.email}`, JSON.stringify(userData));
         }
+
+        // Initial UI load
+        updateStats();
     </script>
 </body>
 </html>

@@ -7,36 +7,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; background: #0f172a; font-family: 'Inter', sans-serif; overflow: hidden; color: white; }
+        body { margin: 0; background: #0f172a; font-family: sans-serif; overflow: hidden; }
         .sidebar { background: #1e293b; width: 260px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; border-right: 1px solid #334155; }
         .main { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
         
-        /* Game Area Container */
+        /* Fixed Game Box */
         #game-canvas { 
-            flex-grow: 1; background: #111827; border-radius: 1.5rem; 
-            position: relative; border: 2px solid #374151; touch-action: none;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.5); overflow: hidden;
+            flex-grow: 1; background: #111827; border-radius: 2rem; 
+            position: relative; border: 3px solid #374151; touch-action: none;
+            overflow: hidden;
         }
 
-        /* Coin Styling */
+        /* Coin Design */
         .coin { 
             position: absolute; width: 70px; height: 70px; 
             background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); 
             border-radius: 50%; border: 4px solid #fff; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.8); cursor: pointer; z-index: 200;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            user-select: none; -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 0 20px #fbbf24; cursor: pointer; z-index: 500;
         }
 
-        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        #game-ui { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%; }
-        
-        #menu-overlay {
-            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95);
+        #overlay {
+            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.9);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 300; border-radius: 1.5rem;
+            z-index: 1000; border-radius: 1.8rem;
         }
 
         @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
@@ -49,121 +43,98 @@
         <nav class="px-4 space-y-2">
             <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
             <a href="play.html" class="flex items-center p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20"><i class="fas fa-gamepad mr-3"></i> Play Game</a>
-            <a href="rewards.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition"><i class="fas fa-gift mr-3"></i> Rewards</a>
         </nav>
     </aside>
 
     <div class="main">
-        <div id="game-ui">
-            <div id="lives-display" class="text-red-500 text-2xl font-bold tracking-widest">❤❤❤</div>
-            <div class="bg-slate-800 px-6 py-2 rounded-xl border border-slate-700 font-black text-indigo-400 shadow-lg">
-                <i class="fas fa-coins mr-2"></i><span id="coin-val">0</span>
+        <div class="flex justify-between items-center mb-4">
+            <div id="hearts-ui" class="text-red-500 text-2xl font-bold">❤❤❤</div>
+            <div class="bg-slate-800 px-6 py-2 rounded-xl border border-slate-700 font-black text-indigo-400">
+                <i class="fas fa-coins mr-2"></i><span id="coin-ui">0</span>
             </div>
         </div>
 
         <div id="game-canvas">
-            <div id="menu-overlay">
-                <div class="bg-indigo-600 w-24 h-24 rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-indigo-500/40">
-                    <i class="fas fa-play text-white text-4xl ml-2"></i>
-                </div>
-                <h1 class="text-white text-4xl font-black mb-2">COIN CLICKER</h1>
-                <p class="text-slate-400 mb-8 font-medium">Catch the coins to earn money!</p>
-                <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-16 py-5 rounded-2xl font-black text-2xl shadow-xl shadow-green-500/20 transition-all active:scale-95">
-                    START NOW
-                </button>
+            <div id="overlay">
+                <h1 class="text-white text-3xl font-black mb-6">START EARNING</h1>
+                <button onclick="bootGame()" class="bg-green-500 text-white px-12 py-4 rounded-2xl font-black text-xl hover:scale-105 transition active:scale-95">START NOW</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Load user data correctly
-        let user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0, email: 'guest' };
-        let gameActive = false;
-        let lives = 3;
+        // Use try-catch to prevent script freezing
+        try {
+            var user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0, email: 'guest' };
+            var active = false;
+            var lives = 3;
 
-        function updateUI() {
-            document.getElementById('coin-val').innerText = (user.coins || 0).toLocaleString();
-            let h = '';
-            for(let i=0; i<3; i++) h += i < lives ? '❤' : '🖤';
-            document.getElementById('lives-display').innerText = h;
-        }
-
-        function startGame() {
-            console.log("Game Starting..."); // For debugging
-            document.getElementById('menu-overlay').style.display = 'none';
-            gameActive = true;
-            lives = 3;
-            updateUI();
-            
-            // Short delay to ensure DOM is ready
-            setTimeout(spawnCoin, 100);
-        }
-
-        function spawnCoin() {
-            if(!gameActive) return;
-            
-            const canvas = document.getElementById('game-canvas');
-            
-            // Safely clear old coins
-            const oldCoins = canvas.querySelectorAll('.coin');
-            oldCoins.forEach(c => c.remove());
-
-            // Create new coin
-            const coin = document.createElement('div');
-            coin.className = 'coin';
-            
-            // Random Positioning with padding
-            const padding = 80;
-            const x = Math.random() * (canvas.clientWidth - padding);
-            const y = Math.random() * (canvas.clientHeight - padding);
-
-            coin.style.left = Math.max(10, x) + 'px';
-            coin.style.top = Math.max(10, y) + 'px';
-            coin.innerHTML = '<i class="fas fa-coins text-white text-3xl"></i>';
-
-            // High-speed Click/Touch Event
-            coin.onpointerdown = function(e) {
-                e.stopPropagation();
-                if(!gameActive) return;
-
-                // Update Coins
-                user.coins = (parseInt(user.coins) || 0) + 5;
-                saveData();
-                updateUI();
-                
-                // Spawn next coin instantly
-                spawnCoin();
-            };
-
-            canvas.appendChild(coin);
-            console.log("Coin Spawned at:", x, y);
-        }
-
-        // Miss Click Detection (Only if clicking the canvas itself)
-        document.getElementById('game-canvas').onpointerdown = function(e) {
-            if(!gameActive || e.target !== this) return;
-            
-            lives--;
-            updateUI();
-            
-            if(lives <= 0) {
-                gameOver();
+            function updateDisplay() {
+                document.getElementById('coin-ui').innerText = (user.coins || 0).toLocaleString();
+                let h = ''; for(let i=0; i<3; i++) h += i < lives ? '❤' : '🖤';
+                document.getElementById('hearts-ui').innerText = h;
             }
-        };
 
-        function gameOver() {
-            gameActive = false;
-            alert("GAME OVER! Your score has been saved.");
-            location.reload();
+            function bootGame() {
+                document.getElementById('overlay').style.display = 'none';
+                active = true;
+                lives = 3;
+                updateDisplay();
+                spawnCoin();
+            }
+
+            function spawnCoin() {
+                if(!active) return;
+                const canvas = document.getElementById('game-canvas');
+                
+                // Remove all old coins
+                canvas.querySelectorAll('.coin').forEach(c => c.remove());
+
+                const coin = document.createElement('div');
+                coin.className = 'coin';
+                
+                // Position logic
+                const x = Math.floor(Math.random() * (canvas.clientWidth - 80));
+                const y = Math.floor(Math.random() * (canvas.clientHeight - 80));
+
+                coin.style.left = Math.max(10, x) + 'px';
+                coin.style.top = Math.max(10, y) + 'px';
+                coin.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
+
+                // Use both click and touch
+                coin.addEventListener('pointerdown', function(e) {
+                    e.stopPropagation();
+                    user.coins = (parseInt(user.coins) || 0) + 5;
+                    save();
+                    updateDisplay();
+                    spawnCoin();
+                });
+
+                canvas.appendChild(coin);
+            }
+
+            // Miss Click logic
+            document.getElementById('game-canvas').addEventListener('pointerdown', function(e) {
+                if(!active || e.target.classList.contains('coin') || e.target.closest('.coin')) return;
+                lives--;
+                updateDisplay();
+                if(lives <= 0) {
+                    active = false;
+                    alert("Game Over! Score Saved.");
+                    location.reload();
+                }
+            });
+
+            function save() {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem('user_' + user.email, JSON.stringify(user));
+            }
+
+            updateDisplay();
+        } catch (err) {
+            console.error("Critical Error:", err);
+            alert("Error loading game. Please refresh.");
         }
-
-        function saveData() {
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
-        }
-
-        // Initialize UI
-        updateUI();
     </script>
 </body>
 </html>

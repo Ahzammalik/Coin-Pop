@@ -7,30 +7,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; background: #0f172a; font-family: sans-serif; overflow: hidden; }
+        body { margin: 0; background: #0f172a; font-family: sans-serif; overflow: hidden; color: white; }
         .sidebar { background: #1e293b; width: 260px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; border-right: 1px solid #334155; }
         .main { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
         
-        /* Fixed Game Box */
-        #game-canvas { 
-            flex-grow: 1; background: #111827; border-radius: 2rem; 
-            position: relative; border: 3px solid #374151; touch-action: none;
-            overflow: hidden;
+        #game-box { 
+            flex-grow: 1; background: #111827; border-radius: 1.5rem; 
+            position: relative; border: 2px solid #374151; touch-action: none;
+            overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
         }
 
-        /* Coin Design */
-        .coin { 
-            position: absolute; width: 70px; height: 70px; 
+        .target-coin { 
+            position: absolute; width: 65px; height: 65px; 
             background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); 
-            border-radius: 50%; border: 4px solid #fff; 
+            border-radius: 50%; border: 3px solid #fff; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 20px #fbbf24; cursor: pointer; z-index: 500;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.7); cursor: pointer; z-index: 500;
         }
 
-        #overlay {
-            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.9);
+        #start-overlay {
+            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; border-radius: 1.8rem;
+            z-index: 1000; border-radius: 1.4rem;
         }
 
         @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
@@ -39,102 +37,102 @@
 <body>
 
     <aside class="sidebar">
-        <div class="p-8 text-indigo-400 font-bold text-2xl italic tracking-tighter">COIN POP</div>
+        <div class="p-8 text-indigo-400 font-bold text-2xl italic">COIN POP</div>
         <nav class="px-4 space-y-2">
             <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-            <a href="play.html" class="flex items-center p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20"><i class="fas fa-gamepad mr-3"></i> Play Game</a>
+            <a href="play.html" class="flex items-center p-3 bg-indigo-600 text-white rounded-xl"><i class="fas fa-gamepad mr-3"></i> Play Game</a>
         </nav>
     </aside>
 
     <div class="main">
         <div class="flex justify-between items-center mb-4">
-            <div id="hearts-ui" class="text-red-500 text-2xl font-bold">❤❤❤</div>
+            <div id="hearts" class="text-red-500 text-2xl font-bold tracking-widest">❤❤❤</div>
             <div class="bg-slate-800 px-6 py-2 rounded-xl border border-slate-700 font-black text-indigo-400">
-                <i class="fas fa-coins mr-2"></i><span id="coin-ui">0</span>
+                Coins: <span id="coin-txt">0</span>
             </div>
         </div>
 
-        <div id="game-canvas">
-            <div id="overlay">
-                <h1 class="text-white text-3xl font-black mb-6">START EARNING</h1>
-                <button onclick="bootGame()" class="bg-green-500 text-white px-12 py-4 rounded-2xl font-black text-xl hover:scale-105 transition active:scale-95">START NOW</button>
+        <div id="game-box">
+            <div id="start-overlay">
+                <button onclick="realStart()" class="bg-green-500 hover:bg-green-600 text-white px-12 py-4 rounded-2xl font-black text-2xl shadow-xl transition active:scale-95">
+                    START NOW
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Use try-catch to prevent script freezing
+        // Use a more robust user initialization
+        let user;
         try {
-            var user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0, email: 'guest' };
-            var active = false;
-            var lives = 3;
+            user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0, email: 'guest' };
+        } catch(e) {
+            user = { coins: 0, email: 'guest' };
+        }
 
-            function updateDisplay() {
-                document.getElementById('coin-ui').innerText = (user.coins || 0).toLocaleString();
-                let h = ''; for(let i=0; i<3; i++) h += i < lives ? '❤' : '🖤';
-                document.getElementById('hearts-ui').innerText = h;
-            }
+        let playing = false;
+        let hp = 3;
 
-            function bootGame() {
-                document.getElementById('overlay').style.display = 'none';
-                active = true;
-                lives = 3;
-                updateDisplay();
-                spawnCoin();
-            }
+        function refreshUI() {
+            document.getElementById('coin-txt').innerText = (user.coins || 0).toLocaleString();
+            let hStr = '';
+            for(let i=0; i<3; i++) hStr += i < hp ? '❤' : '🖤';
+            document.getElementById('hearts').innerText = hStr;
+        }
 
-            function spawnCoin() {
-                if(!active) return;
-                const canvas = document.getElementById('game-canvas');
-                
-                // Remove all old coins
-                canvas.querySelectorAll('.coin').forEach(c => c.remove());
+        function realStart() {
+            document.getElementById('start-overlay').style.display = 'none';
+            playing = true;
+            hp = 3;
+            refreshUI();
+            addCoin();
+        }
 
-                const coin = document.createElement('div');
-                coin.className = 'coin';
-                
-                // Position logic
-                const x = Math.floor(Math.random() * (canvas.clientWidth - 80));
-                const y = Math.floor(Math.random() * (canvas.clientHeight - 80));
+        function addCoin() {
+            if(!playing) return;
+            const box = document.getElementById('game-box');
+            
+            // Clear old coins manually for safety
+            const old = document.getElementsByClassName('target-coin');
+            while(old[0]) old[0].parentNode.removeChild(old[0]);
 
-                coin.style.left = Math.max(10, x) + 'px';
-                coin.style.top = Math.max(10, y) + 'px';
-                coin.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
+            const c = document.createElement('div');
+            c.className = 'target-coin';
+            
+            // Calculate random position
+            const x = Math.floor(Math.random() * (box.clientWidth - 70));
+            const y = Math.floor(Math.random() * (box.clientHeight - 70));
+            
+            c.style.left = Math.max(5, x) + 'px';
+            c.style.top = Math.max(5, y) + 'px';
+            c.innerHTML = '<i class="fas fa-coins text-white text-2xl pointer-events-none"></i>';
 
-                // Use both click and touch
-                coin.addEventListener('pointerdown', function(e) {
-                    e.stopPropagation();
-                    user.coins = (parseInt(user.coins) || 0) + 5;
-                    save();
-                    updateDisplay();
-                    spawnCoin();
-                });
-
-                canvas.appendChild(coin);
-            }
-
-            // Miss Click logic
-            document.getElementById('game-canvas').addEventListener('pointerdown', function(e) {
-                if(!active || e.target.classList.contains('coin') || e.target.closest('.coin')) return;
-                lives--;
-                updateDisplay();
-                if(lives <= 0) {
-                    active = false;
-                    alert("Game Over! Score Saved.");
-                    location.reload();
-                }
-            });
-
-            function save() {
+            // Click listener
+            c.onpointerdown = function(e) {
+                e.stopPropagation();
+                user.coins = (parseInt(user.coins) || 0) + 5;
                 localStorage.setItem('currentUser', JSON.stringify(user));
                 localStorage.setItem('user_' + user.email, JSON.stringify(user));
-            }
+                refreshUI();
+                addCoin();
+            };
 
-            updateDisplay();
-        } catch (err) {
-            console.error("Critical Error:", err);
-            alert("Error loading game. Please refresh.");
+            box.appendChild(c);
         }
+
+        // Missed click
+        document.getElementById('game-box').onpointerdown = function(e) {
+            if(!playing || e.target !== this) return;
+            hp--;
+            refreshUI();
+            if(hp <= 0) {
+                playing = false;
+                alert("GAME OVER! Your progress is saved.");
+                location.reload();
+            }
+        };
+
+        refreshUI();
     </script>
 </body>
 </html>

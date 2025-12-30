@@ -8,37 +8,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .sidebar { background: #1e293b; min-height: 100vh; width: 260px; position: fixed; left: 0; top: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        .sidebar { background: #1e293b; min-height: 100vh; width: 260px; position: fixed; left: 0; top: 0; z-index: 50; }
         .nav-link { transition: 0.3s; border-left: 4px solid transparent; color: #94a3b8; }
         .nav-link.active { background: rgba(255, 255, 255, 0.05); border-left-color: #6366f1; color: white; }
         .main-content { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; }
 
-        /* Spin Wheel Styles */
-        .wheel-container { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+        /* WHEEL FIX & STYLING */
+        .wheel-box { position: relative; width: 340px; height: 340px; margin: 0 auto; filter: drop-shadow(0 0 20px #6366f1); }
+        
         #wheel {
             width: 100%; height: 100%;
             border-radius: 50%;
-            border: 8px solid #334155;
+            border: 10px solid #1e293b;
             position: relative;
             overflow: hidden;
             transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
             background: conic-gradient(
-                #4f46e5 0deg 60deg, #818cf8 60deg 120deg, 
-                #4f46e5 120deg 180deg, #818cf8 180deg 240deg, 
-                #4f46e5 240deg 300deg, #818cf8 300deg 360deg
+                #f43f5e 0deg 60deg, #8b5cf6 60deg 120deg, 
+                #3b82f6 120deg 180deg, #10b981 180deg 240deg, 
+                #f59e0b 240deg 300deg, #ec4899 300deg 360deg
             );
         }
+
         .wheel-pointer {
-            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 40px; background: #ef4444; clip-path: polygon(50% 100%, 0 0, 100% 0);
-            z-index: 10;
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 45px; height: 45px; background: #fff; 
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        .wheel-label {
+
+        .segment-text {
             position: absolute; width: 50%; height: 50%;
             transform-origin: bottom right; top: 0; left: 0;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: white; font-size: 1.2rem;
+            font-weight: 900; color: white; font-size: 1.2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         @media (max-width: 768px) {
@@ -49,7 +53,7 @@
 </head>
 <body class="flex">
 
-    <aside class="sidebar hidden md:flex flex-col shadow-2xl z-50">
+    <aside class="sidebar hidden md:flex flex-col shadow-2xl">
         <div class="p-8 text-2xl font-black text-indigo-400 italic">COIN POP</div>
         <nav class="flex-grow px-4 space-y-2">
             <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
@@ -61,94 +65,97 @@
     </aside>
 
     <div class="main-content flex flex-col">
-        <header class="bg-white p-5 border-b flex justify-between items-center px-10 shadow-sm">
-            <h2 class="font-bold text-gray-800">Lucky Spin Wheel</h2>
-            <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 flex items-center gap-2">
-                <i class="fas fa-coins text-indigo-600"></i>
-                <span id="user-coins-display" class="font-black text-indigo-700">0</span>
+        <header class="bg-slate-900/50 p-5 border-b border-slate-800 flex justify-between items-center px-10">
+            <h2 class="font-bold text-white">Mega Spin</h2>
+            <div class="bg-indigo-600 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-500/30">
+                <i class="fas fa-coins"></i>
+                <span id="user-coins-display" class="font-black text-white">0</span>
             </div>
         </header>
 
         <main class="flex-1 p-8 flex flex-col items-center justify-center">
-            <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-gray-100 text-center max-w-lg w-full">
-                <h1 class="text-3xl font-black text-gray-800 mb-2">Test Your Luck!</h1>
-                <p class="text-gray-400 text-sm mb-10">Spin the wheel and win up to 100 coins instantly.</p>
+            <div class="bg-slate-800/50 p-10 rounded-[3rem] shadow-2xl border border-slate-700 text-center max-w-lg w-full">
+                <h1 class="text-4xl font-black text-white mb-2 tracking-tighter">LUCKY WHEEL</h1>
+                <p class="text-slate-400 text-sm mb-10 uppercase tracking-widest font-bold">Spin & Win Big Rewards</p>
 
-                <div class="wheel-container mb-10">
+                <div class="wheel-box mb-10">
                     <div class="wheel-pointer"></div>
                     <div id="wheel">
-                        <div class="wheel-label" style="transform: rotate(30deg) translate(20px, 40px);">10</div>
-                        <div class="wheel-label" style="transform: rotate(90deg) translate(20px, 40px);">50</div>
-                        <div class="wheel-label" style="transform: rotate(150deg) translate(20px, 40px);">5</div>
-                        <div class="wheel-label" style="transform: rotate(210deg) translate(20px, 40px);">100</div>
-                        <div class="wheel-label" style="transform: rotate(270deg) translate(20px, 40px);">20</div>
-                        <div class="wheel-label" style="transform: rotate(330deg) translate(20px, 40px);">0</div>
+                        <div class="segment-text" style="transform: rotate(30deg) translate(20px, 45px);">10</div>
+                        <div class="segment-text" style="transform: rotate(90deg) translate(20px, 45px);">50</div>
+                        <div class="segment-text" style="transform: rotate(150deg) translate(20px, 45px);">5</div>
+                        <div class="segment-text" style="transform: rotate(210deg) translate(20px, 45px);">100</div>
+                        <div class="segment-text" style="transform: rotate(270deg) translate(20px, 45px);">20</div>
+                        <div class="segment-text" style="transform: rotate(330deg) translate(20px, 45px);">0</div>
                     </div>
                 </div>
 
-                <button id="spin-btn" onclick="spinWheel()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xl shadow-xl hover:bg-indigo-700 transition-all active:scale-95">
-                    SPIN NOW
+                <button id="spin-btn" onclick="startSpin()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-5 rounded-3xl font-black text-xl shadow-2xl hover:scale-105 transition-all active:scale-95 disabled:opacity-50">
+                    SPIN TO WIN
                 </button>
                 
-                <p id="status-msg" class="mt-4 text-sm font-bold text-indigo-500 italic h-5"></p>
+                <p id="status-msg" class="mt-6 text-lg font-bold text-indigo-400 h-6"></p>
             </div>
         </main>
     </div>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0 };
+        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if(!currentUser) window.location.href = 'index.html';
+
         let isSpinning = false;
+        let currentRotation = 0;
 
         function updateUI() {
-            document.getElementById('user-coins-display').innerText = (user.coins || 0).toLocaleString();
+            document.getElementById('user-coins-display').innerText = (currentUser.coins || 0).toLocaleString();
         }
 
-        function spinWheel() {
+        function startSpin() {
             if (isSpinning) return;
 
-            // Optional: Add a limit or cost per spin here
             isSpinning = true;
             const wheel = document.getElementById('wheel');
             const status = document.getElementById('status-msg');
             const btn = document.getElementById('spin-btn');
             
             btn.disabled = true;
-            btn.classList.add('opacity-50');
-            status.innerText = "Spinning...";
+            status.innerText = "Good Luck! 🍀";
 
-            const randomDegree = Math.floor(Math.random() * 360) + 1800; // At least 5 rotations
-            wheel.style.transform = `rotate(${randomDegree}deg)`;
+            // Calculation: Full rotations + random angle
+            const extraDegree = Math.floor(Math.random() * 360);
+            const totalDegree = currentRotation + (360 * 8) + extraDegree; 
+            currentRotation = totalDegree;
+
+            wheel.style.transform = `rotate(${totalDegree}deg)`;
 
             setTimeout(() => {
                 isSpinning = false;
                 btn.disabled = false;
-                btn.classList.remove('opacity-50');
                 
-                const actualDegree = randomDegree % 360;
-                let winAmount = 0;
+                // Calculate which segment it landed on (Inverted logic for wheel rotation)
+                const actualAngle = (360 - (totalDegree % 360)) % 360;
+                let reward = 0;
 
-                // Determine win amount based on rotation
-                if (actualDegree >= 0 && actualDegree < 60) winAmount = 0;
-                else if (actualDegree >= 60 && actualDegree < 120) winAmount = 20;
-                else if (actualDegree >= 120 && actualDegree < 180) winAmount = 100;
-                else if (actualDegree >= 180 && actualDegree < 240) winAmount = 5;
-                else if (actualDegree >= 240 && actualDegree < 300) winAmount = 50;
-                else winAmount = 10;
+                if (actualAngle >= 0 && actualAngle < 60) reward = 10;
+                else if (actualAngle >= 60 && actualAngle < 120) reward = 0;
+                else if (actualAngle >= 120 && actualAngle < 180) reward = 20;
+                else if (actualAngle >= 180 && actualAngle < 240) reward = 100;
+                else if (actualAngle >= 240 && actualAngle < 300) reward = 5;
+                else reward = 50;
 
-                if (winAmount > 0) {
-                    addCoins(winAmount);
-                    status.innerText = `WOW! You won ${winAmount} Coins!`;
-                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                if (reward > 0) {
+                    addCoins(reward);
+                    status.innerText = `CONGRATS! You won ${reward} Coins! 🎁`;
                 } else {
-                    status.innerText = "Better luck next time!";
+                    status.innerText = "Try again! 0 Coins 😢";
                 }
             }, 4000);
         }
 
         function addCoins(amt) {
-            user.coins = (user.coins || 0) + amt;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+            currentUser.coins = (parseInt(currentUser.coins) || 0) + amt;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem(`user_${currentUser.email}`, JSON.stringify(currentUser));
             updateUI();
         }
 

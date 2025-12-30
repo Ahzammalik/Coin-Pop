@@ -2,162 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdraw Funds - Coin Pop</title>
+    <title>Withdraw - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .sidebar { background: #1e293b; min-height: 100vh; width: 260px; position: fixed; left: 0; top: 0; z-index: 50; }
-        .nav-link { transition: 0.3s; border-left: 4px solid transparent; color: #94a3b8; }
-        .nav-link.active { background: rgba(255, 255, 255, 0.05); border-left-color: #6366f1; color: white; }
-        .main-content { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; }
-        .input-box { border: 2px solid #e2e8f0; transition: 0.3s; }
-        .input-box:focus { border-color: #6366f1; outline: none; }
-        
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; width: 100%; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex">
-
-    <aside class="sidebar hidden md:flex flex-col shadow-2xl">
-        <div class="p-8 text-2xl font-black text-indigo-400 italic">COIN POP</div>
-        <nav class="flex-grow px-4 space-y-2">
-            <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-            <a href="play.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-gamepad mr-3"></i> Play Games</a>
-            <a href="reward.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-gift mr-3"></i> Daily Rewards</a>
-            <a href="spin.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-dharmachakra mr-3"></i> Lucky Spin</a>
-            <a href="withdraw.html" class="nav-link active flex items-center p-3 rounded-xl"><i class="fas fa-wallet mr-3"></i> Withdraw</a>
-        </nav>
-    </aside>
-
-    <div class="main-content flex flex-col">
-        <header class="bg-white p-5 border-b flex justify-between items-center px-10 shadow-sm">
-            <h2 class="font-bold text-gray-800">Withdrawal Portal</h2>
-            <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 flex items-center gap-2">
-                <i class="fas fa-coins text-indigo-600"></i>
-                <span id="user-coins-display" class="font-black text-indigo-700">0</span>
-            </div>
-        </header>
-
-        <main class="p-6 md:p-10 flex flex-col items-center">
-            <div class="w-full max-w-2xl bg-white rounded-[2rem] shadow-xl p-8 mb-8 border border-gray-100 flex flex-col md:flex-row justify-between items-center">
-                <div class="text-center md:text-left mb-4 md:mb-0">
-                    <p class="text-gray-400 text-sm font-bold uppercase tracking-widest">Available for PKR</p>
-                    <h3 class="text-4xl font-black text-indigo-600">Rs. <span id="pkr-val">0.00</span></h3>
-                    <p class="text-xs text-gray-400 mt-1">Rate: 1000 Coins = 100 PKR</p>
-                </div>
-                <div class="h-16 w-px bg-gray-100 hidden md:block"></div>
-                <div class="text-center md:text-right">
-                    <p class="text-gray-400 text-sm font-bold uppercase tracking-widest">Min. Withdrawal</p>
-                    <h3 class="text-2xl font-black text-gray-800">Rs. 500</h3>
-                </div>
+<body class="bg-slate-50">
+    <main class="main-content flex items-center justify-center min-h-screen" style="margin-left:0;">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-xl w-full max-w-md border">
+            <h2 class="text-3xl font-black text-slate-800 mb-6">Withdraw Coins</h2>
+            <div class="mb-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                <p class="text-indigo-600 text-sm font-bold uppercase">Current Balance</p>
+                <h3 class="text-3xl font-black text-indigo-700" id="bal">0</h3>
             </div>
 
-            <div class="w-full max-w-2xl bg-white rounded-[2rem] shadow-xl p-8 border border-gray-100">
-                <h4 class="text-xl font-black text-gray-800 mb-6">Request Payout</h4>
+            <div class="space-y-4">
+                <select id="method" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                    <option>JazzCash</option>
+                    <option>EasyPaisa</option>
+                    <option>Bank Transfer</option>
+                </select>
+                <input type="text" id="acc-num" placeholder="Account Number" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                <input type="number" id="amount" placeholder="Amount (Min 1000)" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-500 mb-2">Select Method</label>
-                        <select id="method" class="input-box w-full p-4 rounded-2xl bg-gray-50 font-bold text-gray-700">
-                            <option value="easypaisa">Easypaisa</option>
-                            <option value="jazzcash">JazzCash</option>
-                            <option value="bank">Bank Transfer</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-500 mb-2">Account Number / IBAN</label>
-                        <input type="text" id="acc-num" placeholder="03XXXXXXXXX" class="input-box w-full p-4 rounded-2xl bg-gray-50 font-bold">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-500 mb-2">Account Title (Name)</label>
-                        <input type="text" id="acc-name" placeholder="Full Name" class="input-box w-full p-4 rounded-2xl bg-gray-50 font-bold">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-500 mb-2">Amount to Withdraw (Coins)</label>
-                        <input type="number" id="withdraw-amt" placeholder="Min. 5000 Coins" class="input-box w-full p-4 rounded-2xl bg-gray-50 font-bold">
-                    </div>
-
-                    <button onclick="processWithdraw()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:bg-indigo-700 transition-all active:scale-95 mt-4">
-                        SUBMIT REQUEST
-                    </button>
-                </div>
+                <button onclick="requestWithdraw()" class="w-full bg-green-500 text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:bg-green-600 transition">
+                    SUBMIT REQUEST
+                </button>
             </div>
-
-            <p class="mt-8 text-gray-400 text-xs text-center max-w-md">Payments are processed within 24-48 hours. Please ensure your account details are correct before submitting.</p>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if(!currentUser) window.location.href = 'index.html';
+        let user = JSON.parse(localStorage.getItem('currentUser'));
+        document.getElementById('bal').innerText = user.coins;
 
-        function updateUI() {
-            const coins = currentUser.coins || 0;
-            document.getElementById('user-coins-display').innerText = coins.toLocaleString();
-            // Calculation: 1000 coins = 100 PKR (0.10 rate)
-            document.getElementById('pkr-val').innerText = (coins * 0.10).toFixed(2);
-        }
+        function requestWithdraw() {
+            const amt = document.getElementById('amount').value;
+            if(amt < 1000) { alert("Minimum withdraw is 1000 coins"); return; }
+            if(user.coins < amt) { alert("Insufficient Balance"); return; }
 
-        function processWithdraw() {
-            const method = document.getElementById('method').value;
-            const accNum = document.getElementById('acc-num').value;
-            const accName = document.getElementById('acc-name').value;
-            const amountCoins = parseInt(document.getElementById('withdraw-amt').value);
-
-            // Validation
-            if (!accNum || !accName || !amountCoins) {
-                alert("Please fill all fields!");
-                return;
-            }
-
-            if (amountCoins < 5000) {
-                alert("Minimum withdrawal is 5000 Coins (Rs. 500)");
-                return;
-            }
-
-            if (amountCoins > currentUser.coins) {
-                alert("Insufficient balance!");
-                return;
-            }
-
-            // Logic: Deduct Coins
-            currentUser.coins -= amountCoins;
+            // Store request for Admin
+            let requests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
+            requests.push({
+                email: user.email,
+                amount: amt,
+                method: document.getElementById('method').value,
+                account: document.getElementById('acc-num').value,
+                status: 'Pending',
+                date: new Date().toLocaleDateString()
+            });
             
-            // Save Withdrawal Request in History (Simulated)
-            const request = {
-                id: "WD-" + Math.floor(Math.random() * 1000000),
-                method: method,
-                account: accNum,
-                name: accName,
-                coins: amountCoins,
-                pkr: (amountCoins * 0.10).toFixed(2),
-                status: "Pending",
-                date: new Date().toLocaleString()
-            };
-
-            // Save globally
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            localStorage.setItem(`user_${currentUser.email}`, JSON.stringify(currentUser));
+            localStorage.setItem('withdraw_requests', JSON.stringify(requests));
             
-            // Save to Withdrawal History
-            let history = JSON.parse(localStorage.getItem(`withdrawals_${currentUser.email}`)) || [];
-            history.unshift(request);
-            localStorage.setItem(`withdrawals_${currentUser.email}`, JSON.stringify(history));
-
-            alert("Withdrawal Request Submitted Successfully! Rs. " + request.pkr + " will be sent to your account.");
+            user.coins -= amt;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            alert("Withdrawal request submitted!");
             window.location.href = 'dashboard.html';
         }
-
-        window.onload = updateUI;
     </script>
 </body>
 </html>

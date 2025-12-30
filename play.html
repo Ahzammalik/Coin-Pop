@@ -8,207 +8,150 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow: hidden; touch-action: manipulation; }
         .sidebar { background: #1e293b; min-height: 100vh; width: 260px; position: fixed; left: 0; top: 0; z-index: 50; }
-        .nav-link { transition: 0.3s; border-left: 4px solid transparent; color: #94a3b8; }
-        .nav-link.active { background: rgba(255, 255, 255, 0.05); border-left-color: #6366f1; color: white; }
-        
         .main-content { margin-left: 260px; width: calc(100% - 260px); height: 100vh; display: flex; flex-direction: column; }
         
         #game-area { 
-            width: calc(100% - 40px); 
-            flex-grow: 1;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); 
-            position: relative; 
-            overflow: hidden; 
-            border-radius: 2rem; 
-            margin: 20px;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-            cursor: crosshair;
-            touch-action: none;
+            width: calc(100% - 40px); flex-grow: 1;
+            background: #0f172a; position: relative; 
+            overflow: hidden; border-radius: 2rem; margin: 20px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5); border: 4px solid #1e293b;
         }
 
         .target-coin { 
-            position: absolute; 
-            width: 70px; height: 70px; 
+            position: absolute; width: 70px; height: 70px; 
             background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); 
-            border-radius: 50%; 
-            border: 4px solid #fff; 
+            border-radius: 50%; border: 4px solid #fff; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 30px #fbbf24; 
-            z-index: 20; 
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transition: transform 0.1s;
+            box-shadow: 0 0 20px #fbbf24; z-index: 100; cursor: pointer;
+            transition: transform 0.1s active;
         }
 
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        
-        #game-over { 
-            display: none; position: absolute; inset: 0; 
-            background: rgba(15, 23, 42, 0.95); 
-            z-index: 50; flex-direction: column; align-items: center; justify-content: center; 
-            color: white; border-radius: 2rem; 
+        #game-over, #start-screen { 
+            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); 
+            z-index: 200; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; color: white;
         }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .main-content { margin-left: 0; width: 100%; }
-            #game-area { margin: 10px; width: calc(100% - 20px); }
         }
     </style>
 </head>
 <body class="flex">
 
-    <aside class="sidebar hidden md:flex flex-col shadow-2xl">
+    <aside class="sidebar hidden md:flex flex-col">
         <div class="p-8 text-2xl font-black text-indigo-400 italic">COIN POP</div>
         <nav class="flex-grow px-4 space-y-2">
-            <a href="dashboard.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-            <a href="play.html" class="nav-link active flex items-center p-3 rounded-xl"><i class="fas fa-gamepad mr-3"></i> Play Games</a>
-            <a href="reward.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-gift mr-3"></i> Daily Rewards</a>
-            <a href="spin.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-dharmachakra mr-3"></i> Lucky Spin</a>
-            <a href="withdraw.html" class="nav-link flex items-center p-3 rounded-xl"><i class="fas fa-wallet mr-3"></i> Withdraw</a>
+            <a href="dashboard.html" class="p-3 block text-gray-400 hover:text-white">Dashboard</a>
+            <a href="play.html" class="p-3 block text-white bg-indigo-600 rounded-xl">Play Game</a>
         </nav>
-        <div class="p-6 bg-slate-900/50">
-            <p class="text-[10px] uppercase font-bold text-gray-500 tracking-widest">Session Level</p>
-            <p class="text-xl font-black text-white" id="side-level">Level 1</p>
-        </div>
     </aside>
 
     <div class="main-content">
-        <header class="bg-white p-5 border-b flex justify-between items-center px-10 shadow-sm">
-            <div id="lives-container" class="flex gap-1 text-red-500 text-xl">
-                <i class="fas fa-heart"></i><i class="fas fa-heart"></i><i class="fas fa-heart"></i>
-            </div>
-            <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 flex items-center gap-2">
-                <i class="fas fa-coins text-indigo-600"></i>
-                <span id="user-coins-display" class="font-black text-indigo-700">0</span>
+        <header class="bg-white p-5 border-b flex justify-between items-center px-10">
+            <div id="lives-display" class="flex gap-2 text-red-500 text-2xl"></div>
+            <div class="bg-indigo-50 px-4 py-2 rounded-2xl font-black text-indigo-700">
+                Coins: <span id="coin-count">0</span>
             </div>
         </header>
 
-        <div id="game-area" onclick="handleMissClick(event)">
-            <div id="game-over">
-                <h2 class="text-5xl font-black mb-4 text-red-500">GAME OVER</h2>
-                <p class="text-xl mb-8 text-slate-300">Level Reached: <span id="final-level" class="text-white font-bold">1</span></p>
-                <button onclick="watchAdToRevive()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-4 rounded-2xl font-black text-lg mb-4 shadow-2xl transition-all active:scale-95">
-                    WATCH AD TO REVIVE
-                </button>
-                <button onclick="window.location.href='dashboard.html'" class="text-gray-500 hover:text-white transition underline">Exit to Dashboard</button>
+        <div id="game-area">
+            <div id="start-screen">
+                <h1 class="text-4xl font-black mb-6">COIN CLICKER</h1>
+                <button onclick="initGame()" class="bg-green-500 px-12 py-4 rounded-2xl text-xl font-bold hover:scale-105 transition">START</button>
             </div>
 
-            <div id="start-screen" class="absolute inset-0 flex items-center justify-center z-30 bg-slate-900/80 backdrop-blur-sm">
-                <div class="text-center">
-                    <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-bounce shadow-lg shadow-indigo-500/50">
-                        <i class="fas fa-bolt text-white text-4xl"></i>
-                    </div>
-                    <h1 class="text-white text-4xl font-black mb-2 tracking-tighter">COIN CLICKER</h1>
-                    <p class="text-slate-400 mb-8">Tap coins to earn. Don't miss!</p>
-                    <button onclick="startGame(event)" class="bg-green-500 text-white px-16 py-5 rounded-3xl text-2xl font-black shadow-2xl hover:bg-green-600 transition-all active:scale-95">START GAME</button>
-                </div>
+            <div id="game-over" style="display:none;">
+                <h2 class="text-5xl font-black text-red-500 mb-4">GAME OVER</h2>
+                <button onclick="location.reload()" class="bg-indigo-600 px-10 py-3 rounded-xl font-bold">RETRY</button>
             </div>
         </div>
     </div>
 
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if(!currentUser) window.location.href = 'index.html';
+        // Data Load safely
+        let user = JSON.parse(localStorage.getItem('currentUser')) || null;
+        if(!user) window.location.href = 'index.html';
 
-        let level = 1; 
-        let coinsInLevel = 0; 
-        let lives = 3; 
-        let gameActive = false;
+        let score = 0;
+        let lives = 3;
+        let gameRunning = false;
 
-        function updateUI() {
-            document.getElementById('user-coins-display').innerText = (currentUser.coins || 0).toLocaleString();
-            document.getElementById('side-level').innerText = "Level " + level;
-            updateLivesUI();
+        function updateTopBar() {
+            document.getElementById('coin-count').innerText = (user.coins || 0).toLocaleString();
+            const livesDiv = document.getElementById('lives-display');
+            livesDiv.innerHTML = '';
+            for(let i=0; i<lives; i++) livesDiv.innerHTML += '❤';
         }
 
-        function startGame(e) { 
-            if(e) e.stopPropagation();
-            document.getElementById('start-screen').style.display = 'none'; 
-            gameActive = true; 
-            spawnTarget(); 
-            updateUI();
+        function initGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            gameRunning = true;
+            lives = 3;
+            updateTopBar();
+            spawnCoin();
         }
 
-        function spawnTarget() {
-            if (!gameActive) return;
+        function spawnCoin() {
+            if(!gameRunning) return;
+            
             const area = document.getElementById('game-area');
+            // Purane coins delete karein
+            const oldCoins = document.querySelectorAll('.target-coin');
+            oldCoins.forEach(c => c.remove());
+
+            const coin = document.createElement('div');
+            coin.className = 'target-coin';
             
-            // Remove previous coin
-            const old = document.querySelector('.target-coin'); 
-            if(old) old.remove();
-            
-            const target = document.createElement('div');
-            target.className = 'target-coin';
-            
-            // Generate Random Position within Game Area
-            const x = Math.random() * (area.offsetWidth - 90);
-            const y = Math.random() * (area.offsetHeight - 90);
-            
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
-            target.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
-            
-            // Use pointerdown for faster mobile response
-            target.onpointerdown = (e) => { 
-                e.stopPropagation(); 
-                if(!gameActive) return;
+            // Random Position calculation
+            const maxX = area.clientWidth - 80;
+            const maxY = area.clientHeight - 80;
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            coin.style.left = randomX + 'px';
+            coin.style.top = randomY + 'px';
+            coin.innerHTML = '<i class="fas fa-coins text-white"></i>';
+
+            // CLICK EVENT
+            coin.onpointerdown = function(e) {
+                e.stopPropagation();
+                if(!gameRunning) return;
                 
-                addCoins(2); // Reward 2 coins per click
-                coinsInLevel++; 
-                
-                if (coinsInLevel >= 10) {
-                    level++;
-                    coinsInLevel = 0;
-                    document.getElementById('side-level').innerText = "Level " + level;
-                }
-                
-                spawnTarget(); 
+                // Add 5 coins per click
+                user.coins = (parseInt(user.coins) || 0) + 5;
+                saveData();
+                updateTopBar();
+                spawnCoin();
             };
-            area.appendChild(target);
+
+            area.appendChild(coin);
         }
 
-        function handleMissClick(e) {
-            if (!gameActive || e.target !== document.getElementById('game-area')) return;
-            lives--; 
-            updateLivesUI();
-            if (lives <= 0) gameOver();
+        // MISS CLICK logic
+        document.getElementById('game-area').onpointerdown = function(e) {
+            if(!gameRunning || e.target !== this) return;
+            lives--;
+            updateTopBar();
+            if(lives <= 0) endGame();
+        };
+
+        function saveData() {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
         }
 
-        function addCoins(amt) {
-            currentUser.coins = (parseInt(currentUser.coins) || 0) + amt;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            localStorage.setItem(`user_${currentUser.email}`, JSON.stringify(currentUser));
-            document.getElementById('user-coins-display').innerText = currentUser.coins.toLocaleString();
-        }
-
-        function updateLivesUI() {
-            const container = document.getElementById('lives-container'); 
-            container.innerHTML = '';
-            for(let i=0; i<3; i++) {
-                container.innerHTML += `<i class="fas fa-heart ${i < lives ? 'text-red-500' : 'text-slate-700'}"></i>`;
-            }
-        }
-
-        function gameOver() {
-            gameActive = false;
-            const target = document.querySelector('.target-coin');
-            if(target) target.remove();
-            document.getElementById('final-level').innerText = level;
+        function endGame() {
+            gameRunning = false;
             document.getElementById('game-over').style.display = 'flex';
+            const oldCoins = document.querySelectorAll('.target-coin');
+            oldCoins.forEach(c => c.remove());
         }
 
-        function watchAdToRevive() {
-            alert("Reward Ad Shown! Lives Refilled.");
-            lives = 3; 
-            updateLivesUI();
-            document.getElementById('game-over').style.display = 'none';
-            gameActive = true; 
-            spawnTarget();
-        }
-
-        window.onload = updateUI;
+        updateTopBar();
     </script>
 </body>
 </html>

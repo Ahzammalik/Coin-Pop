@@ -2,153 +2,89 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Control Panel - Coin Pop</title>
+    <title>Admin Panel - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; }
-        .admin-sidebar { background: #1e293b; }
-    </style>
 </head>
-<body class="antialiased flex">
-
-    <div class="hidden md:flex flex-col w-64 admin-sidebar min-h-screen text-white p-6">
-        <h2 class="text-2xl font-black text-indigo-400 mb-10">COIN POP <span class="text-xs text-white block opacity-50">ADMIN AREA</span></h2>
-        <nav class="space-y-4">
-            <a href="#" class="block p-3 rounded-lg bg-indigo-600 font-bold"><i class="fas fa-users mr-2"></i> Users List</a>
-            <a href="#" class="block p-3 rounded-lg hover:bg-gray-700 transition"><i class="fas fa-wallet mr-2"></i> Withdraw Requests</a>
-            <a href="dashboard.html" class="block p-3 rounded-lg hover:bg-gray-700 transition"><i class="fas fa-arrow-left mr-2"></i> User View</a>
-        </nav>
-    </div>
-
-    <div class="flex-1 p-4 md:p-10">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-extrabold text-gray-800">Management Dashboard</h1>
-                <p class="text-gray-500">Welcome back, Boss!</p>
-            </div>
-            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200">
-                <span class="text-sm font-bold text-indigo-600">Admin: ghazimalik1997@gmail.com</span>
-            </div>
-        </header>
+<body class="bg-slate-900 text-white">
+    <div class="p-10 max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-4xl font-black italic tracking-tighter text-indigo-400">ADMIN CONTROL</h1>
+            <button onclick="location.reload()" class="bg-slate-800 p-3 rounded-xl"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500">
-                <p class="text-gray-400 text-sm font-bold uppercase">Total Users</p>
-                <h3 id="stat-total-users" class="text-3xl font-black text-gray-800">0</h3>
+            <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+                <p class="text-slate-400 font-bold uppercase text-xs">Total Requests</p>
+                <h2 id="total-req" class="text-3xl font-black mt-2">0</h2>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
-                <p class="text-gray-400 text-sm font-bold uppercase">Total Coins Issued</p>
-                <h3 id="stat-total-coins" class="text-3xl font-black text-gray-800">0</h3>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500">
-                <p class="text-gray-400 text-sm font-bold uppercase">Pending Requests</p>
-                <h3 class="text-3xl font-black text-gray-800">0</h3>
+            <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+                <p class="text-slate-400 font-bold uppercase text-xs">Pending Amount</p>
+                <h2 id="pending-amt" class="text-3xl font-black mt-2 text-orange-400">0</h2>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800 text-lg">Registered Users</h3>
-                <button onclick="clearAllData()" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-lg font-bold hover:bg-red-600 hover:text-white transition">Reset All Data</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 text-gray-400 text-xs uppercase font-bold">
-                        <tr>
-                            <th class="px-6 py-4">User Details</th>
-                            <th class="px-6 py-4">Coins</th>
-                            <th class="px-6 py-4">Account ID</th>
-                            <th class="px-6 py-4 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body" class="divide-y divide-gray-100 text-sm">
-                        </tbody>
-                </table>
-            </div>
+        <div class="bg-slate-800 rounded-[2rem] overflow-hidden border border-slate-700">
+            <table class="w-full text-left">
+                <thead class="bg-slate-700/50 text-slate-400 uppercase text-sm">
+                    <tr>
+                        <th class="p-6">User Email</th>
+                        <th class="p-6">Method</th>
+                        <th class="p-6">Amount</th>
+                        <th class="p-6">Status</th>
+                        <th class="p-6 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="request-list">
+                    </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        // Check if Admin
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser || currentUser.email !== "ghazimalik1997@gmail.com") {
-                alert("Access Denied!");
-                window.location.href = 'index.html';
-                return;
-            }
-            loadUsers();
-        });
+        function loadRequests() {
+            const requests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
+            const list = document.getElementById('request-list');
+            let totalAmt = 0;
+            list.innerHTML = '';
 
-        function loadUsers() {
-            const tableBody = document.getElementById('user-table-body');
-            tableBody.innerHTML = '';
+            requests.forEach((req, index) => {
+                if(req.status === 'Pending') totalAmt += parseInt(req.amount);
+                
+                list.innerHTML += `
+                    <tr class="border-t border-slate-700">
+                        <td class="p-6 font-bold">${req.email}</td>
+                        <td class="p-6">${req.method} (${req.account})</td>
+                        <td class="p-6 text-indigo-400 font-black">${req.amount} Coins</td>
+                        <td class="p-6"><span class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs font-bold">${req.status}</span></td>
+                        <td class="p-6 text-center">
+                            <button onclick="updateStatus(${index}, 'Approved')" class="bg-green-600 px-4 py-2 rounded-lg text-xs font-bold mr-2 hover:bg-green-700">Approve</button>
+                            <button onclick="updateStatus(${index}, 'Rejected')" class="bg-red-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700">Reject</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('total-req').innerText = requests.length;
+            document.getElementById('pending-amt').innerText = totalAmt.toLocaleString();
+        }
+
+        function updateStatus(index, newStatus) {
+            let requests = JSON.parse(localStorage.getItem('withdraw_requests'));
+            requests[index].status = newStatus;
+            localStorage.setItem('withdraw_requests', JSON.stringify(requests));
             
-            let totalUsers = 0;
-            let totalCoins = 0;
-
-            // LocalStorage se tamam keys nikalna
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('user_')) {
-                    const user = JSON.parse(localStorage.getItem(key));
-                    totalUsers++;
-                    totalCoins += (user.coins || 0);
-
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-gray-800">${user.name || 'No Name'}</div>
-                                <div class="text-xs text-gray-400">${user.email}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold text-xs">${(user.coins || 0).toLocaleString()}</span>
-                            </td>
-                            <td class="px-6 py-4 font-mono text-xs text-gray-500">${user.accountId || 'N/A'}</td>
-                            <td class="px-6 py-4 text-center">
-                                <button onclick="editCoins('${user.email}')" class="text-indigo-600 hover:text-indigo-900 font-bold mr-3">Edit Coins</button>
-                                <button onclick="deleteUser('${user.email}')" class="text-red-600 hover:text-red-900 font-bold">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                }
-            }
-
-            document.getElementById('stat-total-users').innerText = totalUsers;
-            document.getElementById('stat-total-coins').innerText = totalCoins.toLocaleString();
+            // Add to Global History for the user to see
+            let history = JSON.parse(localStorage.getItem('global_history')) || [];
+            history.push(requests[index]);
+            localStorage.setItem('global_history', JSON.stringify(history));
+            
+            alert(`Request ${newStatus}!`);
+            loadRequests();
         }
 
-        function editCoins(email) {
-            const newAmount = prompt("Enter new coin balance for " + email);
-            if (newAmount !== null) {
-                const user = JSON.parse(localStorage.getItem(`user_${email}`));
-                user.coins = parseInt(newAmount);
-                localStorage.setItem(`user_${email}`, JSON.stringify(user));
-                
-                // Agar yehi user login hai toh session bhi update karein
-                const current = JSON.parse(localStorage.getItem('currentUser'));
-                if(current.email === email) localStorage.setItem('currentUser', JSON.stringify(user));
-                
-                loadUsers();
-            }
-        }
-
-        function deleteUser(email) {
-            if(confirm("Are you sure you want to delete this user?")) {
-                localStorage.removeItem(`user_${email}`);
-                loadUsers();
-            }
-        }
-
-        function clearAllData() {
-            if(confirm("CRITICAL: This will delete ALL users and data. Continue?")) {
-                localStorage.clear();
-                window.location.reload();
-            }
-        }
+        loadRequests();
     </script>
 </body>
 </html>

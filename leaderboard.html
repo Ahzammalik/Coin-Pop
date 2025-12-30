@@ -2,162 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root { --primary: #4f46e5; --primary-dark: #4338ca; }
-        * { font-family: 'Inter', sans-serif; }
-        body { background-color: #f3f4f6; }
-
-        /* Sidebar Styling (Same as Dashboard/Withdraw) */
-        .sidebar { background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; width: 280px; min-height: 100vh; flex-shrink: 0; transition: 0.3s; }
-        .nav-link { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255, 255, 255, 0.8); text-decoration: none; border-left: 4px solid transparent; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-link.active { background: rgba(255, 255, 255, 0.2); color: white; border-left-color: #fbbf24; }
-
-        /* Leaderboard Specifics */
-        .podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
-        .podium-item { padding: 1.5rem; border-radius: 1rem; text-align: center; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white; transform: scale(1.05); order: 2; }
-        .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); color: white; order: 1; }
-        .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #A66D29 100%); color: white; order: 3; }
-        
-        .leaderboard-item { display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #eee; background: white; transition: 0.2s; }
-        .leaderboard-item:hover { background: #f9fafb; }
-        
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; left: -280px; z-index: 50; }
-            .sidebar.active { left: 0; }
-            .podium { grid-template-columns: 1fr; }
-            .rank-1, .rank-2, .rank-3 { order: unset; transform: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex min-h-screen">
-
-    <aside id="sidebar" class="sidebar flex flex-col">
-        <div class="p-6 text-2xl font-black flex items-center border-b border-white/10">
-            <i class="fas fa-coins mr-2 text-yellow-400"></i> Coin Pop
-        </div>
-        <nav class="flex-grow mt-4">
-            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3 w-5"></i> Dashboard</a>
-            <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3 w-5"></i> Play & Earn</a>
-            <a href="leaderboard.html" class="nav-link active"><i class="fas fa-trophy mr-3 w-5"></i> Leaderboard</a>
-            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3 w-5"></i> Withdraw PKR</a>
-            <div class="px-6 py-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">Account</div>
-            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3 w-5"></i> My Profile</a>
-            <button id="logout-btn" class="nav-link w-full text-left"><i class="fas fa-sign-out-alt mr-3 w-5"></i> Logout</button>
-        </nav>
-        <div class="p-6 border-t border-white/10 bg-black/10 text-center">
-            <p class="text-xs opacity-70">Your Balance</p>
-            <p class="text-xl font-black text-white" id="side-balance">Rs. 0.00</p>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center px-8">
-            <div class="flex items-center">
-                <button onclick="document.getElementById('sidebar').classList.toggle('active')" class="md:hidden mr-4 text-gray-600">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <h2 class="text-xl font-bold text-gray-800">Top Earners</h2>
-            </div>
-            <div class="bg-indigo-600 text-white px-5 py-2 rounded-full font-bold">
-                My PKR: <span id="header-balance">0.00</span>
-            </div>
-        </header>
-
-        <div class="p-6 overflow-y-auto">
-            <div class="bg-indigo-700 rounded-2xl p-8 text-white mb-8 relative overflow-hidden">
-                <div class="relative z-10">
-                    <h1 class="text-3xl font-black mb-2">Global Ranking</h1>
-                    <p class="opacity-80">See who is making the most money this week!</p>
-                </div>
-                <i class="fas fa-trophy absolute right-8 top-1/2 -translate-y-1/2 text-8xl opacity-10"></i>
-            </div>
-
-            <div class="podium">
-                <div class="podium-item rank-2">
-                    <div class="text-2xl font-bold">2nd</div>
-                    <div class="w-16 h-16 bg-white/20 rounded-full mx-auto my-3 flex items-center justify-center text-2xl font-bold">A</div>
-                    <div class="font-bold">Ali Ahmed</div>
-                    <div class="text-sm opacity-90">Rs. 12,450</div>
-                </div>
-                <div class="podium-item rank-1">
-                    <i class="fas fa-crown text-yellow-300 text-3xl mb-2"></i>
-                    <div class="text-3xl font-black">1st</div>
-                    <div class="w-20 h-20 bg-white/20 rounded-full mx-auto my-3 flex items-center justify-center text-3xl font-bold">S</div>
-                    <div class="font-bold text-lg">Sana Khan</div>
-                    <div class="text-xl font-black">Rs. 18,900</div>
-                </div>
-                <div class="podium-item rank-3">
-                    <div class="text-xl font-bold">3rd</div>
-                    <div class="w-14 h-14 bg-white/20 rounded-full mx-auto my-3 flex items-center justify-center text-xl font-bold">U</div>
-                    <div class="font-bold">Usman Dev</div>
-                    <div class="text-sm opacity-90">Rs. 9,120</div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b bg-gray-50 font-bold text-gray-600 flex justify-between">
-                    <span>Rank & Player</span>
-                    <span>Total PKR Earned</span>
-                </div>
-                
-                <div id="leaderboard-list">
-                    <div class="leaderboard-item">
-                        <div class="flex items-center flex-1">
-                            <span class="w-8 font-bold text-gray-400">4</span>
-                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold mr-3">H</div>
-                            <span class="font-semibold text-gray-800">Hamza Ali</span>
-                        </div>
-                        <span class="font-black text-indigo-600">Rs. 7,400</span>
-                    </div>
-
-                    <div class="leaderboard-item">
-                        <div class="flex items-center flex-1">
-                            <span class="w-8 font-bold text-gray-400">5</span>
-                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold mr-3">Z</div>
-                            <span class="font-semibold text-gray-800">Zainab Bibi</span>
-                        </div>
-                        <span class="font-black text-indigo-600">Rs. 5,200</span>
-                    </div>
-
-                    <div class="leaderboard-item bg-yellow-50">
-                        <div class="flex items-center flex-1">
-                            <span class="w-8 font-bold text-yellow-600">YOU</span>
-                            <div class="w-10 h-10 bg-yellow-500 text-white rounded-full flex items-center justify-center font-bold mr-3">U</div>
-                            <span class="font-bold text-gray-800">Your Account</span>
-                        </div>
-                        <span class="font-black text-indigo-600" id="user-pkr-display">Rs. 0.00</span>
+<body class="bg-slate-50">
+    <main class="max-w-2xl mx-auto p-8">
+        <h1 class="text-4xl font-black text-slate-800 mb-8"><i class="fas fa-trophy text-yellow-500 mr-4"></i>Top Earners</h1>
+        
+        <div class="space-y-4" id="leader-list">
+            <div class="bg-indigo-600 p-6 rounded-[2rem] text-white flex justify-between items-center shadow-xl shadow-indigo-200">
+                <div class="flex items-center">
+                    <span class="text-3xl font-black mr-6">1</span>
+                    <div>
+                        <p class="font-bold">Ahmad Khan</p>
+                        <p class="text-xs text-indigo-200">Global Rank</p>
                     </div>
                 </div>
+                <p class="text-2xl font-black">25,000 <span class="text-sm">pts</span></p>
             </div>
-        </div>
+            </div>
     </main>
-
-    <script>
-        function updateUI() {
-            const balance = localStorage.getItem('userPKR') || "0.00";
-            const formatted = parseFloat(balance).toFixed(2);
-            
-            document.getElementById('header-balance').innerText = formatted;
-            document.getElementById('side-balance').innerText = "Rs. " + formatted;
-            document.getElementById('user-pkr-display').innerText = "Rs. " + formatted;
-        }
-
-        // Logout Logic
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            if(confirm("Are you sure you want to logout?")) {
-                window.location.href = "login.html";
-            }
-        });
-
-        window.onload = updateUI;
-    </script>
 </body>
 </html>

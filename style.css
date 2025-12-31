@@ -46,7 +46,44 @@
 }
 
 .main-content { margin-left: 260px; padding: 25px; }
+/* Sidebar Layout Fix */
+.sidebar {
+    width: 260px;
+    background: #1e293b;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column; /* Is se links ek ke niche ek ayenge */
+    padding: 20px 0;
+    z-index: 1000;
+}
 
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px;
+    color: #94a3b8;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* Main content ko sidebar ke side mein rakhne ke liye */
+.main-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+}
+
+@media (max-width: 768px) {
+    .sidebar { display: none; } /* Mobile par baad mein handle karenge */
+    .main-content { margin-left: 0; width: 100%; }
+}
 @media (max-width: 768px) {
     .sidebar { left: -260px; } /* Mobile par hidden, toggle button ke liye */
     .main-content { margin-left: 0; }

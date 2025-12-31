@@ -5,161 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
-        .sidebar { background: #1e293b; min-height: 100vh; position: fixed; }
-        .nav-link { transition: 0.3s; border-left: 4px solid transparent; }
-        .nav-link:hover, .nav-link.active { background: rgba(255, 255, 255, 0.05); border-left-color: #6366f1; color: white; }
-        .main-content { margin-left: 16rem; width: calc(100% - 16rem); }
+        body { background: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; }
+        
+        /* Sidebar Professional Styling */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            z-index: 1000;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left: 4px solid #6366f1;
+        }
+
+        .nav-link i { width: 25px; margin-right: 12px; }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .card-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
         @media (max-width: 768px) {
             .sidebar { display: none; }
-            .main-content { margin-left: 0; width: 100%; }
+            .main-content { margin-left: 0; padding: 20px; }
         }
     </style>
 </head>
-<body class="flex">
+<body>
 
-    <aside class="sidebar w-64 hidden md:flex flex-col z-50 shadow-2xl">
-        <div class="p-8">
-            <h1 class="text-2xl font-black text-indigo-400 italic tracking-tighter">COIN POP</h1>
+    <aside class="sidebar">
+        <div class="px-8 py-6 mb-4 text-center">
+            <h1 class="text-white font-black text-2xl italic tracking-tighter">COIN POP</h1>
         </div>
         
-        <nav class="flex-1 px-4 space-y-2">
-            <a href="dashboard.html" class="nav-link active flex items-center p-3 rounded-xl text-white">
-                <i class="fas fa-th-large mr-3"></i> Dashboard
-            </a>
-            <a href="play.html" class="nav-link flex items-center p-3 rounded-xl text-gray-400">
-                <i class="fas fa-gamepad mr-3"></i> Play Games
-            </a>
-            <a href="reward.html" class="nav-link flex items-center p-3 rounded-xl text-gray-400">
-                <i class="fas fa-gift mr-3"></i> Daily Rewards
-            </a>
-            <a href="spin.html" class="nav-link flex items-center p-3 rounded-xl text-gray-400">
-                <i class="fas fa-dharmachakra mr-3"></i> Lucky Spin
-            </a>
-            <a href="withdraw.html" class="nav-link flex items-center p-3 rounded-xl text-gray-400">
-                <i class="fas fa-wallet mr-3"></i> Withdraw
-            </a>
-            <hr class="border-gray-800 my-4">
-            <div id="admin-box" class="hidden">
-                <a href="admin.html" class="nav-link flex items-center p-3 rounded-xl text-yellow-500 bg-yellow-500/5">
-                    <i class="fas fa-user-shield mr-3"></i> Admin Panel
-                </a>
-            </div>
+        <nav class="flex flex-col space-y-1">
+            <a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="play.html" class="nav-link"><i class="fas fa-gamepad"></i> Play Games</a>
+            <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
+            <a href="rewards.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
+            
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-50"></div>
+
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
+            <a href="history.html" class="nav-link"><i class="fas fa-history"></i> History</a>
+            
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-50"></div>
+
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> My Profile</a>
+            <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Contact Us</a>
         </nav>
 
-        <div class="p-6">
-            <button onclick="logout()" class="w-full p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition font-bold flex items-center justify-center">
-                <i class="fas fa-power-off mr-2"></i> Logout
-            </button>
+        <div class="mt-auto px-4">
+            <a href="index.html" class="nav-link text-red-400 hover:bg-red-500/10"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </aside>
 
-    <div class="main-content min-h-screen flex flex-col">
-        
-        <header class="bg-white px-8 py-5 flex justify-between items-center shadow-sm border-b">
-            <h2 class="font-extrabold text-gray-800 text-lg">Dashboard Overview</h2>
-            <div class="flex items-center gap-4">
-                <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 flex items-center gap-2">
-                    <i class="fas fa-coins text-indigo-600"></i>
-                    <span id="user-coins-top" class="font-black text-indigo-700">0</span>
+    <main class="main-content">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800">Hello, <span id="user-name">Player</span>!</h2>
+                <p class="text-slate-500 font-medium">Ready to earn some more coins?</p>
+            </div>
+            <div class="bg-white p-2 px-4 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <i class="fas fa-coins text-yellow-500 mr-2"></i>
+                <span id="top-coin-val" class="font-bold text-slate-700">0</span>
+            </div>
+        </div>
+
+        <div class="card-gradient p-10 rounded-[2.5rem] text-white shadow-2xl shadow-indigo-200 relative overflow-hidden mb-10">
+            <div class="relative z-10">
+                <p class="text-indigo-100 font-bold uppercase tracking-widest text-sm mb-2">Total Balance</p>
+                <h3 class="text-6xl font-black mb-6"><span id="main-coin-val">0</span> <span class="text-2xl font-normal opacity-70">Coins</span></h3>
+                <div class="flex space-x-4">
+                    <a href="withdraw.html" class="bg-white/20 hover:bg-white/30 px-6 py-2 rounded-xl font-bold transition backdrop-blur-md">Withdraw Now</a>
+                    <a href="play.html" class="bg-indigo-900/40 hover:bg-indigo-900/60 px-6 py-2 rounded-xl font-bold transition">Earn More</a>
                 </div>
             </div>
-        </header>
+            <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 rounded-full"></div>
+        </div>
 
-        <main class="p-6 md:p-10 flex-1">
-            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl mb-10 relative overflow-hidden">
-                <div class="relative z-10">
-                    <p class="text-indigo-100 font-medium opacity-80">Your Total Balance</p>
-                    <h2 id="user-coins-main" class="text-5xl md:text-6xl font-black mt-2 tracking-tight">0</h2>
-                    <div class="mt-6 inline-flex items-center gap-2 bg-black/20 px-4 py-2 rounded-full border border-white/10">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-200">Account ID:</span>
-                        <span id="user-id" class="text-sm font-mono font-bold">CP-000000</span>
-                    </div>
+        <h4 class="text-xl font-black text-slate-800 mb-6">Quick Access</h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <a href="play.html" class="bg-white p-6 rounded-3xl text-center border border-slate-100 shadow-sm hover:shadow-xl transition group">
+                <div class="w-14 h-14 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <i class="fas fa-gamepad text-2xl"></i>
                 </div>
-                <i class="fas fa-wallet absolute -right-10 -bottom-10 text-[12rem] text-white/10 rotate-12"></i>
-            </div>
-
-            <h3 class="text-gray-800 font-black text-sm uppercase tracking-widest mb-6 ml-2">Quick Access</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                
-                <a href="play.html" class="group bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:border-indigo-300 transition-all text-center flex flex-col items-center">
-                    <div class="w-16 h-16 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-gamepad text-2xl"></i>
-                    </div>
-                    <span class="font-bold text-gray-800">Play</span>
-                </a>
-
-                <a href="reward.html" class="group bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:border-indigo-300 transition-all text-center flex flex-col items-center">
-                    <div class="w-16 h-16 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-gift text-2xl"></i>
-                    </div>
-                    <span class="font-bold text-gray-800">Reward</span>
-                </a>
-
-                <a href="spin.html" class="group bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:border-indigo-300 transition-all text-center flex flex-col items-center">
-                    <div class="w-16 h-16 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-dharmachakra text-2xl"></i>
-                    </div>
-                    <span class="font-bold text-gray-800">Spin</span>
-                </a>
-
-                <a href="withdraw.html" class="group bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:border-indigo-300 transition-all text-center flex flex-col items-center">
-                    <div class="w-16 h-16 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-wallet text-2xl"></i>
-                    </div>
-                    <span class="font-bold text-gray-800">Withdraw</span>
-                </a>
-
-            </div>
-        </main>
-    </div>
+                <span class="font-bold text-slate-700">Play</span>
+            </a>
+            <a href="rewards.html" class="bg-white p-6 rounded-3xl text-center border border-slate-100 shadow-sm hover:shadow-xl transition group">
+                <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <i class="fas fa-gift text-2xl"></i>
+                </div>
+                <span class="font-bold text-slate-700">Daily Bonus</span>
+            </a>
+            <a href="spin.html" class="bg-white p-6 rounded-3xl text-center border border-slate-100 shadow-sm hover:shadow-xl transition group">
+                <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <i class="fas fa-dharmachakra text-2xl"></i>
+                </div>
+                <span class="font-bold text-slate-700">Spin</span>
+            </a>
+            <a href="leaderboard.html" class="bg-white p-6 rounded-3xl text-center border border-slate-100 shadow-sm hover:shadow-xl transition group">
+                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                    <i class="fas fa-trophy text-2xl"></i>
+                </div>
+                <span class="font-bold text-slate-700">Ranking</span>
+            </a>
+        </div>
+    </main>
 
     <script>
+        // Load User Data
         document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('currentUser'));
-            if(!user) { window.location.href = 'index.html'; return; }
-
-            // Sync Data
-            document.getElementById('user-coins-top').innerText = (user.coins || 0).toLocaleString();
-            document.getElementById('user-coins-main').innerText = (user.coins || 0).toLocaleString();
-            document.getElementById('user-id').innerText = user.accountId || "N/A";
-
-            if(user.email === "ghazimalik1997@gmail.com") {
-                document.getElementById('admin-box').classList.remove('hidden');
+            if(!user) {
+                window.location.href = 'index.html';
+                return;
             }
+
+            // Update UI
+            document.getElementById('user-name').innerText = user.name || "Player";
+            const coinCount = (user.coins || 0).toLocaleString();
+            document.getElementById('top-coin-val').innerText = coinCount;
+            document.getElementById('main-coin-val').innerText = coinCount;
         });
-        function logout() { localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
-<aside class="sidebar">
-    <div class="px-8 py-6 mb-4">
-        <h1 class="text-white font-black text-2xl italic">COIN POP</h1>
-    </div>
-    
-    <nav class="flex flex-col flex-grow">
-        <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-        <a href="play.html" class="nav-link"><i class="fas fa-gamepad mr-3"></i> Play Games</a>
-        <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra mr-3"></i> Lucky Spin</a>
-        <a href="rewards.html" class="nav-link"><i class="fas fa-gift mr-3"></i> Daily Rewards</a>
-        
-        <div class="h-px bg-slate-700 my-4 mx-6"></div>
-
-        <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3"></i> Leaderboard</a>
-        <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3"></i> Withdraw</a>
-        <a href="history.html" class="nav-link"><i class="fas fa-history mr-3"></i> History</a>
-        
-        <div class="h-px bg-slate-700 my-4 mx-6"></div>
-
-        <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3"></i> My Profile</a>
-        <a href="settings.html" class="nav-link"><i class="fas fa-cog mr-3"></i> Settings</a>
-        <a href="contact.html" class="nav-link"><i class="fas fa-headset mr-3"></i> Contact Us</a>
-    </nav>
-
-    <div class="mt-auto px-4 pb-4">
-        <a href="index.html" class="nav-link text-red-400"><i class="fas fa-sign-out-alt mr-3"></i> Logout</a>
-    </div>
-</aside>

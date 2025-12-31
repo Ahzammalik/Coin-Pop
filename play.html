@@ -2,161 +2,207 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Play - Coin Pop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Game - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { margin: 0; background: #0f172a; font-family: sans-serif; overflow: hidden; color: white; }
-        .sidebar { background: #1e293b; width: 260px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; border-right: 1px solid #334155; }
-        .main { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        body { background: #0f172a; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         
-        #game-box { 
-            flex-grow: 1; background: #111827; border-radius: 1.5rem; 
-            position: relative; border: 2px solid #374151; touch-action: none;
-            overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        /* Sidebar Fix: Is se links line mein nahi balki niche ayenge */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column; /* Sabse important line */
+            padding: 0;
+            z-index: 1000;
         }
 
-        .target-coin { 
-            position: absolute; width: 65px; height: 65px; 
-            background: radial-gradient(circle, #fcd34d 0%, #d97706 100%); 
-            border-radius: 50%; border: 3px solid #fff; 
-            display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.7); cursor: pointer; z-index: 500;
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
         }
 
-        #start-overlay {
-            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; border-radius: 1.4rem;
+        .nav-link:hover, .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            border-left: 4px solid #6366f1;
         }
 
-        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+        .nav-link i { width: 25px; margin-right: 12px; font-size: 1.1rem; }
+
+        .main-content {
+            margin-left: 260px; /* Sidebar ki jagah chorrna */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 900px;
+            height: 500px;
+            background: #1e293b;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #334155;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .coin {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fbbf24 0%, #d97706 100%);
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="p-8 text-indigo-400 font-bold text-2xl italic">COIN POP</div>
-        <nav class="px-4 space-y-2">
-            <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-            <a href="play.html" class="flex items-center p-3 bg-indigo-600 text-white rounded-xl"><i class="fas fa-gamepad mr-3"></i> Play Game</a>
+        <div class="px-8 py-10">
+            <h1 class="text-white font-black text-2xl italic tracking-tighter uppercase">Coin Pop</h1>
+        </div>
+        
+        <nav class="flex flex-col">
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="play.html" class="nav-link active"><i class="fas fa-gamepad"></i> Play Games</a>
+            <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
+            <a href="reward.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
+            
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
+
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
+            <a href="history.html" class="nav-link"><i class="fas fa-history"></i> History</a>
+            
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
+
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> My Profile</a>
+            <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Contact Us</a>
         </nav>
     </aside>
 
-    <div class="main">
-        <div class="flex justify-between items-center mb-4">
-            <div id="hearts" class="text-red-500 text-2xl font-bold tracking-widest">❤❤❤</div>
-            <div class="bg-slate-800 px-6 py-2 rounded-xl border border-slate-700 font-black text-indigo-400">
-                Coins: <span id="coin-txt">0</span>
+    <main class="main-content">
+        <div class="w-full max-w-4xl flex justify-between items-center mb-6 px-4">
+            <div id="lives" class="flex space-x-2">
+                <i class="fas fa-heart text-red-500 text-2xl"></i>
+                <i class="fas fa-heart text-red-500 text-2xl"></i>
+                <i class="fas fa-heart text-red-500 text-2xl"></i>
+            </div>
+            <div class="bg-indigo-600/30 px-6 py-2 rounded-2xl border border-indigo-500/50">
+                <span class="text-indigo-200 font-bold">Coins: </span>
+                <span id="game-coins" class="text-white font-black text-xl">0</span>
             </div>
         </div>
 
-        <div id="game-box">
-            <div id="start-overlay">
-                <button onclick="realStart()" class="bg-green-500 hover:bg-green-600 text-white px-12 py-4 rounded-2xl font-black text-2xl shadow-xl transition active:scale-95">
-                    START NOW
-                </button>
+        <div id="game-container">
+            <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 z-20">
+                <h2 class="text-white text-4xl font-black mb-6 uppercase tracking-widest">Click The Coins</h2>
+                <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-2xl font-black text-xl shadow-lg transition transform active:scale-90">START NOW</button>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // Use a more robust user initialization
-        let user;
-        try {
-            user = JSON.parse(localStorage.getItem('currentUser')) || { coins: 0, email: 'guest' };
-        } catch(e) {
-            user = { coins: 0, email: 'guest' };
+        let coins = 0;
+        let lives = 3;
+        let gameActive = false;
+        const container = document.getElementById('game-container');
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            gameActive = true;
+            spawnCoin();
         }
 
-        let playing = false;
-        let hp = 3;
+        function spawnCoin() {
+            if (!gameActive) return;
 
-        function refreshUI() {
-            document.getElementById('coin-txt').innerText = (user.coins || 0).toLocaleString();
-            let hStr = '';
-            for(let i=0; i<3; i++) hStr += i < hp ? '❤' : '🖤';
-            document.getElementById('hearts').innerText = hStr;
-        }
-
-        function realStart() {
-            document.getElementById('start-overlay').style.display = 'none';
-            playing = true;
-            hp = 3;
-            refreshUI();
-            addCoin();
-        }
-
-        function addCoin() {
-            if(!playing) return;
-            const box = document.getElementById('game-box');
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.innerHTML = '<i class="fas fa-coins text-2xl"></i>';
             
-            // Clear old coins manually for safety
-            const old = document.getElementsByClassName('target-coin');
-            while(old[0]) old[0].parentNode.removeChild(old[0]);
-
-            const c = document.createElement('div');
-            c.className = 'target-coin';
+            // Random Position
+            const x = Math.random() * (container.offsetWidth - 80);
+            const y = Math.random() * (container.offsetHeight - 80);
             
-            // Calculate random position
-            const x = Math.floor(Math.random() * (box.clientWidth - 70));
-            const y = Math.floor(Math.random() * (box.clientHeight - 70));
-            
-            c.style.left = Math.max(5, x) + 'px';
-            c.style.top = Math.max(5, y) + 'px';
-            c.innerHTML = '<i class="fas fa-coins text-white text-2xl pointer-events-none"></i>';
+            coin.style.left = x + 'px';
+            coin.style.top = y + 'px';
 
-            // Click listener
-            c.onpointerdown = function(e) {
-                e.stopPropagation();
-                user.coins = (parseInt(user.coins) || 0) + 5;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                localStorage.setItem('user_' + user.email, JSON.stringify(user));
-                refreshUI();
-                addCoin();
+            coin.onclick = () => {
+                coins += 10;
+                document.getElementById('game-coins').innerText = coins;
+                coin.remove();
+                spawnCoin();
+                updateUserCoins(10);
             };
 
-            box.appendChild(c);
+            container.appendChild(coin);
+
+            // Auto-remove if not clicked in 1.5 seconds
+            setTimeout(() => {
+                if (coin.parentNode) {
+                    coin.remove();
+                    loseLife();
+                }
+            }, 1500);
         }
 
-        // Missed click
-        document.getElementById('game-box').onpointerdown = function(e) {
-            if(!playing || e.target !== this) return;
-            hp--;
-            refreshUI();
-            if(hp <= 0) {
-                playing = false;
-                alert("GAME OVER! Your progress is saved.");
+        function loseLife() {
+            lives--;
+            const hearts = document.getElementById('lives').children;
+            if (hearts[lives]) hearts[lives].style.opacity = '0.2';
+            
+            if (lives <= 0) {
+                gameActive = false;
+                alert("Game Over! Total Coins Earned: " + coins);
                 location.reload();
+            } else {
+                spawnCoin();
             }
-        };
+        }
 
-        refreshUI();
+        function updateUserCoins(amount) {
+            let user = JSON.parse(localStorage.getItem('currentUser'));
+            if(user) {
+                user.coins = (user.coins || 0) + amount;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
+            }
+        }
     </script>
 </body>
 </html>
-<aside class="sidebar">
-    <div class="px-8 py-6 mb-4">
-        <h1 class="text-white font-black text-2xl italic tracking-tighter">COIN POP</h1>
-    </div>
-    
-    <nav class="flex-grow">
-        <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-        <a href="play.html" class="nav-link"><i class="fas fa-gamepad"></i> Play Games</a>
-        <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
-        <a href="rewards.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
-        
-        <div class="my-4 border-t border-slate-700 mx-6"></div> <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
-        <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
-        <a href="history.html" class="nav-link"><i class="fas fa-history"></i> History</a>
-        
-        <div class="my-4 border-t border-slate-700 mx-6"></div> <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> My Profile</a>
-        <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-        <a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Contact Us</a>
-    </nav>
-
-    <div class="px-6 mt-auto">
-        <a href="index.html" class="nav-link text-red-400"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-</aside>

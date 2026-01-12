@@ -7,9 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #0f172a; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: #0f172a; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
         
-        /* Sidebar Fix: Is se links line mein nahi balki niche ayenge */
+        /* Sidebar Fixed */
         .sidebar {
             width: 260px;
             background: #1e293b;
@@ -18,8 +18,7 @@
             left: 0;
             top: 0;
             display: flex;
-            flex-direction: column; /* Sabse important line */
-            padding: 0;
+            flex-direction: column;
             z-index: 1000;
         }
 
@@ -31,167 +30,149 @@
             font-weight: 600;
             text-decoration: none;
             transition: 0.3s;
-            border-left: 4px solid transparent;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background: rgba(99, 102, 241, 0.1);
-            color: white;
-            border-left: 4px solid #6366f1;
-        }
+        .nav-link.active { background: rgba(99, 102, 241, 0.1); color: white; border-left: 4px solid #6366f1; }
 
-        .nav-link i { width: 25px; margin-right: 12px; font-size: 1.1rem; }
+        .main-content { margin-left: 260px; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        .main-content {
-            margin-left: 260px; /* Sidebar ki jagah chorrna */
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
+        /* Game Box */
         #game-container {
-            width: 90%;
-            max-width: 900px;
+            width: 95%;
+            max-width: 850px;
             height: 500px;
             background: #1e293b;
-            border-radius: 2rem;
+            border-radius: 2.5rem;
             position: relative;
             overflow: hidden;
             border: 4px solid #334155;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            cursor: crosshair; /* Target jesa cursor */
         }
 
         .coin {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             background: radial-gradient(circle, #fbbf24 0%, #d97706 100%);
             border-radius: 50%;
             position: absolute;
-            cursor: pointer;
+            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 900;
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-            animation: popIn 0.3s ease-out;
-        }
-
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; }
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+            transition: transform 0.1s;
         }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="px-8 py-10">
-            <h1 class="text-white font-black text-2xl italic tracking-tighter uppercase">Coin Pop</h1>
-        </div>
-        
+        <div class="px-8 py-10"><h1 class="text-white font-black text-2xl italic tracking-tighter uppercase">Coin Pop</h1></div>
         <nav class="flex flex-col">
-            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="play.html" class="nav-link active"><i class="fas fa-gamepad"></i> Play Games</a>
-            <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
-            <a href="reward.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
-            
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
+            <a href="play.html" class="nav-link active"><i class="fas fa-gamepad mr-3"></i> Play Games</a>
+            <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra mr-3"></i> Lucky Spin</a>
+            <a href="reward.html" class="nav-link"><i class="fas fa-gift mr-3"></i> Daily Rewards</a>
             <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
-
-            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
-            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
-            <a href="history.html" class="nav-link"><i class="fas fa-history"></i> History</a>
-            
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy mr-3"></i> Leaderboard</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet mr-3"></i> Withdraw</a>
+            <a href="history.html" class="nav-link"><i class="fas fa-history mr-3"></i> History</a>
             <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
-
-            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> My Profile</a>
-            <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-            <a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Contact Us</a>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle mr-3"></i> Profile</a>
+            <a href="settings.html" class="nav-link"><i class="fas fa-cog mr-3"></i> Settings</a>
+            <a href="contact.html" class="nav-link"><i class="fas fa-headset mr-3"></i> Contact</a>
         </nav>
     </aside>
 
     <main class="main-content">
-        <div class="w-full max-w-4xl flex justify-between items-center mb-6 px-4">
-            <div id="lives" class="flex space-x-2">
+        <div class="w-full max-w-3xl flex justify-between items-center mb-6">
+            <div id="lives-container" class="flex space-x-2">
                 <i class="fas fa-heart text-red-500 text-2xl"></i>
                 <i class="fas fa-heart text-red-500 text-2xl"></i>
                 <i class="fas fa-heart text-red-500 text-2xl"></i>
             </div>
-            <div class="bg-indigo-600/30 px-6 py-2 rounded-2xl border border-indigo-500/50">
-                <span class="text-indigo-200 font-bold">Coins: </span>
-                <span id="game-coins" class="text-white font-black text-xl">0</span>
+            <div class="bg-white/10 px-6 py-2 rounded-2xl border border-white/10 text-white font-bold">
+                Coins: <span id="current-score" class="text-yellow-400">0</span>
             </div>
         </div>
 
-        <div id="game-container">
-            <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 z-20">
-                <h2 class="text-white text-4xl font-black mb-6 uppercase tracking-widest">Click The Coins</h2>
-                <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-2xl font-black text-xl shadow-lg transition transform active:scale-90">START NOW</button>
+        <div id="game-container" onclick="handleMisTouch(event)">
+            <div id="start-overlay" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center z-50">
+                <h2 class="text-white text-3xl font-black mb-6">DON'T MISS THE COINS!</h2>
+                <button onclick="startGame(event)" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-xl hover:bg-indigo-700">START GAME</button>
             </div>
         </div>
     </main>
 
     <script>
-        let coins = 0;
+        let score = 0;
         let lives = 3;
-        let gameActive = false;
+        let gameRunning = false;
         const container = document.getElementById('game-container');
 
-        function startGame() {
-            document.getElementById('start-screen').style.display = 'none';
-            gameActive = true;
+        function startGame(e) {
+            e.stopPropagation(); // Overlay click se mis-touch trigger na ho
+            document.getElementById('start-overlay').style.display = 'none';
+            gameRunning = true;
             spawnCoin();
         }
 
-        function spawnCoin() {
-            if (!gameActive) return;
+        function handleMisTouch(e) {
+            if (!gameRunning) return;
+            // Agar click direct container par hua (coin par nahi), to life kam karo
+            if (e.target.id === 'game-container') {
+                loseLife();
+                // Screen shake effect for mis-touch
+                container.style.borderColor = '#ef4444';
+                setTimeout(() => container.style.borderColor = '#334155', 200);
+            }
+        }
 
+        function spawnCoin() {
+            if (!gameRunning) return;
+            
             const coin = document.createElement('div');
             coin.className = 'coin';
-            coin.innerHTML = '<i class="fas fa-coins text-2xl"></i>';
+            coin.innerHTML = '<i class="fas fa-coins text-white text-2xl"></i>';
             
-            // Random Position
             const x = Math.random() * (container.offsetWidth - 80);
             const y = Math.random() * (container.offsetHeight - 80);
             
             coin.style.left = x + 'px';
             coin.style.top = y + 'px';
 
-            coin.onclick = () => {
-                coins += 10;
-                document.getElementById('game-coins').innerText = coins;
+            coin.onclick = (e) => {
+                e.stopPropagation(); // Mis-touch trigger hone se roko
+                score += 10;
+                document.getElementById('current-score').innerText = score;
+                updateUserCoins(10);
                 coin.remove();
                 spawnCoin();
-                updateUserCoins(10);
             };
 
             container.appendChild(coin);
 
-            // Auto-remove if not clicked in 1.5 seconds
+            // Time limit for each coin (increase difficulty)
             setTimeout(() => {
                 if (coin.parentNode) {
                     coin.remove();
                     loseLife();
+                    spawnCoin();
                 }
-            }, 1500);
+            }, 1200);
         }
 
         function loseLife() {
             lives--;
-            const hearts = document.getElementById('lives').children;
-            if (hearts[lives]) hearts[lives].style.opacity = '0.2';
+            const hearts = document.getElementById('lives-container').children;
+            if (hearts[lives]) {
+                hearts[lives].classList.replace('text-red-500', 'text-slate-600');
+            }
             
             if (lives <= 0) {
-                gameActive = false;
-                alert("Game Over! Total Coins Earned: " + coins);
+                gameRunning = false;
+                alert("Game Over! Score: " + score);
                 location.reload();
-            } else {
-                spawnCoin();
             }
         }
 

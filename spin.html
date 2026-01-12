@@ -2,83 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucky Spin - Coin Pop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .wheel-container { position: relative; width: 320px; height: 320px; margin: 0 auto; }
-        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #1e293b; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); background: conic-gradient(#6366f1 0deg 45deg, #a855f7 45deg 90deg, #6366f1 90deg 135deg, #a855f7 135deg 180deg, #6366f1 180deg 225deg, #a855f7 225deg 270deg, #6366f1 270deg 315deg, #a855f7 315deg 360deg); }
-        .pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #ef4444; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
+        body { background: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* Sidebar Fix: Vertically aligned links */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            border-left: 4px solid #6366f1;
+        }
+
+        .nav-link i { width: 25px; margin-right: 12px; }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* Wheel Container Fix */
+        .wheel-box {
+            background: white;
+            padding: 50px;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        #wheel {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 8px solid #1e293b;
+            margin: 0 auto 30px;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+            background: conic-gradient(
+                #6366f1 0deg 45deg, 
+                #a855f7 45deg 90deg, 
+                #6366f1 90deg 135deg, 
+                #a855f7 135deg 180deg,
+                #6366f1 180deg 225deg, 
+                #a855f7 225deg 270deg, 
+                #6366f1 270deg 315deg, 
+                #a855f7 315deg 360deg
+            );
+        }
+
+        .pointer {
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ef4444;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+        }
     </style>
 </head>
-<body class="bg-slate-50">
-    <main class="main-content flex flex-col items-center justify-center min-h-screen" style="margin-left:0;">
-        <h1 class="text-4xl font-black text-slate-800 mb-10">Lucky Spin</h1>
-        
-        <div class="wheel-container mb-12">
-            <div class="pointer"></div>
-            <div id="wheel"></div>
-        </div>
+<body>
 
-        <button onclick="spinWheel()" id="spin-btn" class="bg-indigo-600 text-white px-16 py-5 rounded-2xl font-black text-2xl shadow-2xl hover:bg-indigo-700 active:scale-95 transition">
-            SPIN FOR 10 COINS
-        </button>
-        
-        <a href="dashboard.html" class="mt-8 text-slate-400 font-bold hover:text-indigo-600">Back to Dashboard</a>
+    <aside class="sidebar">
+        <div class="px-8 py-10">
+            <h1 class="text-white font-black text-2xl italic tracking-tighter uppercase">Coin Pop</h1>
+        </div>
+        <nav class="flex flex-col flex-grow">
+            <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="play.html" class="nav-link"><i class="fas fa-gamepad"></i> Play Games</a>
+            <a href="spin.html" class="nav-link active"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
+            <a href="reward.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
+            <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
+            <div class="h-px bg-slate-700 my-4 mx-6 opacity-20"></div>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="wheel-box">
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Lucky Spin</h2>
+            <p class="text-slate-500 font-medium mb-8">Win up to 500 coins!</p>
+            
+            <div class="relative inline-block">
+                <div class="pointer"></div>
+                <div id="wheel"></div>
+            </div>
+
+            <button onclick="spinNow()" id="spin-btn" 
+                class="w-full mt-6 bg-indigo-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition active:scale-95">
+                SPIN FOR 10 COINS
+            </button>
+            
+            <p id="result" class="mt-4 font-bold text-indigo-600 text-xl h-8"></p>
+        </div>
     </main>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('currentUser'));
-        let spinning = false;
+        let isSpinning = false;
 
-        function spinWheel() {
-            if(spinning || user.coins < 10) {
-                alert("Not enough coins or already spinning!");
+        function spinNow() {
+            if (isSpinning) return;
+
+            let user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user || user.coins < 10) {
+                alert("Not enough coins to spin!");
                 return;
             }
 
-            spinning = true;
-            user.coins -= 10; // Fee for spinning
-            
-            const randomDeg = Math.floor(Math.random() * 360) + 3600; // 10 rotations + random
+            // Deduct 10 coins
+            user.coins -= 10;
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('result').innerText = "Spinning...";
+
             const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${randomDeg}deg)`;
+            const randomDegree = Math.floor(Math.random() * 360) + 3600; // Multi-spin effect
+            wheel.style.transform = `rotate(${randomDegree}deg)`;
 
             setTimeout(() => {
-                spinning = false;
-                const win = 20; // Fixed reward for this example, can be randomized
-                user.coins += win;
+                isSpinning = false;
+                document.getElementById('spin-btn').disabled = false;
+                
+                // Random Prize Logic
+                const prizes = [10, 50, 0, 100, 20, 500, 5, 200];
+                const winIndex = Math.floor(Math.random() * prizes.length);
+                const wonAmount = prizes[winIndex];
+
+                user.coins += wonAmount;
                 localStorage.setItem('currentUser', JSON.stringify(user));
                 localStorage.setItem(`user_${user.email}`, JSON.stringify(user));
-                alert(`You won ${win} Coins!`);
-                location.reload();
+
+                document.getElementById('result').innerText = wonAmount > 0 ? `You won ${wonAmount} coins! ✨` : "Better luck next time! 😢";
             }, 4000);
         }
     </script>
 </body>
 </html>
-<aside class="sidebar">
-    <div class="px-8 py-6 mb-4">
-        <h1 class="text-white font-black text-2xl italic tracking-tighter">COIN POP</h1>
-    </div>
-    
-    <nav class="flex-grow">
-        <a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
-        <a href="play.html" class="nav-link"><i class="fas fa-gamepad"></i> Play Games</a>
-        <a href="spin.html" class="nav-link"><i class="fas fa-dharmachakra"></i> Lucky Spin</a>
-        <a href="rewards.html" class="nav-link"><i class="fas fa-gift"></i> Daily Rewards</a>
-        
-        <div class="my-4 border-t border-slate-700 mx-6"></div> <a href="leaderboard.html" class="nav-link"><i class="fas fa-trophy"></i> Leaderboard</a>
-        <a href="withdraw.html" class="nav-link"><i class="fas fa-wallet"></i> Withdraw</a>
-        <a href="history.html" class="nav-link"><i class="fas fa-history"></i> History</a>
-        
-        <div class="my-4 border-t border-slate-700 mx-6"></div> <a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i> My Profile</a>
-        <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-        <a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Contact Us</a>
-    </nav>
-
-    <div class="px-6 mt-auto">
-        <a href="index.html" class="nav-link text-red-400"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-</aside>
